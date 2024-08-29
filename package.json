@@ -1,0 +1,23 @@
+{
+  "name": "gamenation",
+  "version": "1.0.0",
+  "description": "GameNation E-commerce web application",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ajaypalamkunnel/GameNation.git"
+  },
+  "author": "Ajayps",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ajaypalamkunnel/GameNation/issues"
+  },
+  "homepage": "https://github.com/ajaypalamkunnel/GameNation#readme",
+  "dependencies": {
+    "express": "^4.19.2",
+    "nodemon": "^3.1.4"
+  }
+}
