@@ -6,7 +6,7 @@ export const getAdminLogin = (req,res)=>{
         if(req.session.admin){
            return res.redirect('/admin/dashboardAdmin')
         }else{
-           return res.render('admin/loginAdmin')
+           return res.render('admin/loginAdmin',{msg:req.flash()})
         }
     } catch (error) {
         console.error(`Error from admin login: ${error}`);
@@ -14,7 +14,7 @@ export const getAdminLogin = (req,res)=>{
         return res.redirect('/admin/loginAdmin');
     }
 
-    res.render("admin/loginAdmin")
+    // res.render("admin/loginAdmin")
 }
 
 //---------------------- admin login post request ---------------------- 
@@ -26,7 +26,7 @@ export const loginPost = (req,res)=>{
           return  res.redirect('/admin/dashboard')
         }else{
             req.flash("error","invalid credential")
-            return  res.redirect('/admin/loginAdmin')
+            return  res.redirect('/admin/login')
         }
     } catch (error) {
         console.error("Error during admin login:", error);

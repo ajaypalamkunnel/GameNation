@@ -9,6 +9,7 @@ import userRouter from './routes/userRoutes.mjs'
 import session from 'express-session';
 import nocache from 'nocache'
 import flash from 'connect-flash'
+import layouts from 'express-ejs-layouts'
 
 
 
@@ -31,10 +32,10 @@ connectDB();
 
 
 
-
 //----------------------setting view engine--------------------------
 app.set('view engine','ejs');
 app.use(flash());
+
 
 
 //---------------------- public static files------------------------------
@@ -63,15 +64,18 @@ app.use(session({
 }))
 
 
+app.use(layouts)
+app.set('layout','./layouts/layout')
+
 //---------------------------- flash setup-------------------------------
 
 
 
-app.use((req, res, next) => {
-    res.locals.success_msg = req.flash('success_msg');
-    res.locals.error_msg = req.flash('error_msg');
-    next();
-});
+// app.use((req, res, next) => {
+//     res.locals.success_msg = req.flash('success_msg');
+//     res.locals.error_msg = req.flash('error_msg');
+//     next();
+// });
 
 
 
