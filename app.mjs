@@ -1,4 +1,4 @@
-//module require
+//---------------------- module require ---------------------------------
 
 import express from 'express'
 import connectDB from './config/db.mjs';
@@ -6,36 +6,72 @@ import dotenv from 'dotenv';
 import path from 'path';
 import adminRouter from './routes/adminRoutes.mjs';
 import userRouter from './routes/userRoutes.mjs'
-
-
+import session from 'express-session';
+import nocache from 'nocache'
+import flash from 'connect-flash'
 
 
 
 const app = express();
 
-//module require
+//---------------------- module require ---------------------------------
 
 
+//PORT
 
-//public static files
+const PORT = process.env.PORT || 3000
 
-app.use(express.static(path.resolve('public')));
-
-//public static files
-
-
-//url encoded data
-app.use(express.json())
-app.use(express.urlencoded({extended:true}))
-//url encoded data
+//PORT
 
 
 // Database connection
 connectDB();
 // Database connection
 
+
+
+
+
 //----------------------setting view engine--------------------------
 app.set('view engine','ejs');
+app.use(flash());
+
+
+//---------------------- public static files------------------------------
+
+app.use(express.static(path.resolve('public')));
+
+
+
+//---------------------- url encoded data ---------------------- 
+
+app.use(express.json())
+app.use(express.urlencoded({extended:true}))
+
+//---------------------- url encoded data ---------------------- 
+
+
+
+
+//---------------------------- middlewares -------------------------------
+
+app.use(nocache());
+app.use(session({
+    secret:"abc123",
+    resave:false,
+    saveUninitialized:false
+}))
+
+
+//---------------------------- flash setup-------------------------------
+
+
+
+app.use((req, res, next) => {
+    res.locals.success_msg = req.flash('success_msg');
+    res.locals.error_msg = req.flash('error_msg');
+    next();
+});
 
 
 
@@ -50,15 +86,6 @@ app.use("/",userRouter)
 
 
 
-
-
-
-
-//PORT
-
-const PORT = process.env.PORT || 3000
-
-//PORT
 
 
 

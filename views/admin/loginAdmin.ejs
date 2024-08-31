@@ -1,13 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="/css/style.css">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Login</title>
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body
+    class="bg-cover bg-center min-h-screen flex items-center justify-center"
+    style="background-image: url('/images/backgroundLogin.png')"
+  >
+    <div
+      class="bg- transparent bg-opacity-80 p-10 rounded-lg shadow-lg w-full max-w-md"
+    >
+      <div class="flex justify-center mb-6">
+        <img src="/images/logo.png" alt="Logo" class="h-16 w-26" />
+      </div>
+      <h1 class="text-2xl font-bold text-center text-white mb-8">
+        Admin Login
+      </h1>
 
-</head>
-<body class="w-full h-full bg-red-500">
-    <h1 class="">Login page</h1>
-</body> 
+      <form id="loginForm" action="/admin/login" method="POST">
+        <div class="mb-4">
+          <label for="username" class="block text-white font-medium mb-2"
+            >Username</label
+          >
+          <input
+            type="text"
+            id="username"
+            name="username"
+            required
+            class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <p id="usernameError" class="text-red-500 text-sm mt-1 hidden">
+            Username is required
+          </p>
+        </div>
+        
+        <div class="mb-6">
+          <label for="password" class="block text-white font-medium mb-2"
+            >Password</label
+          >
+          <input
+            type="password"
+            id="password"
+            name="password"
+            required
+            class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <p id="passwordError" class="text-red-500 text-sm mt-1 hidden">
+            Password is required
+          </p>
+        </div>
+        <button
+          type="submit"
+          class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition duration-200"
+        >
+          Login
+        </button>
+      </form>
+    </div>
+
+    <script>
+      // Client-side validation
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", function (event) {
+          let isValid = true;
+
+          // Validate Username
+          const username = document.getElementById("username");
+          const usernameError = document.getElementById("usernameError");
+          if (username.value.trim() === "") {
+            usernameError.classList.remove("hidden");
+            isValid = false;
+          } else {
+            usernameError.classList.add("hidden");
+          }
+
+          // Validate Password
+          const password = document.getElementById("password");
+          const passwordError = document.getElementById("passwordError");
+          if (password.value.trim() === "") {
+            passwordError.classList.remove("hidden");
+            isValid = false;
+          } else {
+            passwordError.classList.add("hidden");
+          }
+
+          // Prevent form submission if validation fails
+          if (!isValid) {
+            event.preventDefault();
+          }
+        });
+    </script>
+  </body>
 </html>
