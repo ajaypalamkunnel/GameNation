@@ -1,0 +1,187 @@
+<div class="flex items-center justify-center min-h-screen bg-cover bg-center" style="background-image: url('/images/backgroundLogin.png');">
+    <div class="w-full max-w-md bg-t bg-opacity-90 rounded-lg shadow-md p-8">
+        
+        <!-- Logo -->
+        <div class="flex justify-center mb-7">
+            <img src="/images/logo.png" alt="Logo" class="h-12 w-auto">
+        </div>
+
+        <!-- Signup Heading -->
+        <h2 class="text-2xl font-bold text-center mb-7">Sign Up</h2>
+
+        <!-- Signup Form -->
+        <form id="signupForm" action="/signup" method="POST" onsubmit="submitSignupForm(event)">
+            <!-- Username -->
+            <div class="mb-4">
+                <label for="username" class="block text-white">Username</label>
+                <input type="text" id="username" name="username" required class="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                <p id="usernameError" class="text-red-500 text-sm mt-1 hidden">Username must be between 3-20 characters and contain only letters, numbers, and underscores.</p>
+            </div>
+
+            <!-- Email -->
+            <div class="mb-4">
+                <label for="email" class="block text-white">Email</label>
+                <input type="email" id="email" name="email" required class="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                <p id="emailError" class="text-red-500 text-sm mt-1 hidden">Please enter a valid email address.</p>
+            </div>
+            
+            <!-- Password -->
+            <div class="mb-4">
+                <label for="password" class="block text-white">Password</label>
+                <input type="password" id="password" name="password" required class="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                <p id="passwordError" class="text-red-500 text-sm mt-1 hidden">Password must be at least 8 characters long and include a number, an uppercase letter, and a lowercase letter.</p>
+            </div>
+            
+            <!-- Confirm Password -->
+            <div class="mb-6">
+                <label for="confirmPassword" class="block text-white">Confirm Password</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" required class="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                <p id="confirmPasswordError" class="text-red-500 text-sm mt-1 hidden">Passwords do not match.</p>
+            </div>
+            
+            <!-- Signup Button -->
+            <button type="submit" class="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600">Sign Up</button>
+        </form>
+
+
+
+        <form id="otpForm" action="/verify-otp" method="POST" class="hidden" onsubmit="return submitOtpForm(event)">
+            <div class="mb-4">
+                <label for="otp" class="block text-white">Enter OTP</label>
+                <input type="text" id="otp" name="otp" required class="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                <p id="otpError" class="text-red-500 text-sm mt-1 hidden">Invalid OTP. Please try again.</p>
+            </div>
+            <button type="submit" class="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600">Verify OTP</button>
+        </form>
+
+
+
+
+
+
+        <!-- Sign In Link -->
+        <p class="text-center mt-4 text-white">
+            Already have an Account? 
+            <a href="/signin" class="text-blue-500 hover:text-blue-700">Sign In here.</a>
+        </p>
+
+        <!-- Signup with Others -->
+        <p class="text-center mt-6 text-white">or sign up with</p>
+
+        <!-- Social Login Buttons -->
+        <div class="flex justify-between mt-4">
+            <!-- Google Button -->
+            <button class="flex items-center justify-center w-1/2 mr-2 bg-transparent text-white py-2 rounded-md border border-white hover:bg-white hover:text-red-500 transition-colors duration-300">
+                <i class="bi bi-google mr-2"></i>
+                Google
+            </button>
+       
+            <!-- Facebook Button -->
+            <button class="flex items-center justify-center w-1/2 ml-2 bg-transparent text-white py-2 rounded-md border border-white hover:bg-white hover:text-blue-600 transition-colors duration-300">
+                <i class="bi bi-facebook mr-2"></i>
+                Facebook
+            </button>
+        </div>
+        
+    </div>
+</div>
+
+<script>
+
+    function submitSignupForm(event){
+        event.preventDefault();
+
+        if(!validateForm()){
+            return;
+        }
+
+         // If valid, send a POST request to the backend to initiate OTP process
+
+         fetch('/signup',{
+            method:'POST',
+            body: new FormData(document.getElementById('signupForm'))
+         })
+
+         .then(response =>response.json())
+         .then(data=>{
+            if(data.success){
+                //Hide signup form and show OTP form
+                document.getElementById('signupForm').classList.add('hidden');
+                document.getElementById('otpForm').classList.remove('hidden');
+
+            }else{
+                // Handle signup error (e.g., email already exists)
+                document.getElementById('signupError').textContent = data.message || 'Signup failed. Please try again.';
+                document.getElementById('signupError').classList.remove('hidden');
+            }
+         })
+
+    }
+
+    function submitOtpForm(event){
+        event.preventDefault();
+
+        fetch('/verify-otp',{
+            method:'POST',
+            body: new FormData(document.getElementById('otpForm'))
+        })
+        .then(response => response.json())
+        .then(data=>{
+            if(data.success){
+                 // Redirect to login or dashboard
+                 window.location.href = '/dashboard';
+            }else{
+                // Show OTP error
+                document.getElementById('otpError').textContent = data.message || 'Invalid OTP. Please try again.';
+                document.getElementById('otpError').classList.remove('hidden');  
+            }
+        })
+
+    }
+
+
+
+    function validateForm() {
+        // Clear previous error messages
+        document.getElementById("usernameError").classList.add("hidden");
+        document.getElementById("emailError").classList.add("hidden");
+        document.getElementById("passwordError").classList.add("hidden");
+        document.getElementById("confirmPasswordError").classList.add("hidden");
+
+        // Get form values
+        const username = document.getElementById("username").value;
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+        const confirmPassword = document.getElementById("confirmPassword").value;
+
+        // Validate username format
+        const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
+        if (!usernameRegex.test(username)) {
+            document.getElementById("usernameError").classList.remove("hidden");
+            return false;
+        }
+
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            document.getElementById("emailError").classList.remove("hidden");
+            return false;
+        }
+
+        // Validate strong password
+        const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+        if (!passwordRegex.test(password)) {
+            document.getElementById("passwordError").classList.remove("hidden");
+            return false;
+        }
+
+        // Validate confirm password
+        if (password !== confirmPassword) {
+            document.getElementById("confirmPasswordError").classList.remove("hidden");
+            return false;
+        }
+
+        // If all validations pass, allow form submission
+        return true;
+    }
+</script>
