@@ -1,6 +1,6 @@
 import express from 'express';
 const adminRouter = express.Router();
-import { getAdminLogin,loginPost,dashboard } from '../controller/adminController/adminController.mjs';
+import { getAdminLogin,loginPost,dashboard,addCategory,addCategoryPost } from '../controller/adminController/adminController.mjs';
 
 //------------------------------------  Login  ------------------------------------------------
 
@@ -16,6 +16,10 @@ adminRouter.post('/login',loginPost)
 adminRouter.get('/dashboard',dashboard)
 
 
+//------------------------------------  add category ------------------------------------------------
+
+adminRouter.get('/addCategory',addCategory)
+adminRouter.post('/addCategory',addCategoryPost)
 
 
 

@@ -1,4 +1,5 @@
-
+import category from "../../model/categoryScehema.mjs";
+import mongoose from "mongoose";
 //---------------------- admin login get request ---------------------- 
 export const getAdminLogin = (req,res)=>{
 
@@ -6,7 +7,7 @@ export const getAdminLogin = (req,res)=>{
         if(req.session.admin){
            return res.redirect('/admin/dashboardAdmin')
         }else{
-           return res.render('admin/loginAdmin',{msg:req.flash()})
+           return res.render('admin/loginAdmin',{msg:req.flash(),title:'AdminLogin'})
         }
     } catch (error) {
         console.error(`Error from admin login: ${error}`);
@@ -38,5 +39,57 @@ export const loginPost = (req,res)=>{
 
 
 export const dashboard = (req,res)=>{
-    res.render('admin/dashboardAdmin')
+    try {
+        if(req.session.admin){
+            res.render('admin/dashboardAdmin',{title:"AdminHome"})
+        }else{
+            res.redirect('/admin/login')
+        }
+    } catch (error) {
+        
+    }
+}
+
+
+
+//---------------------------- user login -------------------------------------
+
+
+export const addCategory = (req,res)=>{
+    try {
+        if(req.session.admin){
+            res.render('admin/addCategory',{title:"Add category",admin:req.session.admin})
+        }else{
+            res.redirect('admin/login')
+        }
+    } catch (error) {
+    console.log(`error while rendering add category ${error} `)
+        
+    }
+}
+
+
+export const addCategoryPost = async (req,res)=>{
+    
+
+    try {
+        const {categoryName,isBlocked} = req.body;
+
+        const newCategory = new category({
+            collectionName: categoryName,
+            isActive:isBlocked==='true'
+        })
+
+        await newCategory.save()
+       return res.redirect('addCategory/?success=true')
+        
+    } catch (error) {
+
+        console.log("Error adding category:", error);
+
+        res.redirect('/addCategory?success=false')
+        
+        
+    }
+
 }

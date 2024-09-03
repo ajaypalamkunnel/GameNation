@@ -1,3 +1,13 @@
 <!-- views/admin/dashboardAdmin.ejs -->
 <%- include('adminHeader') %>
-<h1>admin home</h1>
+
+<div style="display: flex; height: 100vh;">
+    <!-- Sidebar -->
+    <%- include('sidebar') %>
+
+    <!-- Main Content -->
+    <div style="flex-grow: 1; padding: 20px; background-color: #1C1C1C; color: #FFFFFF;">
+        <h1>Admin Home</h1>
+        <!-- Other content goes here -->
+    </div>
+</div>

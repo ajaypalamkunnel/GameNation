@@ -5,12 +5,15 @@ import nodemailer from 'nodemailer'
 //---------------------- user signup get request ---------------------- 
 
 export const getSignUp = (req,res)=>{
-    try {
-       return res.render('user/signup') 
-    } catch (error) {
-        console.log("error");
-        
+   try {
+    if(req.session.user){
+        res.redirect('/home')
+    }else{
+        res.render('user/signup',{title:'signup',user:req.session.user})
     }
+   } catch (error) {
+    console.log(`error while rendering signup page ${error} `)
+  }
 }
 
 
@@ -24,8 +27,8 @@ async function sendOtpEmail(email,otp){
     const transporter = nodemailer.createTransport({
             service:'Gmail',
             auth:{
-                user:'ajaypalamkunnel45@gmail.com',
-                pass: '26334945'
+                user:'gamenationproject@gmail.com',
+                pass: 'cjhu vavt wglz yrzp'
             }
         });
 
@@ -74,4 +77,26 @@ export const signupPost = async(req,res)=>{
     } catch (error) {
         
     }
+}
+
+export const verifyOtp = (req,res)=>{
+
+}
+
+
+
+//---------------------------- user login -------------------------------------
+
+
+export const getLogin = (req,res)=>{
+    if(req.session.user){
+        res.redirect('/home')
+    }else{
+        res.render('user/login',{title:'Login',user:req.session.user})
+    }
+}
+
+
+export const loginPost = (req,res)=>{
+
 }

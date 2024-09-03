@@ -1,8 +1,8 @@
 import express from 'express';
-import {getLogin,loginPost , verifyOtp  } from '../controller/userController/userController.mjs';
+import {   } from '../controller/userController/userController.mjs';
 const userRouter = express.Router()
 
-import {getSignUp,signupPost} from '../controller/userController/userAuth.mjs'
+import {getSignUp,signupPost, verifyOtp,getLogin,loginPost} from '../controller/userController/userAuth.mjs'
 
 
 
