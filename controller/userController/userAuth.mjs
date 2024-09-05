@@ -128,13 +128,44 @@ export const signupPost = async(req,res)=>{
         console.error(`Error during signup: ${error}`);
         return res.status(500).json({
             success: false,
-            message: 'Server error. Please try again later.'
+            message: 'Server error. Please try again later.',
+            email: newUser.email
+
         });
         
     }
 }
 
-export const verifyOtp = (req,res)=>{
+export const verifyOtp = async (req,res)=>{
+
+    const {email,otp} = req.body;
+    console.log("----",email,"------",otp);
+
+    try {
+        const user = await User.findOne({email});
+
+        if(!user){
+            return res.status(400).json({success:false,message:"user not found"})
+        }
+
+        if(user.otp === otp && user.otpExpiry > Date.now()){
+            user.isVerified=true;
+            user.otp = undefined;
+            user.otpExpiry=undefined;
+            await user.save();
+            req.session.user = email
+           return res.status(200).json({success:true,message:"OTP verified, account activated"})
+        }else{
+           return res.status(400).json({success:false,message:"Invalid or expired OTP"})
+        }
+
+    } catch (error) {
+        res.status(500).json({success:false,message:"server error",error})
+        
+    }
+
+
+    
 
 }
 

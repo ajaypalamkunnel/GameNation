@@ -12,7 +12,7 @@
         </div>
         <!-- Flash Messages -->
         <div id="signupError" class="bg-red-500 text-white text-center py-2 rounded-md mb-4 hidden"></div>
-
+       
         <!-- Success Message -->
 <% if (typeof success_msg !== 'undefined' && success_msg.length > 0) { %>
     <div class="bg-green-500 text-white text-center py-2 rounded-md mb-4">
@@ -68,7 +68,7 @@
 
 
 
-        <form id="otpForm" action="/verify-otp" method="POST" class="hidden" onsubmit="return submitOtpForm(event)">
+        <form id="otpForm"  method="POST" class="hidden" onsubmit="return submitOtpForm(event)">
             <div class="mb-4">
                 <label for="otp" class="block text-white">Enter OTP</label>
                 <input type="text" id="otp" name="otp" required class="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
@@ -140,8 +140,21 @@
             
             if(data.success){
                 //Hide signup form and show OTP form
-                document.getElementById('signupForm').classList.add('hidden');
-                document.getElementById('otpForm').classList.remove('hidden');
+
+                const successMessageDiv = document.createElement('div');
+                successMessageDiv.classList.add('bg-green-500', 'text-white', 'text-center', 'py-2', 'rounded-md', 'mb-4')
+                successMessageDiv.textContent = data.message || 'OTP sent to email. Please check your inbox.';
+                document.querySelector('.w-full.max-w-md').insertBefore(successMessageDiv, document.getElementById('signupForm'));
+
+                setTimeout(()=>{
+                    successMessageDiv.remove();
+                    document.getElementById('signupForm').classList.add('hidden');
+                    document.getElementById('otpForm').classList.remove('hidden');
+
+                },2000)
+
+
+
 
             }else{
                 // Handle signup error (e.g., email already exists)
@@ -155,15 +168,25 @@
     function submitOtpForm(event){
         event.preventDefault();
 
+        const otpFormData = new FormData(document.getElementById('otpForm'));
+        const otpData = Object.fromEntries(otpFormData.entries()) 
+        const email = document.getElementById('email').value
+
         fetch('/verify-otp',{
             method:'POST',
-            body: new FormData(document.getElementById('otpForm'))
+            headers:{
+                "content-Type":"application/json",
+            },
+            body:JSON.stringify({
+                otp:otpData.otp,
+                email:email
+            })
         })
         .then(response => response.json())
         .then(data=>{
             if(data.success){
                  // Redirect to login or dashboard
-                 window.location.href = '/dashboard';
+                 window.location.href = '/home';
             }else{
                 // Show OTP error
                 document.getElementById('otpError').textContent = data.message || 'Invalid OTP. Please try again.';
