@@ -114,3 +114,30 @@ export const categoryView = async(req,res)=>{
         res.status(500).send('Internal Server Error');
     }
 }
+
+export const updateCategory = async(req,res)=>{
+
+        const {id} = req.params;
+        const {name,isBlocked} = req.body;
+
+    try {
+
+        const result = await category.findByIdAndUpdate(
+            id,
+            {collectionName:name, isActive:isBlocked},
+            {new:true}
+        )
+
+        if(!result){
+            return res.status(404).json({ message: 'Category not found' });
+        }
+
+        res.status(200).json({message:"category updated succesfully",category:result})
+        
+    } catch (error) {
+
+        console.error('Error updating category:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+        
+    }
+}

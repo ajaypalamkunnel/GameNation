@@ -1,7 +1,7 @@
 import express from 'express';
 import { isAdmin } from '../middleware/adminSession.mjs';
 const adminRouter = express.Router();
-import { getAdminLogin,loginPost,dashboard,addCategory,addCategoryPost,categoryView } from '../controller/adminController/adminController.mjs';
+import { getAdminLogin,loginPost,dashboard,addCategory,addCategoryPost,categoryView,updateCategory } from '../controller/adminController/adminController.mjs';
 
 //------------------------------------  Login  ------------------------------------------------
 
@@ -22,6 +22,7 @@ adminRouter.get('/dashboard',dashboard)
 adminRouter.get('/category',isAdmin,categoryView)
 adminRouter.get('/addCategory',addCategory)
 adminRouter.post('/addCategory',addCategoryPost)
+adminRouter.patch('/updateCategory/:id',updateCategory)
 
 
 
