@@ -4,7 +4,13 @@ export default {
     "./views/**/*.ejs",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        'custom-green': '#1DB954', // Replace with your hex color
+        'custom-blue': '#3490dc',
+        'custom-yellow':'#8a913f'
+      },
+    },
   },
   plugins: [],
 }

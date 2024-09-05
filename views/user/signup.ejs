@@ -1,16 +1,39 @@
 <div class="flex items-center justify-center min-h-screen bg-cover bg-center" style="background-image: url('/images/backgroundLogin.png');">
     <div class="w-full max-w-md bg-t bg-opacity-90 rounded-lg shadow-md p-8">
+        <!-- Signup Error (dynamic error for form submission) -->
+        
+        
+        
+        
         
         <!-- Logo -->
         <div class="flex justify-center mb-7">
             <img src="/images/logo.png" alt="Logo" class="h-12 w-auto">
         </div>
+        <!-- Flash Messages -->
+        <div id="signupError" class="bg-red-500 text-white text-center py-2 rounded-md mb-4 hidden"></div>
+
+        <!-- Success Message -->
+<% if (typeof success_msg !== 'undefined' && success_msg.length > 0) { %>
+    <div class="bg-green-500 text-white text-center py-2 rounded-md mb-4">
+        <%= success_msg %>
+    </div>
+<% } %>
+
+
+
+<!-- Error Message -->
+<% if (typeof error_msg !== 'undefined' && error_msg.length > 0) { %>
+    <div class="bg-red-500 text-white text-center py-2 rounded-md mb-4">
+        <%= error_msg %>
+    </div>
+<% } %>
 
         <!-- Signup Heading -->
-        <h2 class="text-2xl font-bold text-center mb-7">Sign Up</h2>
+        <h2 class="text-2xl text-white font-bold text-center mb-7">Sign Up</h2>
 
         <!-- Signup Form -->
-        <form id="signupForm" action="/signup" method="POST" onsubmit="submitSignupForm(event)">
+        <form id="signupForm" method="POST" onsubmit="submitSignupForm(event)">
             <!-- Username -->
             <div class="mb-4">
                 <label for="username" class="block text-white">Username</label>
@@ -96,14 +119,25 @@
         }
 
          // If valid, send a POST request to the backend to initiate OTP process
-
+         const formData = new FormData(document.getElementById('signupForm'));
+         const data = Object.fromEntries(formData.entries())
+         console.log(data);
+         
          fetch('/signup',{
             method:'POST',
-            body: new FormData(document.getElementById('signupForm'))
+            headers: {
+                "Content-Type": "application/json",
+              },
+            body:JSON.stringify({
+                username:data.username,
+                email:data.email,
+                password:data.password
+            })
          })
-
          .then(response =>response.json())
          .then(data=>{
+            console.log("dsfsdfsdafsdafsda",data);
+            
             if(data.success){
                 //Hide signup form and show OTP form
                 document.getElementById('signupForm').classList.add('hidden');

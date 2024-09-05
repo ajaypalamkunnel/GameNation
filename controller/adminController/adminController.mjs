@@ -60,7 +60,7 @@ export const addCategory = (req,res)=>{
         if(req.session.admin){
             res.render('admin/addCategory',{title:"Add category",admin:req.session.admin})
         }else{
-            res.redirect('admin/login')
+            res.redirect('/admin/login')
         }
     } catch (error) {
     console.log(`error while rendering add category ${error} `)
@@ -92,4 +92,25 @@ export const addCategoryPost = async (req,res)=>{
         
     }
 
+}
+
+
+
+export const categoryView = async(req,res)=>{
+    try {
+        // Fetch all categories from the database
+        const categories = await category.find({})
+
+        // Render the view and pass the categories data
+
+        res.render('admin/category',{
+            title:"Category",
+            admin:req.session.admin,
+            categories
+        })
+
+    } catch (error) {
+        console.error('Error fetching categories:', error);
+        res.status(500).send('Internal Server Error');
+    }
 }
