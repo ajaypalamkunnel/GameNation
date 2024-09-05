@@ -178,11 +178,40 @@ export const getLogin = (req,res)=>{
     if(req.session.user){
         res.redirect('/home')
     }else{
-        res.render('user/login',{title:'Login',user:req.session.user})
+        res.render('user/login',{ error_msg: req.flash('error'),title:'Login',user:req.session.user})
     }
 }
 
 
-export const loginPost = (req,res)=>{
+export const loginPost = async(req,res)=>{
+
+    try {
+        const user = await User.findOne({email:req.body.email})
+        if(user){
+
+            if(!user.isVerified){
+                req.flash('error','user access is blocked by admin');
+                res.redirect('/login')
+    
+            }else{
+                const password = await bcrypt.compare(req.body.password,user.password)
+                
+                if(user && password){
+                    req.session.user = user.email;
+                    res.redirect('/home')
+                }else{
+                    req.flash('error','Invalid credentitals');
+                    res.redirect('/login')
+                }
+            }
+        }else{
+            req.flash('error','coudnt find user, please login again');
+            res.redirect('/login')
+        }
+        
+    } catch (error) {
+        console.log(`errror while login post ${error}`);
+        
+    }
 
 }
