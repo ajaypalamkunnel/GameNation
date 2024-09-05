@@ -905,10 +905,6 @@ video {
   fill: #fff;
 }
 
-.fill-red-500 {
-  fill: #ef4444;
-}
-
 .p-10 {
   padding: 2.5rem;
 }
@@ -1135,10 +1131,6 @@ video {
 
 .hover\:fill-red-500:hover {
   fill: #ef4444;
-}
-
-.hover\:fill-red-700:hover {
-  fill: #b91c1c;
 }
 
 .hover\:text-blue-600:hover {

@@ -110,7 +110,7 @@
 
     const updateButton = modal.querySelector('#updateCategoryButton');
 
-    updateButton.onClick = async ()=>{
+    updateButton.onclick = async ()=>{
       const updatedName = nameInput.value;
       const updatedIsBlocked = isBlockedSelect.value === 'true';
 
@@ -146,7 +146,7 @@
   document.querySelectorAll('button[id="editCategory"]').forEach(button=>{
     button.addEventListener('click',()=>{
 
-      console.log("heiiiiiiiiiii");
+     
       
 
       const id = button.dataset.id;
@@ -158,8 +158,9 @@
     })
   })
 
+  
    // Close modal functionality
-   document.querySelector('#editCategoryModal #closeModal').addEventListener('click', () => {
+   document.querySelector('#closeModal').addEventListener('click', () => {
     document.querySelector('#editCategoryModal').classList.add('hidden');
   });
 
