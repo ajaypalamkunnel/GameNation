@@ -2,6 +2,7 @@ import User from "../../model/userSchema.mjs";
 import crypto from 'crypto';
 import nodemailer from 'nodemailer'
 import bcrypt from 'bcrypt'
+import passport from "passport";
 //---------------------- user signup get request ---------------------- 
 
 export const getSignUp = (req,res)=>{
@@ -215,3 +216,42 @@ export const loginPost = async(req,res)=>{
     }
 
 }
+
+
+//----------------------------------- google auth  ----------------------------
+
+export const googleAuth = passport.authenticate('google', {
+    scope: ['email', 'profile']
+  });
+  
+//----------------------------------- google auth callback  ----------------------------
+
+
+export const googleAuthCallback = (req, res, next) => {
+    passport.authenticate('google', (err, user, info) => {
+      if (err) {
+        console.log(`Error on Google auth callback: ${err}`);
+        req.flash('error_msg', 'Something went wrong during authentication.');
+        return res.redirect('/login');
+      }
+  
+      if (!user) {
+        req.flash('error_msg', 'No user found with this Google account.');
+        return res.redirect('/login');
+      }
+  
+      req.logIn(user, (err) => {
+        if (err) {
+          console.log(`Login error: ${err}`);
+          req.flash('error_msg', 'Failed to log you in.');
+          return res.redirect('/login');
+        }
+  
+        // Store user in the session
+        req.session.user = user;
+        req.flash('success_msg', 'Successfully logged in with Google!');
+        return res.redirect('/home');
+      });
+    })(req, res, next); // Make sure to pass next here
+  };
+  

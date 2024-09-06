@@ -11,7 +11,8 @@ import session from "express-session";
 import nocache from "nocache";
 import flash from "connect-flash";
 import layouts from "express-ejs-layouts";
-
+import passport from "passport";
+import passportSetup from './services/auth.mjs'
 //---------------------- module require ---------------------------------
 const app = express();
 
@@ -63,6 +64,12 @@ app.use((req, res, next) => {
   next();
 });
 
+//---------------------------- passport setup-------------------------------
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+
 //routes
 
 app.use(nocache());
@@ -71,6 +78,8 @@ app.use("/admin", adminRouter);
 app.use("/", userRouter);
 
 //routes
+
+
 
 //server listening
 

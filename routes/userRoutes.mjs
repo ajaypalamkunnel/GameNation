@@ -2,9 +2,11 @@ import express from 'express';
 import {   } from '../controller/userController/userController.mjs';
 const userRouter = express.Router()
 
-import {getSignUp,signupPost, verifyOtp,getLogin,loginPost} from '../controller/userController/userAuth.mjs'
+import {getSignUp,signupPost, verifyOtp,getLogin,loginPost,googleAuth,googleAuthCallback} from '../controller/userController/userAuth.mjs'
+// import {} '../services/auth.mjs'
 
 import { home } from '../controller/userController/userController.mjs'; 
+import passport from 'passport';
 
 //----------------------------- login -------------------------------
 
@@ -20,6 +22,35 @@ userRouter.post('/signup',signupPost)
 
 //----------------------------- OTP verification -------------------------------
 userRouter.post('/verify-otp', verifyOtp)
+
+
+
+
+
+
+
+
+//----------------------------- Google authentication -------------------------------
+
+
+userRouter.get('/auth/google',googleAuth)
+userRouter.get('/auth/google/callback', googleAuthCallback);
+
+
+// userRouter.get('/auth/google',googleAuth);
+
+// userRouter.get(
+//     '/auth/google/callback',
+//     passport.authenticate('google',{failureRedirect:'/'}),
+//     (req,res)=>{
+//         res.redirect('/home')
+//     }
+// )
+
+
+
+
+
 
 
 
