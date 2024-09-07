@@ -41,7 +41,7 @@ const productSchema = mongoose.Schema({
         required: true
       },
       playable_on: {
-        type: [String],
+        type: String,
         required: true
       },
       PEGI_rating: {
