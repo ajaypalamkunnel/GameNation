@@ -2,7 +2,7 @@ import express from 'express';
 import { isAdmin } from '../middleware/adminSession.mjs';
 const adminRouter = express.Router();
 import { getAdminLogin,loginPost,dashboard,addCategory,addCategoryPost,categoryView,updateCategory,customers,toggleVerification } from '../controller/adminController/adminController.mjs';
-
+import { addProduct } from '../controller/adminController/productController.mjs';
 //------------------------------------  Login  ------------------------------------------------
 
 adminRouter.get('/login',getAdminLogin)
@@ -27,10 +27,15 @@ adminRouter.patch('/updateCategory/:id',updateCategory)
 
 
 
-//-----------------------------display user-------------------------------
+//-----------------------------display Category-------------------------------
 adminRouter.get('/customers',customers)
 adminRouter.post('/toggleVerification',toggleVerification)
 
+
+
+//-----------------------------Products routes-------------------------------
+
+adminRouter.get('/addProduct',addProduct)
 
 
 
