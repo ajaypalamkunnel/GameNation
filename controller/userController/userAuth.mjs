@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import nodemailer from 'nodemailer'
 import bcrypt from 'bcrypt'
 import passport from "passport";
+import { title } from "process";
 //---------------------- user signup get request ---------------------- 
 
 export const getSignUp = (req,res)=>{
@@ -254,4 +255,6 @@ export const googleAuthCallback = (req, res, next) => {
       });
     })(req, res, next); // Make sure to pass next here
   };
+
+
   

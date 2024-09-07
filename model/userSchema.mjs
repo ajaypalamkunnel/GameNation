@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-
+import addressSchema from './addressSchema.mjs'
 
 const userSchema = mongoose.Schema(
     {
@@ -20,6 +20,10 @@ const userSchema = mongoose.Schema(
         },
         phone:{
             type:Number
+        },
+        address:{
+            type:[addressSchema],
+            default:[]
         },
         otp:{
             type:String

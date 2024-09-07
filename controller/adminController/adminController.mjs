@@ -1,4 +1,5 @@
 import category from "../../model/categoryScehema.mjs";
+import User from "../../model/userSchema.mjs";
 import mongoose from "mongoose";
 //---------------------- admin login get request ---------------------- 
 export const getAdminLogin = (req,res)=>{
@@ -139,5 +140,62 @@ export const updateCategory = async(req,res)=>{
         console.error('Error updating category:', error);
         res.status(500).json({ message: 'Internal Server Error' });
         
+    }
+}
+
+
+
+
+export const customers = async(req,res)=>{
+
+    try {
+        if(req.session.admin){
+
+            const page = parseInt(req.query.page)||1;
+            const limit = parseInt(req.query.limit)||5;
+
+            const skip = (page-1) * limit;
+
+            const totalUsers = await User.countDocuments({});
+
+
+            const users = await User.find({}).skip(skip).limit(limit);
+
+            const totalPages = Math.ceil(totalUsers/limit);
+            res.render('admin/customers',{
+                title:'customers',users,
+                users:users,
+                currentPage:page,
+                totalPages:totalPages,
+                limit:limit
+
+            });
+
+        }else{
+            res.redirect('/admin/login')
+        }
+    } catch (error) {
+        console.log(`error while rendering add customers ${error} `)
+        
+    }
+   
+   }
+
+
+
+export const toggleVerification = async(req,res)=>{
+    const {userId,isVerified} = req.body;
+    try {
+        console.log(isVerified);
+        
+    //    const resss = await User.findOneAndUpdate({email:email},{isVerified:isVerified})
+        await User.updateOne({_id:userId},{$set:{isVerified:isVerified}})
+       
+       
+        res.json({success:true})      
+    } catch (error) {
+        console.log(`Error while updating verification status: ${error}`);
+        res.status(500).json({success:false,message:'Failed to update status'});
+        res.json({success:false})
     }
 }

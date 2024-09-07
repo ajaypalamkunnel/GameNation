@@ -37,26 +37,19 @@ userRouter.get('/auth/google',googleAuth)
 userRouter.get('/auth/google/callback', googleAuthCallback);
 
 
-// userRouter.get('/auth/google',googleAuth);
-
-// userRouter.get(
-//     '/auth/google/callback',
-//     passport.authenticate('google',{failureRedirect:'/'}),
-//     (req,res)=>{
-//         res.redirect('/home')
-//     }
-// )
-
-
-
-
-
-
-
-
+        
+        
+        
+        
+        
+        
+        
 //----------------------------- Home -------------------------------
-
-
+        
 userRouter.get('/home',home)
+
+
+
+
 
 export default userRouter
