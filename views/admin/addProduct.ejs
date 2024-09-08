@@ -12,6 +12,8 @@
           <label class="absolute left-3 top-[-10px] bg-[#1f1f1f] px-2 text-sm text-white">Product Name</label>
           <input required id="product_name" type="text" name="product_name" placeholder="Enter Product Name" class="w-full rounded border border-gray-700 bg-black text-white px-4 py-3 focus:outline-none focus:border-blue-500" />
         </div>
+        
+
 
         <div class="relative">
           <label class="absolute left-3 top-[-10px] bg-[#1f1f1f] px-2 text-sm text-white">Release Date</label>
@@ -50,6 +52,10 @@
           <label class="absolute left-3 top-[-10px] bg-[#1f1f1f] px-2 text-sm text-white">PEGI Rating</label>
           <input required min="0" id="PEGI" name="PEGI_rating" type="number" placeholder="Enter age limit" class="w-full rounded border border-gray-700 bg-black text-white px-4 py-3 focus:outline-none focus:border-blue-500" />
         </div>
+
+
+       
+        
 
         <div class="relative">
           <label class="absolute left-3 top-[-10px] bg-[#1f1f1f] px-2 text-sm text-white">Quantity</label>
@@ -103,6 +109,42 @@
             <textarea required id="product_description" name="discription" placeholder="Type Description" class="mx-auto block w-full max-w-md rounded border border-gray-300 text-white bg-black p-4 text-sm outline-[#007bff]" rows="4"></textarea>
           </div>
 
+
+          <!-- Spinner -->
+          <div id="spinner" class=" hidden fixed inset-0 flex justify-center items-center z-[1000]">
+            <svg  xmlns="http://www.w3.org/2000/svg" class="w-10 animate-spin  fill-blue-600 block mx-auto "
+        viewBox="0 0 24 24">
+        <path
+          d="M12 22c5.421 0 10-4.579 10-10h-2c0 4.337-3.663 8-8 8s-8-3.663-8-8c0-4.336 3.663-8 8-8V2C6.579 2 2 6.58 2 12c0 5.421 4.579 10 10 10z"
+          data-original="#000000" />
+      </svg>
+  
+          </div>
+
+
+
+<!-- Success Modal -->
+
+
+<div id="successModal" class=" hidden fixed inset-0 flex justify-center items-center z-[1000]">
+  <!-- Modal Background Overlay -->
+  <div class="absolute inset-0 bg-[rgba(0,0,0,0.5)]"></div>
+  
+  <!-- Modal Content -->
+  <div class="relative w-full max-w-md bg-gray-800 shadow-lg rounded-lg p-6 text-center z-[1001]">
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-20 h-20 fill-green-500 absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2" viewBox="0 0 60 60">
+      <circle cx="30" cy="30" r="29" />
+      <path fill="#fff" d="m24.262 42.07-6.8-6.642a1.534 1.534 0 0 1 0-2.2l2.255-2.2a1.621 1.621 0 0 1 2.256 0l4.048 3.957 11.353-17.26a1.617 1.617 0 0 1 2.2-.468l2.684 1.686a1.537 1.537 0 0 1 .479 2.154L29.294 41.541a3.3 3.3 0 0 1-5.032.529z" />
+    </svg>
+    
+    <div class="mt-12">
+      <h3 class="text-white text-2xl font-bold">Success</h3>
+      <p class="text-sm text-white mt-3">Product added successfully</p>
+      <button id="successBtn" type="button" class="px-6 py-2.5 mt-8 w-full rounded-md text-white text-sm font-semibold bg-green-500 hover:bg-green-600">OK</button>
+    </div>
+  </div>
+</div>
+
       
       <!-- File Upload with Preview & Crop -->
 <div class="col-span-2">
@@ -139,62 +181,17 @@
       </button>
     </form>
   </div>
+ 
+
 </div>
+
+
 
 <script>
   
   //-----------------------------------Image croping adding----------------------------
 
-// const fileInput = document.getElementById('fileInput');
-//   const previewContainer = document.getElementById('previewContainer');
-//   const cropModal = document.getElementById('cropModal');
-//   const imageToCrop = document.getElementById('imageToCrop');
-//   let cropper;
-//   let fileCount = 0;
 
-//   fileInput.addEventListener('change', handleFiles);
-
-//   function handleFiles(event) {
-//     const files = event.target.files;
-//     const maxFiles = 4;
-//     if (fileCount + files.length > maxFiles) {
-//       alert('You can upload a maximum of 3 files.');
-//       return;
-//     }
-
-//     Array.from(files).forEach((file) => {
-//       const reader = new FileReader();
-//       reader.onload = function (e) {
-//         imageToCrop.src = e.target.result;
-//         cropModal.classList.remove('hidden');
-//         cropper = new Cropper(imageToCrop, {
-//           aspectRatio: 1,
-//           viewMode: 1,
-//           background: false,
-//         });
-//       };
-//       reader.readAsDataURL(file);
-//     });
-//   }
-
-//   document.getElementById('cropButton').addEventListener('click', function () {
-//     const croppedCanvas = cropper.getCroppedCanvas();
-//     const croppedImageURL = croppedCanvas.toDataURL();
-
-//     const imgElement = document.createElement('img');
-//     imgElement.src = croppedImageURL;
-//     imgElement.classList.add('rounded', 'border', 'border-gray-700', 'p-2');
-    
-//     previewContainer.appendChild(imgElement);
-//     cropper.destroy();
-//     cropModal.classList.add('hidden');
-//     fileCount += 1;
-//   });
-
-//   document.getElementById('cancelCropButton').addEventListener('click', function () {
-//     cropper.destroy();
-//     cropModal.classList.add('hidden');
-//   });
 
 const fileInput = document.getElementById('fileInput');
 const previewContainer = document.getElementById('previewContainer');
@@ -202,6 +199,9 @@ const cropModal = document.getElementById('cropModal');
 const imageToCrop = document.getElementById('imageToCrop');
 const addProductBtn = document.getElementById('addProductBtn');  // Add Product button
 const productForm = document.getElementById('productForm');
+const spinner = document.getElementById('spinner');
+const successModal = document.getElementById('successModal');
+
 let cropper;
 let fileCount = 0;
 let croppedImages = [];  // To store all cropped images
@@ -211,7 +211,7 @@ fileInput.addEventListener('change', handleFiles);
 
 function handleFiles(event) {
   const files = event.target.files;
-  const maxFiles = 3;
+  const maxFiles = 3;       
 
   if (files.length > maxFiles) {
     alert('You can upload a maximum of 3 files.');
@@ -276,6 +276,8 @@ productForm.addEventListener('submit', function(e) {
     return;
   }
 
+  spinner.classList.remove('hidden');
+
   // If validation passes, submit the form via fetch
   const formData = new FormData(productForm);
 
@@ -292,8 +294,11 @@ productForm.addEventListener('submit', function(e) {
     .then(response => response.json())
     .then(data => {
       console.log(data);
+      // Hide the spinner
+      spinner.classList.add('hidden');
       if (data.message) {
-        alert('Product added successfully!');
+       // Show success modal
+       successModal.classList.remove('hidden');
         // Optionally reset the form or redirect the user
         productForm.reset();
         previewContainer.innerHTML = '';  // Clear the image preview
@@ -308,8 +313,10 @@ productForm.addEventListener('submit', function(e) {
 });
 
 
-
-//-----------------------------------Form validation----------------------------
+successBtn.addEventListener('click', function() {
+  successModal.classList.add('hidden');
+});
+//-----------------------------------Category dropdwon ----------------------------
 
 
 
@@ -334,35 +341,5 @@ let dropdownToggle = document.getElementById('dropdownToggle');
       </svg>`;
     dropdownMenu.classList.add('hidden');
   }
-
-//   // Form validation
-//   document.getElementById('productForm').addEventListener('submit', function(e) {
-//     const youtubeLink = document.getElementById('trailer_link').value;
-//     const imageFiles = document.getElementById('fileInput').files;
-//     console.log(imageFiles);
-    
-
-//     // YouTube link validation
-//     const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/;
-//     if (!youtubeRegex.test(youtubeLink)) {
-//       alert('Please enter a valid YouTube link.');
-//       e.preventDefault();
-//       return;
-//     }
-
-//     // Image upload validation (exactly 3 images)
-//     if (fileCount !== 3) {
-//       alert('Please upload exactly 3 images.');
-//       e.preventDefault();
-//     }
-//   });
-
-
-
-
-
-
-
-
 
 </script>

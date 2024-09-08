@@ -9,10 +9,24 @@ import {Buffer} from 'buffer'
 
 export const addProduct = async (req, res) => {
   try {
+    if(req.session.admin){
+
+    
     const categories = await category.find({ isActive: true });
-    res.render("admin/addProduct", { title: "Add Product", categories });
+     // Retrieve flash messages
+     const successMessage = req.flash('success');
+     const failedMessage = req.flash('failed');
+    res.render("admin/addProduct", {
+       title: "Add Product",
+       successMessage,
+       failedMessage,
+        categories
+       });
+    }else{
+      res.redirect('/admin/login')
+    }
   } catch (error) {
-    console.error("Error fetching categories: ", err);
+    console.error("Error fetching categories: ", error);
     res.status(500).send("Internal Server Error");
   }
 };
@@ -82,8 +96,10 @@ export const addProductPost = async (req, res) => {
 
     await newProduct.save();
 
+    req.flash('success',"Product added successfully")
     res.status(201).json({ message: 'Product added successfully', product: newProduct });
   } catch (error) {
+    req.flash('failed',"could not add product")
     console.error('Error adding product:', error);
     res.status(500).json({ error: 'Server error, could not add product' });
   }
