@@ -12,7 +12,7 @@ const productSchema = mongoose.Schema({
         ref: 'category', // 'Category' is the name of the model we want to reference
         required: true
       },
-      genere: {
+      genre: {
         type: String,
         required: true
       },

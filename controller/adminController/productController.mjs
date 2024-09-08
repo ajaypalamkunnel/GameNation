@@ -14,10 +14,11 @@ export const addProduct = async (req, res) => {
 
 export const addProductPost = async (req, res) => {
   try {
+    const imageUrls = req.files.map((file) => file.path);
     const {
       product_name,
       category,
-      genere,
+      genre,
       game_Play_hour,
       release_date,
       developer,
@@ -33,13 +34,14 @@ export const addProductPost = async (req, res) => {
       trailer_link,
     } = req.body;
 
-    const imageUrls = req.files.map((file) => file.path);
+    
+    const internetRequirement = req.body['internet-requirement'] === 'on' ? true : false;
     const categoryId = new mongoose.Types.ObjectId(category); // Correct way to convert
 
     const newProduct = new Product({
       product_name,
       category: categoryId, // Convert to ObjectId if necessary
-      genere,
+      genre,
       game_Play_hour,
       release_date,
       developer,
@@ -52,7 +54,7 @@ export const addProductPost = async (req, res) => {
       price,
       stock,
       discount,
-      internet_requirement,
+      internet_requirement: internetRequirement,
       trailer_link,
     });
     await newProduct.save();
