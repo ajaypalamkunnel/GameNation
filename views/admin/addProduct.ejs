@@ -6,7 +6,7 @@
   <div class="w-full h-full p-8">
     <h4 class="font-bold text-white text-2xl mb-8">Add Product Details</h4>
 
-    <form id="productForm" action="/admin/addProduct" method="POST" enctype="multipart/form-data" class="bg-[#1f1f1f] p-10 rounded-lg shadow-md max-w-4xl mx-auto font-[sans-serif]">
+    <form id="productForm" method="POST" enctype="multipart/form-data" class="bg-[#1f1f1f] p-10 rounded-lg shadow-md max-w-4xl mx-auto font-[sans-serif]">
       <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
         <div class="relative">
           <label class="absolute left-3 top-[-10px] bg-[#1f1f1f] px-2 text-sm text-white">Product Name</label>
@@ -142,105 +142,175 @@
 </div>
 
 <script>
-// let dropdownToggle = document.getElementById('dropdownToggle');
-//   let dropdownMenu = document.getElementById('dropdownMenu');
-
-//   function handleClick() {
-//     dropdownMenu.classList.toggle('hidden');
-//   }
-
-//   dropdownToggle.addEventListener('click', handleClick);
-
-//   function selectCategory(categoryName) {
-//     dropdownToggle.innerHTML = categoryName + `
-//       <svg xmlns="http://www.w3.org/2000/svg" class="ml-2 inline w-3 fill-white" viewBox="0 0 24 24">
-//         <path fill-rule="evenodd"
-//           d="M11.99997 18.1669a2.38 2.38 0 0 1-1.68266-.69733l-9.52-9.52a2.38 2.38 0 1 1 3.36532-3.36532l7.83734 7.83734 7.83734-7.83734a2.38 2.38 0 1 1 3.36532 3.36532l-9.52 9.52a2.38 2.38 0 0 1-1.68266.69734z"
-//           clip-rule="evenodd" />
-//       </svg>`;
-//     dropdownMenu.classList.add('hidden');
-//   }
-
-
-//   //test
-//  const btn = document.getElementById('sub');
-//  btn.addEventListener('click',function(){
-//   console.log("add clicked");
   
-//  })
+  //-----------------------------------Image croping adding----------------------------
+
+// const fileInput = document.getElementById('fileInput');
+//   const previewContainer = document.getElementById('previewContainer');
+//   const cropModal = document.getElementById('cropModal');
+//   const imageToCrop = document.getElementById('imageToCrop');
+//   let cropper;
+//   let fileCount = 0;
+
+//   fileInput.addEventListener('change', handleFiles);
+
+//   function handleFiles(event) {
+//     const files = event.target.files;
+//     const maxFiles = 4;
+//     if (fileCount + files.length > maxFiles) {
+//       alert('You can upload a maximum of 3 files.');
+//       return;
+//     }
+
+//     Array.from(files).forEach((file) => {
+//       const reader = new FileReader();
+//       reader.onload = function (e) {
+//         imageToCrop.src = e.target.result;
+//         cropModal.classList.remove('hidden');
+//         cropper = new Cropper(imageToCrop, {
+//           aspectRatio: 1,
+//           viewMode: 1,
+//           background: false,
+//         });
+//       };
+//       reader.readAsDataURL(file);
+//     });
+//   }
+
+//   document.getElementById('cropButton').addEventListener('click', function () {
+//     const croppedCanvas = cropper.getCroppedCanvas();
+//     const croppedImageURL = croppedCanvas.toDataURL();
+
+//     const imgElement = document.createElement('img');
+//     imgElement.src = croppedImageURL;
+//     imgElement.classList.add('rounded', 'border', 'border-gray-700', 'p-2');
+    
+//     previewContainer.appendChild(imgElement);
+//     cropper.destroy();
+//     cropModal.classList.add('hidden');
+//     fileCount += 1;
+//   });
+
+//   document.getElementById('cancelCropButton').addEventListener('click', function () {
+//     cropper.destroy();
+//     cropModal.classList.add('hidden');
+//   });
 
 const fileInput = document.getElementById('fileInput');
-  const previewContainer = document.getElementById('previewContainer');
-  const cropModal = document.getElementById('cropModal');
-  const imageToCrop = document.getElementById('imageToCrop');
-  let cropper;
-  let fileCount = 0;
+const previewContainer = document.getElementById('previewContainer');
+const cropModal = document.getElementById('cropModal');
+const imageToCrop = document.getElementById('imageToCrop');
+const addProductBtn = document.getElementById('addProductBtn');  // Add Product button
+const productForm = document.getElementById('productForm');
+let cropper;
+let fileCount = 0;
+let croppedImages = [];  // To store all cropped images
 
-  fileInput.addEventListener('change', handleFiles);
+// File input handling
+fileInput.addEventListener('change', handleFiles);
 
-  function handleFiles(event) {
-    const files = event.target.files;
-    const maxFiles = 4;
-    if (fileCount + files.length > maxFiles) {
-      alert('You can upload a maximum of 3 files.');
-      return;
-    }
+function handleFiles(event) {
+  const files = event.target.files;
+  const maxFiles = 3;
 
-    Array.from(files).forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        imageToCrop.src = e.target.result;
-        cropModal.classList.remove('hidden');
-        cropper = new Cropper(imageToCrop, {
-          aspectRatio: 1,
-          viewMode: 1,
-          background: false,
-        });
-      };
-      reader.readAsDataURL(file);
-    });
+  if (files.length > maxFiles) {
+    alert('You can upload a maximum of 3 files.');
+    return;
   }
 
-  document.getElementById('cropButton').addEventListener('click', function () {
-    const croppedCanvas = cropper.getCroppedCanvas();
-    const croppedImageURL = croppedCanvas.toDataURL();
+  Array.from(files).forEach((file) => {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      imageToCrop.src = e.target.result;
+      cropModal.classList.remove('hidden');
+      cropper = new Cropper(imageToCrop, {
+        aspectRatio: 1,
+        viewMode: 1,
+        background: false,
+      });
+    };
+    reader.readAsDataURL(file);
+  });
+}
 
-    const imgElement = document.createElement('img');
-    imgElement.src = croppedImageURL;
-    imgElement.classList.add('rounded', 'border', 'border-gray-700', 'p-2');
-    
-    previewContainer.appendChild(imgElement);
-    cropper.destroy();
-    cropModal.classList.add('hidden');
-    fileCount += 1;
+// Handle the crop button click
+document.getElementById('cropButton').addEventListener('click', function() {
+  const croppedCanvas = cropper.getCroppedCanvas();
+  const croppedImageURL = croppedCanvas.toDataURL();
+
+  const imgElement = document.createElement('img');
+  imgElement.src = croppedImageURL;
+  imgElement.classList.add('rounded', 'border', 'border-gray-700', 'p-2');
+
+  // Append the cropped image to the preview container
+  previewContainer.appendChild(imgElement);
+
+  // Store the cropped image in an array for submission
+  croppedImages.push(croppedImageURL);
+
+  cropper.destroy();
+  cropModal.classList.add('hidden');
+  fileCount += 1;
+
+  if (fileCount === 3) {
+    alert('All images cropped');
+  }
+});
+
+// Form validation and submission handler
+productForm.addEventListener('submit', function(e) {
+  e.preventDefault();  // Prevent default form submission
+
+  // Validate YouTube link
+  const youtubeLink = document.getElementById('trailer_link').value;
+  const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/;
+
+  if (!youtubeRegex.test(youtubeLink)) {
+    alert('Please enter a valid YouTube link.');
+    return;
+  }
+
+  // Validate image upload (exactly 3 images should be cropped)
+  if (croppedImages.length !== 3) {
+    alert('Please upload and crop exactly 3 images.');
+    return;
+  }
+
+  // If validation passes, submit the form via fetch
+  const formData = new FormData(productForm);
+
+  // Append the cropped images as Base64 strings
+  croppedImages.forEach((img, index) => {
+    formData.append(`croppedImage${index + 1}`, img);
   });
 
-  document.getElementById('cancelCropButton').addEventListener('click', function () {
-    cropper.destroy();
-    cropModal.classList.add('hidden');
-  });
+  // Submit form data with fetch API
+  fetch('/admin/addProduct', {
+    method: 'POST',
+    body: formData
+  })
+    .then(response => response.json())
+    .then(data => {
+      console.log(data);
+      if (data.message) {
+        alert('Product added successfully!');
+        // Optionally reset the form or redirect the user
+        productForm.reset();
+        previewContainer.innerHTML = '';  // Clear the image preview
+        croppedImages = [];  // Clear the cropped image array
+        fileCount = 0;
+      }
+    })
+    .catch(error => {
+      console.error('Error adding product:', error);
+      alert('An error occurred while adding the product.');
+    });
+});
+
 
 
 //-----------------------------------Form validation----------------------------
 
-
-// const product_name = document.getElementById('product_name');
-// const release_date = document.getElementById('release_date');
-// const genre = document.getElementById('genre');
-// const developer = document.getElementById('developer');
-// const category = document.getElementById('')//-------------
-// const PEGI = document.getElementById('PEGI');
-// const stock = document.getElementById('stock');
-// const price = document.getElementById('price');
-// const discount = document.getElementById('discount');
-// const country_of_orgin = document.getElementById('country_of_orgin')
-// const game_Play_hour = document.getElementById('game_Play_hour');
-// const publisher = document.getElementById('publisher');
-// const playable_on = document.getElementById('playable_on');
-// const trailer_link = document.getElementById('trailer_link');
-// const internet_requirement = document.getElementById('');//-------------
-// const description = document.getElementById('description');
-// const image = document.getElementById('')//---------------
 
 
 
@@ -265,27 +335,27 @@ let dropdownToggle = document.getElementById('dropdownToggle');
     dropdownMenu.classList.add('hidden');
   }
 
-  // Form validation
-  document.getElementById('productForm').addEventListener('submit', function(e) {
-    const youtubeLink = document.getElementById('trailer_link').value;
-    const imageFiles = document.getElementById('fileInput').files;
-    console.log(imageFiles);
+//   // Form validation
+//   document.getElementById('productForm').addEventListener('submit', function(e) {
+//     const youtubeLink = document.getElementById('trailer_link').value;
+//     const imageFiles = document.getElementById('fileInput').files;
+//     console.log(imageFiles);
     
 
-    // YouTube link validation
-    const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/;
-    if (!youtubeRegex.test(youtubeLink)) {
-      alert('Please enter a valid YouTube link.');
-      e.preventDefault();
-      return;
-    }
+//     // YouTube link validation
+//     const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/;
+//     if (!youtubeRegex.test(youtubeLink)) {
+//       alert('Please enter a valid YouTube link.');
+//       e.preventDefault();
+//       return;
+//     }
 
-    // Image upload validation (exactly 3 images)
-    if (fileCount !== 3) {
-      alert('Please upload exactly 3 images.');
-      e.preventDefault();
-    }
-  });
+//     // Image upload validation (exactly 3 images)
+//     if (fileCount !== 3) {
+//       alert('Please upload exactly 3 images.');
+//       e.preventDefault();
+//     }
+//   });
 
 
 
