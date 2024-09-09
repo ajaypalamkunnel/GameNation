@@ -2,7 +2,7 @@ import express from 'express';
 import { isAdmin } from '../middleware/adminSession.mjs';
 const adminRouter = express.Router();
 import { getAdminLogin,loginPost,dashboard,addCategory,addCategoryPost,categoryView,updateCategory,customers,toggleVerification } from '../controller/adminController/adminController.mjs';
-import { addProduct, addProductPost} from '../controller/adminController/productController.mjs';
+import { addProduct, addProductPost,viewProducts} from '../controller/adminController/productController.mjs';
 //import cloudinary from '../uploads/cloudinary.mjs';
 import {upload} from '../uploads/cloudinary.mjs'
 
@@ -40,6 +40,9 @@ adminRouter.post('/toggleVerification',toggleVerification)
 
 adminRouter.get('/addProduct',addProduct)
 adminRouter.post('/addProduct',upload.array('image',3),addProductPost)
+
+
+adminRouter.get('/products',viewProducts)
 
 
 

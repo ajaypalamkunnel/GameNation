@@ -104,3 +104,47 @@ export const addProductPost = async (req, res) => {
     res.status(500).json({ error: 'Server error, could not add product' });
   }
 };
+
+
+
+
+//---------------------------------view products-----------------------------------
+
+export const viewProducts = async(req,res)=>{
+
+
+  try {
+
+    const page = parseInt(req.query.page)||1;
+    const limit = parseInt(req.query.limit)||10;
+
+
+    const skip = (page-1) * limit;
+
+    const totalProducts = await Product.countDocuments();
+
+
+    const products = await Product.find({}).limit(limit).skip(skip)
+    console.log("------",products[0].category.collectionName);
+    
+
+    const totalPages = Math.ceil(totalProducts/limit)
+
+
+    res.render('admin/products',{
+      title:'Products',
+      products,
+      totalProducts,
+      currentPage:page,
+      totalPages,
+      hasNextPage: page < totalPages,
+      hasPreviousPage: page>1,
+      limit
+    })
+    
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("An error occurred while fetching products.");
+  }
+
+}

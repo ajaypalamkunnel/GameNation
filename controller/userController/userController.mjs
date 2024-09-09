@@ -8,11 +8,11 @@ export const home = async(req,res)=>{
 
             const categories = await category.find({})
 
-            res.render('user/home',{title:'Home',user:req.session.user,categories})
+            res.render('user/home',{title:'Home',user:req.session.user,categories,user:req.session.user})
     
         }else{
             res.redirect('/login')
-        }
+       }
         
     } catch (error) {
         
