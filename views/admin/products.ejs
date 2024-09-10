@@ -1,8 +1,17 @@
 <%- include('adminHeader') %>
 <div style="display: flex; height: 100vh">
     <%- include('sidebar') %>
+    
 
     <div class="overflow-x-auto flex-grow: 2; font-[sans-serif] w-full">
+      <form class="w-full  flex items-center bg-gray-800">
+        <input type="text" class="w-3/6 mt-5  ml-4 mb-3 border rounded-lg p-2  h-8 text-sm" placeholder="Search by user name...">
+        <button type="submit" class="bg-green-400  ml-4 mt-5 mb-3 text-white p-2 h-8 text-sm rounded-lg hover:bg-blue-700">Search</button>
+        
+        <a href="/addProduct" class="bg-green-400  ml-4 mt-5 mb-3 text-white p-2 h-8 text-sm rounded-lg hover:bg-blue-700">Add product</a>
+        
+  
+    </form>
         <table class="min-w-full w-full bg-white">
           <thead class="bg-gray-100 whitespace-nowrap">
             <tr>
@@ -36,16 +45,18 @@
                 <%= product.publisher %>
               </td>
               <td class="p-4 text-sm">
-                <%= product.category ? product.category.collectionName : 'N/A' %>
+                <%= product.category  ? product.category.collectionName : 'N/A' %>
               </td>
               <td class="p-4 text-sm">
-                <button title="Edit">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 fill-gray-500" viewBox="0 0 32 32">
-                    <path
-                      d="M13 16c0 1.654 1.346 3 3 3s3-1.346 3-3-1.346-3-3-3-3 1.346-3 3zm0 10c0 1.654 1.346 3 3 3s3-1.346 3-3-1.346-3-3-3-3 1.346-3 3zm0-20c0 1.654 1.346 3 3 3s3-1.346 3-3-1.346-3-3-3-3 1.346-3 3z"
-                      data-original="#000000" />
-                  </svg>
-                </button>
+                <div class="font-[sans-serif] space-x-4 space-y-4 text-center">
+                  
+                  <a  href="/admin/editProduct?id=<%= product._id %>"  class="h-8 px-5 py-2 rounded-lg text-white text-sm tracking-wider font-medium border border-current outline-none bg-custom-yellow hover:bg-green-800 active:bg-green-700">Edit</a>
+                  <button type="button"
+                  class="h-8 px-5 py-2 rounded-lg text-white text-sm tracking-wider font-medium border border-current outline-none bg-[#d02c2c] hover:bg-[#b63131] active:bg-green-700">Delete</button>
+                </div>
+                
+                
+
               </td>
             </tr>
             <% }) %>

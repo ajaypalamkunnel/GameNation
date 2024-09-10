@@ -49,7 +49,7 @@ export const addProductPost = async (req, res) => {
   try {
     const {
       product_name,
-      category,
+      categoryId,
       genre,
       game_Play_hour,
       release_date,
@@ -73,10 +73,12 @@ export const addProductPost = async (req, res) => {
       imageUrls.push(await uploadBase64ImageToCloudinary(req.body.croppedImage2));
       imageUrls.push(await uploadBase64ImageToCloudinary(req.body.croppedImage3));
     }
-
+    const category_id = await category.findOne({category});
+    console.log("------------",category_id);
+    
     const newProduct = new Product({
       product_name,
-      category: new mongoose.Types.ObjectId(category),
+      category: category_id,
       genre,
       game_Play_hour,
       release_date,
@@ -124,8 +126,12 @@ export const viewProducts = async(req,res)=>{
     const totalProducts = await Product.countDocuments();
 
 
-    const products = await Product.find({}).limit(limit).skip(skip)
-    console.log("------",products[0].category.collectionName);
+    const products = await Product.find({}) .populate({
+      path: 'category', // Path to the 'category' field in Product schema
+      select: 'collectionName' // Select only 'collectionName' from Category
+    }).limit(limit).skip(skip)
+
+    //console.log("------",products.category);
     
 
     const totalPages = Math.ceil(totalProducts/limit)
@@ -148,3 +154,147 @@ export const viewProducts = async(req,res)=>{
   }
 
 }
+
+
+
+//---------------------------------Edit products-----------------------------------
+
+
+export const editProduct = async(req,res)=>{
+  try {
+
+    const id = req.query.id
+    console.log('------',id);
+
+    const product = await Product.findOne({_id: id}) .populate({
+      path: 'category', // Path to the 'category' field in Product schema
+      select: 'collectionName' // Select only 'collectionName' from Category
+    })
+    const categories = await category.find({ isActive: true });
+    const cat =product.category.collectionName;
+    
+    
+
+    res.render('admin/editProduct',{title:'Edit product',product:product,categories,cat})
+    
+  } catch (error) {
+
+     console.error(error);
+    res.status(500).send("An error occurred while showing edit product",error);
+  }
+
+
+}
+
+
+//---------------------------------Edit products put-----------------------------------
+
+
+
+export const editProductPut = async(req,res)=>{
+
+  try {
+
+    console.log(req.body);
+    
+
+    const {
+      product_name,
+      categoryId,
+      genre,
+      game_Play_hour,
+      release_date,
+      developer,
+      publisher,
+      country_of_orgin,
+      discription,
+      playable_on,
+      PEGI_rating,
+      price,
+      stock,
+      discount,
+      trailer_link,
+      internet_requirement
+    } = req.body;
+
+    const productId = req.params.id;
+
+    const product = await Product.findById(productId);
+
+    if(!product){
+      return res.status(404).json({error:'Product not found'})
+    }
+
+
+
+    // Process removed images (if any)
+    const removedImages = Object.keys(req.body)
+      .filter(key => key.startsWith('removedImage'))
+      .map(key => req.body[key]);
+
+    // Remove the images from the product document
+    product.image = product.image.filter(img => !removedImages.includes(img));
+
+     // Convert and process new cropped images if provided
+     const imageUrls = [];
+     if (req.body.croppedImage1) {
+       imageUrls.push(await uploadBase64ImageToCloudinary(req.body.croppedImage1));
+     }
+     if (req.body.croppedImage2) {
+       imageUrls.push(await uploadBase64ImageToCloudinary(req.body.croppedImage2));
+     }
+     if (req.body.croppedImage3) {
+       imageUrls.push(await uploadBase64ImageToCloudinary(req.body.croppedImage3));
+     }
+
+
+      // Add new image URLs to the product (if there are any)
+    product.image = product.image.concat(imageUrls);
+
+    // Find the category based on the provided category name or ID
+    const category_id = await category.findOne({ _id: categoryId });
+
+
+     // Update product fields
+     product.product_name = product_name;
+     product.category = category_id;
+     product.genre = genre;
+     product.game_Play_hour = game_Play_hour;
+     product.release_date = release_date;
+     product.developer = developer;
+     product.publisher = publisher;
+     product.country_of_orgin = country_of_orgin;
+     product.discription = discription;
+     product.playable_on = playable_on;
+     product.PEGI_rating = PEGI_rating;
+     product.price = price;
+     product.stock = stock;
+     product.discount = discount;
+     product.internet_requirement = internet_requirement === 'true';
+     product.trailer_link = trailer_link;
+ 
+     // Save the updated product
+     await product.save();
+
+     req.flash('success', 'Product updated successfully');
+     return res.status(200).json({ message: 'Product updated successfully', product });
+
+
+  
+    
+  } catch (error) {
+
+    console.error('Error updating product:', error);
+    req.flash('failed', 'Could not update product');
+    return res.status(500).json({ error: 'Server error, could not update product' });
+    
+  }
+
+}
+
+
+
+
+
+
+
