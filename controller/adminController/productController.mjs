@@ -164,7 +164,7 @@ export const editProduct = async(req,res)=>{
   try {
 
     const id = req.query.id
-    console.log('------',id);
+   // console.log('------',id);
 
     const product = await Product.findOne({_id: id}) .populate({
       path: 'category', // Path to the 'category' field in Product schema
@@ -195,7 +195,7 @@ export const editProductPut = async(req,res)=>{
 
   try {
 
-    console.log(req.body);
+    // console.log(req.body);
     
 
     const {
@@ -217,6 +217,9 @@ export const editProductPut = async(req,res)=>{
       internet_requirement
     } = req.body;
 
+    console.log("------",categoryId[0]);
+    
+
     const productId = req.params.id;
 
     const product = await Product.findById(productId);
@@ -224,7 +227,6 @@ export const editProductPut = async(req,res)=>{
     if(!product){
       return res.status(404).json({error:'Product not found'})
     }
-
 
 
     // Process removed images (if any)
@@ -252,12 +254,12 @@ export const editProductPut = async(req,res)=>{
     product.image = product.image.concat(imageUrls);
 
     // Find the category based on the provided category name or ID
-    const category_id = await category.findOne({ _id: categoryId });
+    //const category_id = await category.findOne({ _id: categoryId });
 
 
      // Update product fields
      product.product_name = product_name;
-     product.category = category_id;
+     product.category = categoryId[0];
      product.genre = genre;
      product.game_Play_hour = game_Play_hour;
      product.release_date = release_date;

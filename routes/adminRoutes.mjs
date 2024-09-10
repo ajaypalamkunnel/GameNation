@@ -42,7 +42,7 @@ adminRouter.get('/addProduct',addProduct)
 adminRouter.post('/addProduct',upload.array('image',3),addProductPost)
 adminRouter.get('/products',viewProducts)
 adminRouter.get('/editProduct',editProduct)
-adminRouter.put('/editProduct/:id',editProductPut)
+adminRouter.post('/editProduct/:id',upload.array('image',3),editProductPut)
 
 
 
