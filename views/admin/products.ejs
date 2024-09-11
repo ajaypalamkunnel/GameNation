@@ -12,6 +12,19 @@
         
   
     </form>
+    <div id="toast-message" class=" hidden font-[sans-serif] space-y-6 mx-auto w-max mt-20 left-3/4 transition-opacity duration-300 z-[1000]   fixed inset-0">
+      <div class="bg-white shadow-[0_3px_10px_-3px_rgba(6,81,237,0.3)] border-t-4 border-green-500 text-gray-800 flex items-center w-max max-w-sm p-4 rounded-md"
+          role="alert">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-[18px] shrink-0 fill-green-500 inline mr-3" viewBox="0 0 512 512">
+              <ellipse cx="246" cy="246" data-original="#000" rx="246" ry="246" />
+              <path class="fill-white"
+                  d="m235.472 392.08-121.04-94.296 34.416-44.168 74.328 57.904 122.672-177.016 46.032 31.888z"
+                  data-original="#000" />
+          </svg>
+          <span id="toast-message-text" class="text-sm font-semibold tracking-wide"></span>
+      </div>
+    </div>
+    
         <table class="min-w-full w-full bg-white">
           <thead class="bg-gray-100 whitespace-nowrap">
             <tr>
@@ -66,6 +79,13 @@
             <% }) %>
           </tbody>
         </table>
+
+
+
+        
+
+
+
       
         <!-- Pagination Section -->
         <div class="md:flex m-4">
@@ -156,19 +176,52 @@ async function toggleDelete(productId, currentStatus) {
       button.textContent = 'Add';
       button.classList.remove('bg-red-600', 'hover:bg-red-700');
       button.classList.add('bg-green-600', 'hover:bg-green-700');
+      showToast('Product deleted successfully');
     } else {
       button.textContent = 'Delete';
       button.classList.remove('bg-green-600', 'hover:bg-green-700');
       button.classList.add('bg-red-600', 'hover:bg-red-700');
+      showToast('Product restored successfully');
     }
 
-    alert(data.message);
+   
   } catch (error) {
     console.error('Error:', error);
-    alert(`An error occurred: ${error.message}`);
+    showToast(`An error occurred: ${error.message}`, true); // Show error message
   }
 }
 
+
+// Function to show toast message
+function showToast(message, isError = false) {
+  const toastMessage = document.getElementById('toast-message');
+  const toastText = document.getElementById('toast-message-text');
+
+  // Set the message
+  toastText.textContent = message;
+
+  // Set styles for error/success messages
+  if (isError) {
+    toastMessage.classList.remove('border-green-500');
+    toastMessage.classList.add('border-red-500');
+  } else {
+    toastMessage.classList.remove('border-red-500');
+    toastMessage.classList.add('border-green-500');
+  }
+
+  // Show the toast message
+  toastMessage.classList.remove('hidden');
+  toastMessage.classList.add('opacity-100');
+
+  // Hide the message after 3 seconds
+  setTimeout(() => {
+    toastMessage.classList.add('opacity-0');
+    setTimeout(() => {
+      toastMessage.classList.remove('opacity-100');
+      toastMessage.classList.add('hidden');
+    }, 300); // Delay to allow fade out effect
+  }, 3000);
+}
 
 
 

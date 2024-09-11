@@ -77,7 +77,17 @@ app.use(nocache());
 app.use("/admin", adminRouter);
 app.use("/", userRouter);
 
-//routes
+
+app.get('/',(req,res)=>{
+  try {
+    res.redirect('/home')
+  } catch (error) {
+    console.log(`error from main route ${error}`) 
+  }
+})
+//------------------------------routes------------------
+
+
 
 
 

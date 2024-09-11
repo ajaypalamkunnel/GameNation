@@ -1,20 +1,20 @@
 import category from "../../model/categoryScehema.mjs"
-
+import Product from "../../model/productSchema.mjs";
 
 export const home = async(req,res)=>{
 
     try {
-        if(req.session.user){
+            const categories = await category.find({});
+            const products = await Product.find({});
 
-            const categories = await category.find({})
+      //      console.log(products);
+            
 
-            res.render('user/home',{title:'Home',user:req.session.user,categories,user:req.session.user})
-    
-        }else{
-            res.redirect('/login')
-       }
-        
+
+            res.render('user/home',{title:'Home',user:req.session.user,categories,products,user:req.session.user})     
     } catch (error) {
+
+        console.log(`error while rendering user home page ${error}`)
         
     }
 }

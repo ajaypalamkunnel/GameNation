@@ -2,7 +2,8 @@ import express from 'express';
 import {   } from '../controller/userController/userController.mjs';
 const userRouter = express.Router()
 
-import {getSignUp,signupPost, verifyOtp,getLogin,loginPost,googleAuth,googleAuthCallback} from '../controller/userController/userAuth.mjs'
+import {getSignUp,signupPost, verifyOtp,getLogin,loginPost,googleAuth,googleAuthCallback,} from '../controller/userController/userAuth.mjs'
+import { productView } from '../controller/adminController/productController.mjs';
 // import {} '../services/auth.mjs'
 
 import { home } from '../controller/userController/userController.mjs'; 
@@ -48,7 +49,7 @@ userRouter.get('/auth/google/callback', googleAuthCallback);
         
 userRouter.get('/home',home)
 
-
+userRouter.get('/productView/:id',productView)
 
 
 

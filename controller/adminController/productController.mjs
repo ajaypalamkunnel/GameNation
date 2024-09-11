@@ -3,6 +3,8 @@ import Product from "../../model/productSchema.mjs";
 import mongoose from "mongoose";
 import {v2 as cloudinary} from 'cloudinary'
 import {Buffer} from 'buffer'
+import { response } from "express";
+import { title } from "process";
 
 
 
@@ -339,3 +341,40 @@ export const deleteProduct = async(req,res)=>{
 }
 
 
+
+
+export const productView = async(req,res)=>{
+
+  try {
+
+    const productId= req.params.id;
+    const product = await Product.findById(productId);
+    const categories = await category.find({ isActive: true });
+
+    if (!product || product.isDelete) {
+      return res.status(404).json({ message: 'Product not found or deleted' });
+    }
+    console.log("hiiiiii",product);
+
+    // res.status(200).json(product);
+    let discountPrice = Math.ceil(product.price - (product.price * product.discount/100))
+    console.log(discountPrice);
+    
+    res.render('user/productView',
+      {
+        title:'Game Nation',
+        product,
+        categories,
+        discountPrice,
+        user:req.session.user
+      }
+      
+    )
+    
+  } catch (error) {
+    console.error('Error fetching product details:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+
+}
+// C:\Users\91628\Desktop\GameNation\views\user\productView.ejs
