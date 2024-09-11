@@ -51,8 +51,12 @@
                 <div class="font-[sans-serif] space-x-4 space-y-4 text-center">
                   
                   <a  href="/admin/editProduct?id=<%= product._id %>"  class="h-8 px-5 py-2 rounded-lg text-white text-sm tracking-wider font-medium border border-current outline-none bg-custom-yellow hover:bg-green-800 active:bg-green-700">Edit</a>
-                  <button type="button"
-                  class="h-8 px-5 py-2 rounded-lg text-white text-sm tracking-wider font-medium border border-current outline-none bg-[#d02c2c] hover:bg-[#b63131] active:bg-green-700">Delete</button>
+                  <button
+                  class="h-8 px-5 py-2 rounded-lg text-white text-sm tracking-wider font-medium border border-current outline-none <%= product.isDelete ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700' %>"
+                  onclick="toggleDelete('<%= product._id %>',' <%= product.isDelete %>')">
+                  <%= product.isDelete ? 'Add' : 'Delete' %>
+                </button>
+                  
                 </div>
                 
                 
@@ -113,4 +117,61 @@
           </div>
         </div>
       </div>
+
+
+<script>
+
+async function toggleDelete(productId, currentStatus) {
+  const url = `/admin/deleteProduct/${productId}`;
+
+  try {
+    // Send a PUT request to the server
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    // Check if the response is in the 200-299 range (success)
+    if (!response.ok) {
+      // If not successful, check if it's returning HTML
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('text/html')) {
+        throw new Error('Received HTML error page instead of JSON');
+      }
+      
+      // Try to parse the error message as JSON
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to toggle product status');
+    }
+
+    const data = await response.json();  // Parse the successful JSON response
+
+    // Find the button that triggered the event
+    const button = document.querySelector(`button[onclick*="${productId}"]`);
+
+    // Toggle the button text and color based on the new isDelete status
+    if (data.isDelete) {
+      button.textContent = 'Add';
+      button.classList.remove('bg-red-600', 'hover:bg-red-700');
+      button.classList.add('bg-green-600', 'hover:bg-green-700');
+    } else {
+      button.textContent = 'Delete';
+      button.classList.remove('bg-green-600', 'hover:bg-green-700');
+      button.classList.add('bg-red-600', 'hover:bg-red-700');
+    }
+
+    alert(data.message);
+  } catch (error) {
+    console.error('Error:', error);
+    alert(`An error occurred: ${error.message}`);
+  }
+}
+
+
+
+
+
+</script>
       

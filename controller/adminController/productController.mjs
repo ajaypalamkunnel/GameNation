@@ -296,7 +296,46 @@ export const editProductPut = async(req,res)=>{
 
 
 
+//---------------------------------Delete products-----------------------------------
 
 
+
+export const deleteProduct = async(req,res)=>{
+
+  try {
+    console.log("--------hi-----------");
+    
+
+    const {id}  = req.params;
+
+    const product = await Product.findById(id);
+    if(!product){
+      return res.status(404).json({message:"Product not found"})
+    }
+    // Toggle the isDelete field
+    product.isDelete = !product.isDelete;
+
+
+     // Save the updated product
+     await product.save();
+
+     res.status(200).json({
+
+      message: `Product has been ${product.isDelete ? 'deleted' : 'restored'}`,
+      isDelete:product.isDelete
+
+     })
+    
+
+
+
+
+  } catch (error) {
+
+    res.status(500).json({ message: "Server error", error });
+    
+  }
+
+}
 
 
