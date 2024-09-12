@@ -168,7 +168,7 @@ export const editProduct = async(req,res)=>{
     const id = req.query.id
    // console.log('------',id);
 
-    const product = await Product.findOne({_id: id}) .populate({
+    const product = await Product.findOne({_id: id}).populate({
       path: 'category', // Path to the 'category' field in Product schema
       select: 'collectionName' // Select only 'collectionName' from Category
     })
@@ -348,7 +348,10 @@ export const productView = async(req,res)=>{
   try {
 
     const productId= req.params.id;
-    const product = await Product.findById(productId);
+    const product = await Product.findById(productId).populate({
+      path: 'category',  // Populate the 'category' field in the Product schema
+      select: 'collectionName' // Select only 'collectionName' from Category
+    });
     const categories = await category.find({ isActive: true });
 
     if (!product || product.isDelete) {
@@ -359,6 +362,7 @@ export const productView = async(req,res)=>{
     // res.status(200).json(product);
     let discountPrice = Math.ceil(product.price - (product.price * product.discount/100))
     console.log(discountPrice);
+    
     
     res.render('user/productView',
       {

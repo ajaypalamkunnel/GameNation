@@ -62,10 +62,11 @@
             <span class="absolute left-auto -ml-1 top-0 rounded-full bg-red-500 px-1 py-0 text-xs text-white">0</span>
           </span>
           <% if (!user) { %>
+            <a class='px-5 py-2 text-sm rounded-full text-white border-2 border-[#3F9147] bg-[#3F9147] hover:bg-[#004bff]' href="/login">
             <button
-              class='px-5 py-2 text-sm rounded-full text-white border-2 border-[#3F9147] bg-[#3F9147] hover:bg-[#004bff]'>Sign
+              >Sign
               In</button>
-           
+            </a>
           <% } else {%>
             <p class="text-white">user</p>
           <% } %>

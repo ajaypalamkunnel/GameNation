@@ -1,5 +1,7 @@
 <%- include('header') %>
-<ul class="flex items-center justify-center bg-black font-[sans-serif] space-x-4 mt-4">
+
+<div class="bg-gray-800 p-2">
+  <ul class="flex items-center ml-6   bg-gray-800 font-[sans-serif]  ">
     <li class="text-gray-500 text-base cursor-pointer">
       Home
     </li>
@@ -11,7 +13,7 @@
       </svg>
     </li>
     <li class="text-gray-500 text-base cursor-pointer">
-      Profile
+      Product
     </li>
     <li>
       <svg xmlns="http://www.w3.org/2000/svg" class="fill-gray-400 w-3.5 -rotate-90" viewBox="0 0 24 24">
@@ -24,17 +26,26 @@
       Edit
     </li>
   </ul>
+</div>
+
 
 <div class="bg-gray-800 min-h-screen p-6 flex justify-center items-center">
+  
+
     <div class="bg-gray-900 text-white max-w-4xl w-full rounded-xl shadow-lg p-6">
       <div class="flex flex-col lg:flex-row gap-6">
         <!-- Left Side (Image, Ratings) -->
         <div class="flex flex-col items-center lg:w-1/3">
-          <img src="<%= product.image[0]%>" alt="FIFA 23" class="w-full object-cover rounded-lg shadow-lg" />
+          <!-- Main Image (Zoom on Hover) -->
+          <div class="relative overflow-hidden w-full h-auto rounded-lg shadow-lg">
+            <img id="mainImage" src="<%= product.image[0] %>" alt="Main Image" class="w-full object-cover rounded-lg transform transition-transform duration-300 ease-in-out hover:scale-110" />
+          </div>
+        
+          <!-- Thumbnails -->
           <div class="flex mt-4 gap-1">
-            <img src="<%= product.image[0]%>" alt="Thumbnail 1" class="w-16 h-16 rounded-lg object-cover">
-            <img src="<%= product.image[1]%>" alt="Thumbnail 2" class="w-16 h-16 rounded-lg object-cover">
-            <img src="<%= product.image[2]%>" alt="Thumbnail 3" class="w-16 h-16 rounded-lg object-cover">
+            <% product.image.forEach((img, index) => { %>
+              <img src="<%= img %>" alt="Thumbnail <%= index + 1 %>" class="w-16 h-16 rounded-lg object-cover cursor-pointer" onclick="swapImage('<%= img %>')">
+            <% }); %>
           </div>
         </div>
   
@@ -152,4 +163,23 @@
       </div>
     </div>
   </div>
+
+  <script>
+
+    // JavaScript function to swap the main image when a thumbnail is clicked
+  function swapImage(imageUrl) {
+    // Get the main image element
+    const mainImage = document.getElementById('mainImage');
+    
+    // Update the src attribute to the clicked thumbnail's image URL
+    mainImage.src = imageUrl;
+  }
+
+
+
+
+
+
+
+  </script>
   
