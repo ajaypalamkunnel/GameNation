@@ -38,7 +38,8 @@
           <input
             required
             id="release_date"
-            value="<%=product.release_date%>"
+            value="<%= product.release_date ? new Date(product.release_date).toISOString().split('T')[0] : '' %>"
+            
             type="date"
             name="release_date"
             class="w-full rounded border border-gray-700 bg-black text-white px-4 py-3 focus:outline-none focus:border-blue-500"
