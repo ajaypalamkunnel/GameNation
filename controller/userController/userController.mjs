@@ -5,7 +5,7 @@ export const home = async(req,res)=>{
 
     try {
             const categories = await category.find({});
-            const products = await Product.find({});
+            const products = await Product.find({isDelete:false});
 
       //      console.log(products);
             

@@ -22,7 +22,7 @@
         <!-- Product Card 1 -->
         <% products.forEach(product=>{ %>
         <div class="min-w-[200px] bg-white rounded-lg shadow-lg overflow-hidden">
-          <img src="/images/p1.jpeg" alt="Product 1" class="w-full h-60 mt-2 p-5 py-0 rounded-lg object-cover">
+          <img src="<%= product.image[0]%>" alt="Product 1" class="w-full h-60 mt-2 p-5 py-0 rounded-lg object-cover">
           <div class="p-4 flex">
             <div class="">
             <h3 class="text-lg font-semibold"><%= product.product_name%></h3>
