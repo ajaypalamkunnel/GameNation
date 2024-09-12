@@ -173,6 +173,11 @@ export const editProduct = async(req,res)=>{
       select: 'collectionName' // Select only 'collectionName' from Category
     })
     const categories = await category.find({ isActive: true });
+
+    console.log("-------hi-------");
+    
+
+
     const cat =product.category.collectionName;
     
     
