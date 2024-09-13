@@ -4,7 +4,7 @@ import Product from "../../model/productSchema.mjs";
 export const home = async(req,res)=>{
 
     try {
-            const categories = await category.find({});
+            const categories = await category.find({isActive:true});
             const products = await Product.find({isDelete:false});
 
       //      console.log(products);

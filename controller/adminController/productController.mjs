@@ -386,4 +386,31 @@ export const productView = async(req,res)=>{
   }
 
 }
-// C:\Users\91628\Desktop\GameNation\views\user\productView.ejs
+
+
+
+export const allProducts = async (req, res) => {
+  try {
+    
+    const products = await Product.find({ isDelete: false }) // Fetch all non-deleted products
+      .populate({
+        path: 'category',  
+        select: 'collectionName'
+      });
+    
+    // Fetch all active categories
+    const categories = await category.find({ isActive: true });
+
+    // Render the 'allProducts' page with the products, categories, and user session
+    res.render('user/allProducts', {
+      title: 'All Products',
+      products,
+      categories,
+      user: req.session.user
+    });
+
+  } catch (error) {
+    console.error('Error fetching product details:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
