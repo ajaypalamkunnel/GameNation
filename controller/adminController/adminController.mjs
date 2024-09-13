@@ -59,7 +59,12 @@ export const dashboard = (req,res)=>{
 export const addCategory = (req,res)=>{
     try {
         if(req.session.admin){
-            res.render('admin/addCategory',{title:"Add category",admin:req.session.admin})
+            res.render('admin/addCategory',{
+                title:"Add category",
+                admin:req.session.admin,
+                successMessage:req.flash('success'),
+                errorMessage:req.flash('error')
+            })
         }else{
             res.redirect('/admin/login')
         }
@@ -76,12 +81,23 @@ export const addCategoryPost = async (req,res)=>{
     try {
         const {categoryName,isBlocked} = req.body;
 
+        const existingCategory = await category.findOne({collectionName:categoryName.trim()})
+
+
+        if(existingCategory){
+            req.flash('error','category already exist');
+            return res.redirect('/admin/addCategory?success=false')
+        }
+
+
+
         const newCategory = new category({
             collectionName: categoryName,
             isActive:isBlocked==='true'
         })
 
         await newCategory.save()
+        req.flash('success', 'Category added successfully!');
        return res.redirect('addCategory/?success=true')
         
     } catch (error) {
