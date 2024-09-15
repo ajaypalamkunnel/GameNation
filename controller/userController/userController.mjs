@@ -8,9 +8,11 @@ export const home = async(req,res)=>{
             const products = await Product.find({isDelete:false});
 
       //      console.log(products);
+      products.forEach((product) => {
+        const discountPrice = Math.ceil(product.price - (product.price * product.discount) / 100);
+        product.discountPrice = discountPrice; // Append discountPrice to product
+      });
             
-
-
             res.render('user/home',{title:'Home',user:req.session.user,categories,products,user:req.session.user})     
     } catch (error) {
 
