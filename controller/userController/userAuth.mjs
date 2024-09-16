@@ -92,6 +92,7 @@ export const signupPost = async(req,res)=>{
         //Generate OTP and expiry time 
         const otp = generateOtp();
         const otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
+        req.session.otp = { otp, otpExpiry };
 
         // Hash the password before saving
         const hashedPassword = await bcrypt.hash(password, 10); // 10 rounds for salting
@@ -103,8 +104,6 @@ export const signupPost = async(req,res)=>{
             username,
             email,
             password: hashedPassword, // Save hashed password
-            otp,
-            otpExpiry,
             isVerified: false  // Assuming you have this field for verification
         });
 
@@ -150,25 +149,23 @@ export const verifyOtp = async (req,res)=>{
             return res.status(400).json({success:false,message:"user not found"})
         }
 
-        if(user.otp === otp && user.otpExpiry > Date.now()){
-            user.isVerified=true;
-            user.otp = undefined;
-            user.otpExpiry=undefined;
-            await user.save();
-            req.session.user = email
-           return res.status(200).json({success:true,message:"OTP verified, account activated"})
-        }else{
-           return res.status(400).json({success:false,message:"Invalid or expired OTP"})
+        const sessionOtp = req.session.otp;
+        if (!sessionOtp || sessionOtp.otp !== otp || sessionOtp.otpExpiry < Date.now()) {
+            return res.status(400).json({ success: false, message: "Invalid or expired OTP" });
         }
+        
+        user.isVerified = true;
+        await user.save()
+
+        req.session.otp = null;
+
+        req.session.user = email;
+        return res.status(200).json({ success: true, message: "OTP verified, account activated" });
 
     } catch (error) {
-        res.status(500).json({success:false,message:"server error",error})
-        
+        console.error(`Error during OTP verification: ${error}`);
+        return res.status(500).json({ success: false, message: "Server error. Please try again later." });       
     }
-
-
-    
-
 }
 
 
