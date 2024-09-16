@@ -216,6 +216,43 @@ export const loginPost = async(req,res)=>{
 }
 
 
+export const resendOtp = async (req, res) => {
+    const { email } = req.body;
+
+    try {
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(400).json({ success: false, message: "User not found" });
+        }
+
+        // Generate a new OTP
+        const otp = generateOtp();
+        const otpExpiry = Date.now() + 10 * 60 * 1000; // OTP valid for 10 minutes
+
+        // Send new OTP (you might store OTP in session or use another mechanism)
+        req.session.otp = { otp, otpExpiry };
+
+        await sendOtpEmail(email, otp);
+
+        return res.status(200).json({ success: true, message: 'OTP resent successfully' });
+    } catch (error) {
+        console.error(`Error resending OTP: ${error}`);
+        return res.status(500).json({ success: false, message: "Server error. Please try again later." });
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
 //----------------------------------- google auth  ----------------------------
 
 export const googleAuth = passport.authenticate('google', {

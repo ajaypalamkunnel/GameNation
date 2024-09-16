@@ -68,14 +68,24 @@
 
 
 
-        <form id="otpForm"  method="POST" class="hidden" onsubmit="return submitOtpForm(event)">
+        <form id="otpForm" method="POST" class="hidden" onsubmit="return submitOtpForm(event)">
             <div class="mb-4">
                 <label for="otp" class="block text-white">Enter OTP</label>
                 <input type="text" id="otp" name="otp" required class="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
                 <p id="otpError" class="text-red-500 text-sm mt-1 hidden">Invalid OTP. Please try again.</p>
             </div>
+            
+            <!-- Countdown Timer -->
+            <div class="mb-4 text-center text-white">
+                <span id="otpTimer">00:00</span>
+            </div>
+        
+            <!-- Resend OTP Link (Hidden initially) -->
+            <p id="resendOtp" class="text-center mt-4 text-blue-500 hover:text-blue-700 hidden cursor-pointer" onclick="resendOtp()">Resend OTP</p>
+        
             <button type="submit" class="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600">Verify OTP</button>
         </form>
+        
 
 
 
@@ -111,91 +121,127 @@
 
 <script>
 
-    function submitSignupForm(event){
-        event.preventDefault();
+   // Timer for OTP form
+let otpTimerInterval;
 
-        if(!validateForm()){
-            return;
+function startOtpTimer(duration) {
+    let timer = duration, minutes, seconds;
+    otpTimerInterval = setInterval(() => {
+        minutes = parseInt(timer / 60, 10);
+        seconds = parseInt(timer % 60, 10);
+
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+
+        document.getElementById('otpTimer').textContent = minutes + ":" + seconds;
+
+        if (--timer < 0) {
+            clearInterval(otpTimerInterval);
+            document.getElementById('resendOtp').classList.remove('hidden'); // Show the resend OTP link
         }
+    }, 1000);
+}
 
-         // If valid, send a POST request to the backend to initiate OTP process
-         const formData = new FormData(document.getElementById('signupForm'));
-         const data = Object.fromEntries(formData.entries())
-         console.log(data);
-         
-         fetch('/signup',{
-            method:'POST',
-            headers: {
-                "Content-Type": "application/json",
-              },
-            body:JSON.stringify({
-                username:data.username,
-                email:data.email,
-                password:data.password
-            })
-         })
-         .then(response =>response.json())
-         .then(data=>{
-            console.log("dsfsdfsdafsdafsda",data);
-            
-            if(data.success){
-                //Hide signup form and show OTP form
+// Call this when OTP form is displayed (starts 2-minute countdown)
+function displayOtpForm() {
+    document.getElementById('signupForm').classList.add('hidden');
+    document.getElementById('otpForm').classList.remove('hidden');
 
-                const successMessageDiv = document.createElement('div');
-                successMessageDiv.classList.add('bg-green-500', 'text-white', 'text-center', 'py-2', 'rounded-md', 'mb-4')
-                successMessageDiv.textContent = data.message || 'OTP sent to email. Please check your inbox.';
-                document.querySelector('.w-full.max-w-md').insertBefore(successMessageDiv, document.getElementById('signupForm'));
+    // Start OTP countdown (2 minutes = 120 seconds)
+    startOtpTimer(120);
+}
 
-                setTimeout(()=>{
-                    successMessageDiv.remove();
-                    document.getElementById('signupForm').classList.add('hidden');
-                    document.getElementById('otpForm').classList.remove('hidden');
+// Submit signup form with OTP process
+function submitSignupForm(event) {
+    event.preventDefault();
 
-                },2000)
-
-
-
-
-            }else{
-                // Handle signup error (e.g., email already exists)
-                document.getElementById('signupError').textContent = data.message || 'Signup failed. Please try again.';
-                document.getElementById('signupError').classList.remove('hidden');
-            }
-         })
-
+    if (!validateForm()) {
+        return;
     }
 
-    function submitOtpForm(event){
-        event.preventDefault();
+    // If valid, send a POST request to the backend to initiate OTP process
+    const formData = new FormData(document.getElementById('signupForm'));
+    const data = Object.fromEntries(formData.entries());
 
-        const otpFormData = new FormData(document.getElementById('otpForm'));
-        const otpData = Object.fromEntries(otpFormData.entries()) 
-        const email = document.getElementById('email').value
-
-        fetch('/verify-otp',{
-            method:'POST',
-            headers:{
-                "content-Type":"application/json",
-            },
-            body:JSON.stringify({
-                otp:otpData.otp,
-                email:email
-            })
+    fetch('/signup', {
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            username: data.username,
+            email: data.email,
+            password: data.password
         })
-        .then(response => response.json())
-        .then(data=>{
-            if(data.success){
-                 // Redirect to login or dashboard
-                 window.location.href = '/home';
-            }else{
-                // Show OTP error
-                document.getElementById('otpError').textContent = data.message || 'Invalid OTP. Please try again.';
-                document.getElementById('otpError').classList.remove('hidden');  
-            }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Hide signup form and show OTP form
+            displayOtpForm();
+        } else {
+            // Handle signup error (e.g., email already exists)
+            document.getElementById('signupError').textContent = data.message || 'Signup failed. Please try again.';
+            document.getElementById('signupError').classList.remove('hidden');
+        }
+    });
+}
+
+// Submit OTP form for verification
+function submitOtpForm(event) {
+    event.preventDefault();
+
+    const otpFormData = new FormData(document.getElementById('otpForm'));
+    const otpData = Object.fromEntries(otpFormData.entries());
+    const email = document.getElementById('email').value;
+
+    fetch('/verify-otp', {
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            otp: otpData.otp,
+            email: email
         })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Redirect to login or dashboard
+            window.location.href = '/home';
+        } else {
+            // Show OTP error
+            document.getElementById('otpError').textContent = data.message || 'Invalid OTP. Please try again.';
+            document.getElementById('otpError').classList.remove('hidden');
+        }
+    });
+}
 
-    }
+// Resend OTP functionality
+function resendOtp() {
+    const email = document.getElementById('email').value;
 
+    fetch('/resend-otp', {
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: email })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Reset the timer and hide the resend link again
+            document.getElementById('resendOtp').classList.add('hidden');
+            startOtpTimer(120); // Restart 2-minute countdown
+        } else {
+            // Show resend error (optional)
+            document.getElementById('otpError').textContent = 'Failed to resend OTP. Please try again.';
+            document.getElementById('otpError').classList.remove('hidden');
+        }
+    });
+}
 
 
     function validateForm() {
@@ -241,4 +287,8 @@
         // If all validations pass, allow form submission
         return true;
     }
+
+
+
+    
 </script>
