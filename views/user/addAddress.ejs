@@ -1,0 +1,258 @@
+<%- include('header') %>
+
+<div class="flex flex-col md:flex-row min-h-screen">
+
+    <!-- Sidebar Section (1/4 of the width) -->
+    <div class="w-full bg-gray-700 md:w-1/4">
+        <%- include('sidebar') %>
+    </div>
+
+    <!-- Main Content Section (3/4 of the width) -->
+    <div class="w-full bg-gray-700 md:w-3/4 flex-grow p-4">
+
+         <!-- Success Toast -->
+         <% if (typeof success !== 'undefined' && success.length > 0) { %>
+            <div id="toast-success" class="bg-green-500 text-white font-semibold tracking-wide flex items-center w-max max-w-sm p-4 rounded-md shadow-md shadow-green-200 mx-auto mt-4 font-[sans-serif]" role="alert">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-[18px] shrink-0 fill-white inline mr-3" viewBox="0 0 512 512">
+                    <ellipse cx="256" cy="256" fill="#fff" rx="256" ry="255.832" />
+                    <path class="fill-green-500" d="m235.472 392.08-121.04-94.296 34.416-44.168 74.328 57.904 122.672-177.016 46.032 31.888z" />
+                </svg>
+                <span class="block sm:inline text-sm mr-3"><%= success %></span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3 cursor-pointer shrink-0 fill-white ml-auto" viewBox="0 0 320.591 320.591" onclick="closeToast('toast-success')">
+                    <path d="M30.391 318.583a30.37 30.37 0 0 1-21.56-7.288c-11.774-11.844-11.774-30.973 0-42.817L266.643 10.665c12.246-11.459 31.462-10.822 42.921 1.424 10.362 11.074 10.966 28.095 1.414 39.875L51.647 311.295a30.366 30.366 0 0 1-21.256 7.288z"/>
+                    <path d="M287.9 318.583a30.37 30.37 0 0 1-21.257-8.806L8.83 51.963C-2.078 39.225-.595 20.055 12.143 9.146c11.369-9.736 28.136-9.736 39.504 0l259.331 257.813c12.243 11.462 12.876 30.679 1.414 42.922-.456.487-.927.958-1.414 1.414a30.368 30.368 0 0 1-23.078 7.288z"/>
+                </svg>
+            </div>
+            <% } %>
+
+
+            <!-- Error Toast -->
+        <% if (typeof error !== 'undefined' && error.length > 0) { %>
+            <div id="toast-error" class="bg-red-500 text-white font-semibold tracking-wide flex items-center w-max max-w-sm p-4 rounded-md shadow-md shadow-red-200 mx-auto mt-4 font-[sans-serif]" role="alert">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-[18px] shrink-0 fill-white inline mr-3" viewBox="0 0 512 512">
+                    <ellipse cx="256" cy="256" fill="#fff" rx="256" ry="255.832" />
+                    <path class="fill-red-500" d="m235.472 392.08-121.04-94.296 34.416-44.168 74.328 57.904 122.672-177.016 46.032 31.888z" />
+                </svg>
+                <span class="block sm:inline text-sm mr-3"><%= error %></span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3 cursor-pointer shrink-0 fill-white ml-auto" viewBox="0 0 320.591 320.591" onclick="closeToast('toast-error')">
+                    <path d="M30.391 318.583a30.37 30.37 0 0 1-21.56-7.288c-11.774-11.844-11.774-30.973 0-42.817L266.643 10.665c12.246-11.459 31.462-10.822 42.921 1.424 10.362 11.074 10.966 28.095 1.414 39.875L51.647 311.295a30.366 30.366 0 0 1-21.256 7.288z"/>
+                    <path d="M287.9 318.583a30.37 30.37 0 0 1-21.257-8.806L8.83 51.963C-2.078 39.225-.595 20.055 12.143 9.146c11.369-9.736 28.136-9.736 39.504 0l259.331 257.813c12.243 11.462 12.876 30.679 1.414 42.922-.456.487-.927.958-1.414 1.414a30.368 30.368 0 0 1-23.078 7.288z"/>
+                </svg>
+            </div>
+            <% } %>
+
+        <div class="bg-gray-900 min-h-screen flex items-center justify-center p-4">
+            <div class="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-2xl">
+                <h2 class="text-lg font-semibold text-white mb-6">Add New Address</h2>
+        
+                <form action="/addNewAddress" method="POST" id="addressForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Full Name -->
+                    <div>
+                        <label for="contactName" class="block text-gray-300 text-sm">Full Name</label>
+                        <input type="text" id="contactName" name="contactName" placeholder="Full Name" class="w-full mt-2 p-2 bg-gray-700 text-white border-none rounded-md">
+                        <span id="contactNameError" class="text-red-500 text-sm"></span>
+                    </div>
+
+                    <!-- Mobile Number -->
+                    <div>
+                        <label for="phonenumber" class="block text-gray-300 text-sm">Mobile Number</label>
+                        <input type="text" id="phonenumber" name="phonenumber" class="w-full mt-2 p-2 bg-gray-700 text-white border-none rounded-md">
+                        <span id="phonenumberError" class="text-red-500 text-sm"></span>
+                    </div>
+
+                    <!-- Building -->
+                    <div>
+                        <label for="building" class="block text-gray-300 text-sm">Building / Address Line</label>
+                        <input type="text" id="building" name="building" placeholder="Building / Address Line"
+                            class="w-full mt-2 p-2 bg-gray-700 text-white border-none rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <span id="buildingError" class="text-red-500 text-sm"></span>
+                    </div>
+
+                    <!-- Pincode -->
+                    <div>
+                        <label for="pincode" class="block text-gray-300 text-sm">Pincode</label>
+                        <input type="text" id="pincode" name="pincode" placeholder="Enter Pincode" class="w-full mt-2 p-2 bg-gray-700 text-white border-none rounded-md" maxlength="6">
+                        <span id="pincodeError" class="text-red-500 text-sm"></span>
+
+                        <div id="loader" class="absolute inset-y-0 left-2/4 flex items-center pr-3 hidden">
+                            <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-10 w-10"></div>
+                        </div>
+                    </div>
+
+                    <!-- City -->
+                    <div>
+                        <label for="city" class="block text-gray-300 text-sm">City</label>
+                        <input type="text" id="city" name="city" class="w-full mt-2 p-2 bg-gray-700 text-white border-none rounded-md" readonly>
+                        <span id="cityError" class="text-red-500 text-sm"></span>
+                    </div>
+
+                    <!-- Landmark -->
+                    <div>
+                        <label for="landmark" class="block text-gray-300 text-sm">Landmark</label>
+                        <input type="text" id="landmark" name="landmark" placeholder="Landmark"
+                            class="w-full mt-2 p-2 bg-gray-700 text-white border-none rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <span id="landmarkError" class="text-red-500 text-sm"></span>
+                    </div>
+
+                    <!-- District -->
+                    <div>
+                        <label for="district" class="block text-gray-300 text-sm">District</label>
+                        <input type="text" id="district" name="district" class="w-full mt-2 p-2 bg-gray-700 text-white border-none rounded-md" readonly>
+                        <span id="districtError" class="text-red-500 text-sm"></span>
+                    </div>
+
+                    <!-- State -->
+                    <div>
+                        <label for="state" class="block text-gray-300 text-sm">State</label>
+                        <input type="text" id="state" name="state" class="w-full mt-2 p-2 bg-gray-700 text-white border-none rounded-md" readonly>
+                        <span id="stateError" class="text-red-500 text-sm"></span>
+                    </div>
+
+                    <!-- Country -->
+                    <div>
+                        <label for="country" class="block text-gray-300 text-sm">Country</label>
+                        <input type="text" id="country" name="country" value="India" class="w-full mt-2 p-2 bg-gray-700 text-white border-none rounded-md" readonly>
+                        <span id="countryError" class="text-red-500 text-sm"></span>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="md:col-span-2 flex justify-end mt-4">
+                        <button type="submit" class="bg-green-500 text-white py-2 px-6 rounded-md hover:bg-green-600">
+                            Add
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Loader Spinner -->
+        <style>
+            .loader {
+                border-color: #ffffff transparent transparent transparent;
+                animation: spin 1s linear infinite;
+            }
+
+            @keyframes spin {
+                0% {
+                    transform: rotate(0deg);
+                }
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+        </style>
+
+        <!-- Client-side Validation and Pincode Fetch -->
+        <script>
+
+            function closeToast(toastId) {
+                document.getElementById(toastId).style.display = 'none';
+            }
+
+            // Automatically close toast after 3 seconds for both success and error messages
+            setTimeout(() => {
+                closeToast('toast-success');
+                closeToast('toast-error');
+            }, 3000);
+
+
+
+
+
+            const addressForm = document.getElementById('addressForm');
+            
+            addressForm.addEventListener('submit', function (e) {
+                let isValid = true;
+
+                // Full Name Validation
+                const contactName = document.getElementById('contactName').value;
+                if (contactName.trim() === "") {
+                    document.getElementById('contactNameError').innerText = "Full Name is required.";
+                    isValid = false;
+                } else {
+                    document.getElementById('contactNameError').innerText = "";
+                }
+
+                // Phone Number Validation
+                const phoneNumber = document.getElementById('phonenumber').value;
+                const phoneRegex = /^[6-9]\d{9}$/;
+                if (!phoneRegex.test(phoneNumber)) {
+                    document.getElementById('phonenumberError').innerText = "Enter a valid 10-digit mobile number.";
+                    isValid = false;
+                } else {
+                    document.getElementById('phonenumberError').innerText = "";
+                }
+
+                // Building / Address Line Validation
+                const building = document.getElementById('building').value;
+                if (building.trim() === "") {
+                    document.getElementById('buildingError').innerText = "Building/Address is required.";
+                    isValid = false;
+                } else {
+                    document.getElementById('buildingError').innerText = "";
+                }
+
+                // Pincode Validation
+                const pincode = document.getElementById('pincode').value;
+                const pincodeRegex = /^[1-9][0-9]{5}$/;
+                if (!pincodeRegex.test(pincode)) {
+                    document.getElementById('pincodeError').innerText = "Enter a valid 6-digit pincode.";
+                    isValid = false;
+                } else {
+                    document.getElementById('pincodeError').innerText = "";
+                }
+
+                // Prevent form submission if any validation failed
+                if (!isValid) {
+                    e.preventDefault();
+                }
+            });
+
+            // Existing pincode fetch logic with loader
+            let timeout;
+            document.getElementById('pincode').addEventListener('input', function () {
+                const pincode = this.value;
+
+                clearTimeout(timeout); // Clear any existing timeout before setting a new one
+
+                if (pincode.length === 6) {
+                    timeout = setTimeout(() => {
+                        fetchPincodeDetails(pincode);
+                    }, 500); // Wait 500ms before making the API call
+                }
+            });
+
+            function fetchPincodeDetails(pincode) {
+                // Show the loader
+                document.getElementById('loader').classList.remove('hidden');
+
+                fetch(`https://api.postalpincode.in/pincode/${pincode}`)
+                    .then((response) => response.json())
+                    .then((data) => {
+                        if (data[0].Status === 'Success') {
+                            const postOffice = data[0].PostOffice[0];
+                            document.getElementById('city').value = postOffice.Name;
+                            document.getElementById('district').value = postOffice.District;
+                            document.getElementById('state').value = postOffice.State;
+                        } else {
+                            clearAddressFields();
+                        }
+                    })
+                    .catch((err) => {
+                        console.error('Error fetching Pincode data:', err);
+                        clearAddressFields();
+                    })
+                    .finally(() => {
+                        // Hide the loader after the API call completes
+                        document.getElementById('loader').classList.add('hidden');
+                    });
+            }
+
+            function clearAddressFields() {
+                document.getElementById('city').value = '';
+                document.getElementById('district').value = '';
+                document.getElementById('state').value = '';
+            }
+        </script>
+    </div>
+</div>

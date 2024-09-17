@@ -1,12 +1,11 @@
 import express from 'express';
-import {   } from '../controller/userController/userController.mjs';
 const userRouter = express.Router()
 
 import {getSignUp,signupPost, verifyOtp,getLogin,loginPost,googleAuth,googleAuthCallback,userLogout,resendOtp} from '../controller/userController/userAuth.mjs'
 import { productView,allProducts } from '../controller/adminController/productController.mjs';
 // import {} '../services/auth.mjs'
 
-import { home } from '../controller/userController/userController.mjs'; 
+import { home,userProfile,addressView,addNewAddress,addNewAddressPost } from '../controller/userController/userController.mjs'; 
 import passport from 'passport';
 
 //----------------------------- login -------------------------------
@@ -55,6 +54,15 @@ userRouter.get('/home',home)
 userRouter.get('/productView/:id',productView)
 
 userRouter.get('/allProducts',allProducts)
+
+
+
+//----------------------------- User profile -------------------------------
+
+userRouter.get('/userProfile',userProfile);
+userRouter.get('/address',addressView);
+userRouter.get('/addNewAddress',addNewAddress);
+userRouter.post('/addNewAddress',addNewAddressPost);
 
 
 

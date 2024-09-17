@@ -17,36 +17,33 @@ adminRouter.post('/login',loginPost)
 //------------------------------------  admin dashboard  ------------------------------------------------
 
 
-adminRouter.get('/dashboard',dashboard)
+adminRouter.get('/dashboard',isAdmin,dashboard)
 
 
 //------------------------------------  add category ------------------------------------------------
 
 adminRouter.get('/category',isAdmin,categoryView)
-adminRouter.get('/addCategory',addCategory)
-adminRouter.post('/addCategory',addCategoryPost)
+adminRouter.get('/addCategory',isAdmin,addCategory)
+adminRouter.post('/addCategory',isAdmin,addCategoryPost)
 adminRouter.patch('/updateCategory/:id',updateCategory)
 
 
 
 
 //-----------------------------display Category-------------------------------
-adminRouter.get('/customers',customers)
+adminRouter.get('/customers',isAdmin,customers)
 adminRouter.post('/toggleVerification',toggleVerification)
 
 
 
 //-----------------------------Products routes-------------------------------
 
-adminRouter.get('/addProduct',addProduct)
+adminRouter.get('/addProduct',isAdmin,addProduct)
 adminRouter.post('/addProduct',upload.array('image',3),addProductPost)
-adminRouter.get('/products',viewProducts)
-adminRouter.get('/editProduct',editProduct)
+adminRouter.get('/products',isAdmin,viewProducts)
+adminRouter.get('/editProduct',isAdmin,editProduct)
 adminRouter.post('/editProduct/:id',upload.array('image',3),editProductPut)
-adminRouter.put('/deleteProduct/:id', deleteProduct); 
-
-
-
+adminRouter.put('/deleteProduct/:id',isAdmin, deleteProduct); 
 
 
 

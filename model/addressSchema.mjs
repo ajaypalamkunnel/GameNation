@@ -16,6 +16,11 @@ const addressSchema = mongoose.Schema({
         required: false,
         unique: false
     },
+    district:{
+        type: String,
+        required: false,
+        unique: false
+    },
     state: {
         type: String,
         required: false,
