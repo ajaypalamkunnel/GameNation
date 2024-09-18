@@ -1,54 +1,54 @@
-import mongoose from "mongoose";
+    import mongoose from "mongoose";
 
-const addressSchema = mongoose.Schema({
-    contactName:{
-        type: String,
-        required:false,
-        unique:false
-    },
-    building:{
-        type:String,
-        required:false,
-        unique:false
-    },
-    city: {
-        type: String,
-        required: false,
-        unique: false
-    },
-    district:{
-        type: String,
-        required: false,
-        unique: false
-    },
-    state: {
-        type: String,
-        required: false,
-        unique: false
-    },
-    country: {
-        type: String,
-        required: false,
-        unique: false
-    },
-    pincode: {
-        type: String,
-        required: false,
-        unique: false
-    },
-    phonenumber: {
-        type: Number,
-        required: false,
-        unique: false
-    },
-    landmark: {
-        type: String,
-        required: false,
-        unique: false
-    }
-
-
-},{_id:false})
+    const addressSchema = mongoose.Schema({
+        contactName:{
+            type: String,
+            required:false,
+            unique:false
+        },
+        building:{
+            type:String,
+            required:false,
+            unique:false
+        },
+        city: {
+            type: String,
+            required: false,
+            unique: false
+        },
+        district:{
+            type: String,
+            required: false,
+            unique: false
+        },
+        state: {
+            type: String,
+            required: false,
+            unique: false
+        },
+        country: {
+            type: String,
+            required: false,
+            unique: false
+        },
+        pincode: {
+            type: String,
+            required: false,
+            unique: false
+        },
+        phonenumber: {
+            type: Number,
+            required: false,
+            unique: false
+        },
+        landmark: {
+            type: String,
+            required: false,
+            unique: false
+        }
 
 
-export default addressSchema
+    },{_id:true})
+
+
+    export default addressSchema

@@ -1,0 +1,244 @@
+<%- include('header') %>
+
+<div class="flex flex-col md:flex-row min-h-screen">
+  <!-- Sidebar Section -->
+  <div class="w-full bg-gray-700 md:w-1/4">
+    <%- include('sidebar') %>
+  </div>
+
+  <!-- Main Content Section -->
+  <div class="w-full bg-gray-700 md:w-3/4 flex-grow p-4">
+    <div class="bg-gray-900 min-h-screen flex items-center justify-center p-4">
+      <div class="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-2xl">
+        <h2 class="text-lg font-semibold text-white mb-6">Edit Address</h2>
+
+        <form id="editAddressForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Hidden input to pass the address ID -->
+          <input type="hidden" id="addressId" name="id" value="<%= address._id %>">
+
+          <!-- Full Name -->
+          <div>
+            <label for="contactName" class="block text-gray-300 text-sm">Full Name</label>
+            <input type="text" id="contactName" name="contactName" value="<%= address.contactName %>" class="w-full mt-2 p-2 bg-gray-700 text-white border-none rounded-md">
+            <span id="contactNameError" class="text-red-500 text-sm"></span>
+          </div>
+
+          <!-- Mobile Number -->
+          <div>
+            <label for="phonenumber" class="block text-gray-300 text-sm">Mobile Number</label>
+            <input type="text" id="phonenumber" name="phonenumber" value="<%= address.phonenumber %>" class="w-full mt-2 p-2 bg-gray-700 text-white border-none rounded-md">
+            <span id="phonenumberError" class="text-red-500 text-sm"></span>
+          </div>
+
+          <!-- Building / Address Line -->
+          <div>
+            <label for="building" class="block text-gray-300 text-sm">Building / Address Line</label>
+            <input type="text" id="building" name="building" value="<%= address.building %>" class="w-full mt-2 p-2 bg-gray-700 text-white border-none rounded-md">
+            <span id="buildingError" class="text-red-500 text-sm"></span>
+          </div>
+
+          <!-- Pincode -->
+          <div>
+            <label for="pincode" class="block text-gray-300 text-sm">Pincode</label>
+            <input type="text" id="pincode" name="pincode" value="<%= address.pincode %>" class="w-full mt-2 p-2 bg-gray-700 text-white border-none rounded-md" maxlength="6">
+            <span id="pincodeError" class="text-red-500 text-sm"></span>
+
+            <div id="loader" class="absolute inset-y-0 left-2/4 flex items-center pr-3 hidden">
+              <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-10 w-10"></div>
+            </div>
+          </div>
+
+          <!-- City -->
+          <div>
+            <label for="city" class="block text-gray-300 text-sm">City</label>
+            <input type="text" id="city" name="city" value="<%= address.city %>" class="w-full mt-2 p-2 bg-gray-700 text-white border-none rounded-md" readonly>
+            <span id="cityError" class="text-red-500 text-sm"></span>
+          </div>
+
+          <!-- District -->
+          <div>
+            <label for="district" class="block text-gray-300 text-sm">District</label>
+            <input type="text" id="district" name="district" value="<%= address.district %>" class="w-full mt-2 p-2 bg-gray-700 text-white border-none rounded-md" readonly>
+            <span id="districtError" class="text-red-500 text-sm"></span>
+          </div>
+
+          <!-- State -->
+          <div>
+            <label for="state" class="block text-gray-300 text-sm">State</label>
+            <input type="text" id="state" name="state" value="<%= address.state %>" class="w-full mt-2 p-2 bg-gray-700 text-white border-none rounded-md" readonly>
+            <span id="stateError" class="text-red-500 text-sm"></span>
+          </div>
+
+          <!-- Country -->
+          <div>
+            <label for="country" class="block text-gray-300 text-sm">Country</label>
+            <input type="text" id="country" name="country" value="<%= address.country %>" class="w-full mt-2 p-2 bg-gray-700 text-white border-none rounded-md" readonly>
+          </div>
+
+          <!-- Landmark -->
+          <div>
+            <label for="landmark" class="block text-gray-300 text-sm">Landmark</label>
+            <input type="text" id="landmark" name="landmark" value="<%= address.landmark %>" class="w-full mt-2 p-2 bg-gray-700 text-white border-none rounded-md">
+            <span id="landmarkError" class="text-red-500 text-sm"></span>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="md:col-span-2 flex justify-end mt-4">
+            <button type="submit" id="submitBtn" class="bg-green-500 text-white py-2 px-6 rounded-md hover:bg-green-600">
+              Save Changes
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Loader Spinner -->
+<style>
+  .loader {
+    border-color: #ffffff transparent transparent transparent;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+</style>
+
+<script>
+  const editAddressForm = document.getElementById('editAddressForm');
+
+  editAddressForm.addEventListener('submit', function (e) {
+    e.preventDefault(); // Prevent default form submission
+
+    let isValid = true;
+
+    // Form Validation
+    const contactName = document.getElementById('contactName').value;
+    const phoneNumber = document.getElementById('phonenumber').value;
+    const building = document.getElementById('building').value;
+    const pincode = document.getElementById('pincode').value;
+    const pincodeRegex = /^[1-9][0-9]{5}$/;
+
+    // Full Name Validation
+    if (contactName.trim() === "") {
+      document.getElementById('contactNameError').innerText = "Full Name is required.";
+      isValid = false;
+    } else {
+      document.getElementById('contactNameError').innerText = "";
+    }
+
+    // Phone Number Validation
+    const phoneRegex = /^[6-9]\d{9}$/;
+    if (!phoneRegex.test(phoneNumber)) {
+      document.getElementById('phonenumberError').innerText = "Enter a valid 10-digit mobile number.";
+      isValid = false;
+    } else {
+      document.getElementById('phonenumberError').innerText = "";
+    }
+
+    // Building Validation
+    if (building.trim() === "") {
+      document.getElementById('buildingError').innerText = "Building/Address is required.";
+      isValid = false;
+    } else {
+      document.getElementById('buildingError').innerText = "";
+    }
+
+    // Pincode Validation
+    if (!pincodeRegex.test(pincode)) {
+      document.getElementById('pincodeError').innerText = "Enter a valid 6-digit pincode.";
+      isValid = false;
+    } else {
+      document.getElementById('pincodeError').innerText = "";
+    }
+
+    // If form validation fails, return
+    if (!isValid) return;
+
+    // Collect form data
+    const formData = {
+      contactName,
+      phonenumber: phoneNumber,
+      building,
+      pincode,
+      city: document.getElementById('city').value,
+      district: document.getElementById('district').value,
+      state: document.getElementById('state').value,
+      country: document.getElementById('country').value,
+      landmark: document.getElementById('landmark').value,
+      id: document.getElementById('addressId').value
+    };
+
+    // Submit the form via fetch (PUT method)
+    fetch(`/editAddress/${formData.id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(formData)
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert('Address updated successfully!');
+          window.location.href = '/address';
+        } else {
+          alert('Failed to update address');
+        }
+      })
+      .catch(err => console.error('Error updating address:', err));
+  });
+
+  // Pincode fetching logic
+  let timeout;
+  document.getElementById('pincode').addEventListener('input', function () {
+    const pincode = this.value;
+
+    clearTimeout(timeout); // Clear any existing timeout before setting a new one
+
+    if (pincode.length === 6) {
+      timeout = setTimeout(() => {
+        fetchPincodeDetails(pincode);
+      }, 500); // Wait 500ms before making the API call
+    }
+  });
+
+  function fetchPincodeDetails(pincode) {
+    // Show the loader
+    document.getElementById('loader').classList.remove('hidden');
+
+    fetch(`https://api.postalpincode.in/pincode/${pincode}`)
+      .then((response) => response.json())
+      .then((data) => {
+        if (data[0].Status === 'Success') {
+          const postOffice = data[0].PostOffice[0];
+          document.getElementById('city').value = postOffice.Name;
+          document.getElementById('district').value = postOffice.District;
+          document.getElementById('state').value = postOffice.State;
+        } else {
+          clearAddressFields();
+        }
+      })
+      .catch((err) => {
+        console.error('Error fetching Pincode data:', err);
+        clearAddressFields();
+      })
+      .finally(() => {
+        // Hide the loader after the API call completes
+        document.getElementById('loader').classList.add('hidden');
+      });
+  }
+
+  function clearAddressFields() {
+    document.getElementById('city').value = '';
+    document.getElementById('district').value = '';
+    document.getElementById('state').value = '';
+  }
+</script>

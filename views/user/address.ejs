@@ -28,22 +28,21 @@
                     <p><%= address.city %> - <%= address.pincode %>,</p>
                     <p><%= address.district %>, <%= address.state %>.</p>
                     <p>Mobile: <%= address.phonenumber %></p>
+                    <%= console.log("-----------",address._id) %>
                 </div>
-                <!-- Edit/Delete Icons -->
+                <!-- Edit-->
+                
                 <div class="flex space-x-4">
-                    <button class="text-green-400 hover:text-green-500 focus:outline-none">
-                        <i class="bi bi-pencil-square text-2xl"></i>
-                    </button>
-                    <button class="text-red-500 hover:text-red-600 focus:outline-none">
-                        <i class="bi bi-trash-fill text-2xl"></i>
-                    </button>
+                    <a href="/editAddress/<%= address._id %>" class="text-green-400 hover:text-green-500 focus:outline-none"><i class="bi bi-pencil-square text-2xl"></i></a>
+                   <!-- Delete Icons  -->
+                   <a href="" class="text-red-500 hover:text-red-600 focus:outline-none"><i class="bi bi-trash-fill text-2xl"></i></a>   
                 </div>
             </div>
             <% }) %>
         
-            <!-- Address Card 2 (Repeat for additional addresses) -->
+                                                                                                                                                                                                                                                                   
            
-        
+        x
         <!-- Add Bootstrap Icons -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
         
