@@ -145,7 +145,7 @@ export const addNewAddressPost = async (req, res) => {
       user.address.push(newAddress);
       await user.save();
       req.flash("success", "New address added successfully");
-      res.redirect("/addNewAddress");
+      res.redirect("/address");
     } else {
       res.redirect("/login");
     }
@@ -180,7 +180,7 @@ export const editAddress = async (req, res) => {
 
           if (!address) {
             req.flash("error", "Address not found");
-            return res.redirect("/user/address");
+            return res.redirect("/address");
           } else {
             const categories = await category.find({ isActive: true });
 
@@ -194,11 +194,11 @@ export const editAddress = async (req, res) => {
           }
         } else {
           req.flash("error", "No addresses found for this user.");
-          return res.redirect("/user/address");
+          return res.redirect("/address");
         }
       } else {
         req.flash("error", "User not found");
-        return res.redirect("/user/address");
+        return res.redirect("/address");
       }
     } else {
       res.redirect("/login");
@@ -262,3 +262,47 @@ export const editAddressPut = async (req, res) => {
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
+
+export const deleteAddress = async(req,res)=>{
+console.log("---deleteAddress");
+
+  try {
+    const addressId= req.params.addressId;
+
+    const user = await User.findOne({'address._id':addressId});
+
+    if(!user){
+      return res.status(404).json({success:false,message:'User not found'});
+    }
+
+    user.address.pull({_id:addressId});
+
+    await user.save();
+
+    return res.status(200).json({ success: true, message: 'Address deleted successfully' });
+    
+  } catch (error) {
+    console.error('Error deleting address:', error);
+    return res.status(500).json({ success: false, message: 'Server error' });
+    
+  }
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

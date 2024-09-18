@@ -5,7 +5,7 @@ import {getSignUp,signupPost, verifyOtp,getLogin,loginPost,googleAuth,googleAuth
 import { productView,allProducts } from '../controller/adminController/productController.mjs';
 // import {} '../services/auth.mjs'
 
-import { home,userProfile,addressView,addNewAddress,addNewAddressPost,editAddress,editAddressPut } from '../controller/userController/userController.mjs'; 
+import { home,userProfile,addressView,addNewAddress,addNewAddressPost,editAddress,editAddressPut,deleteAddress } from '../controller/userController/userController.mjs'; 
 import passport from 'passport';
 
 //----------------------------- login -------------------------------
@@ -64,7 +64,8 @@ userRouter.get('/address',addressView);
 userRouter.get('/addNewAddress',addNewAddress);
 userRouter.post('/addNewAddress',addNewAddressPost);
 userRouter.get('/editAddress/:addressId', editAddress); 
-userRouter.put('/editAddress/:addressId',editAddressPut)
+userRouter.put('/editAddress/:addressId',editAddressPut);
+userRouter.delete('/deleteAddress/:addressId',deleteAddress);
 
 
 export default userRouter
