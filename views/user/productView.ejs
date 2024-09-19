@@ -82,15 +82,15 @@
           <div class="mt-6 flex gap-4">
             <% if (product.stock > 0) { %>
               <!-- Enable buttons when in stock -->
-              <button class="bg-yellow-500 text-gray-900 font-semibold py-2 px-6 rounded-lg hover:bg-yellow-400 transition">
+              <button class="add-to-cart-btn bg-yellow-500 text-gray-900 font-semibold py-2 px-6 rounded-lg hover:bg-yellow-400 transition" data-product-id="<%= product._id %>">
                 Add to cart
-              </button>
+            </button>
               <button class="bg-green-500 text-white font-semibold py-2 px-6 rounded-lg hover:bg-green-400 transition">
                 Buy Now
               </button>
             <% } else { %>
               <!-- Disable buttons and change style when out of stock -->
-              <button class="bg-gray-500 text-gray-400 font-semibold py-2 px-6 rounded-lg cursor-not-allowed" disabled>
+              <button class=" bg-gray-500 text-gray-400 font-semibold py-2 px-6 rounded-lg cursor-not-allowed" disabled>
                 Add to cart
               </button>
               <button class="bg-gray-500 text-gray-400 font-semibold py-2 px-6 rounded-lg cursor-not-allowed" disabled>
@@ -178,7 +178,7 @@
       </div>
     </div>
   </div>
-
+<%- include('footer') %>
   <script>
 
     // JavaScript function to swap the main image when a thumbnail is clicked
@@ -189,6 +189,61 @@
     // Update the src attribute to the clicked thumbnail's image URL
     mainImage.src = imageUrl;
   }
+
+  const addToCart = async (productId)=>{
+    try {
+      const response = await fetch('/cart/add',{
+        method:'POST',
+        headers:{
+          'content-Type' : 'application/json'
+        },
+        body:JSON.stringify({
+          productId : productId,
+          productCount:1
+        })
+      })
+
+      const data = await response.json();
+
+      if(response.ok){
+        alert(data.message)
+      }else{
+        alert(data.message)
+      }
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      
+    }
+  }
+
+
+  document.querySelectorAll('.add-to-cart-btn').forEach(button=>{
+    button.addEventListener('click',function(){
+      const productId = this.getAttribute('data-product-id');
+      addToCart(productId)
+    })
+  })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   </script>
   

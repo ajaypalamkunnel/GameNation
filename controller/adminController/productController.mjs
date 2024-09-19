@@ -1,10 +1,12 @@
 import category from "../../model/categoryScehema.mjs";
 import Product from "../../model/productSchema.mjs";
+import User from "../../model/userSchema.mjs";
 import mongoose from "mongoose";
 import {v2 as cloudinary} from 'cloudinary'
 import {Buffer} from 'buffer'
 import { response } from "express";
 import { title } from "process";
+import Cart from "../../model/cartSchema.mjs";
 
 
 
@@ -423,6 +425,11 @@ export const allProducts = async (req, res) => {
 export const cart = async(req,res)=>{
   try {
 
+    const email = req.session.user._id;
+
+    console.log(email);
+    
+
     const categories = await category.find({ isActive: true });
 
     res.render('user/cart',{
@@ -432,6 +439,101 @@ export const cart = async(req,res)=>{
     })
     
   } catch (error) {
+    
+  }
+}
+
+
+
+
+export const addToCart = async(req,res)=>{
+  try {
+
+    if(req.session.user){
+
+      const email = req.session.user;
+
+      const user = await User.findOne({email:email});
+
+      if(!user){
+        return res.status(404).json({message:'User not found'})
+      }
+
+
+      const {productId,productCount} = req.body;
+
+      const product = await Product.findById(productId)
+
+      if(!product){
+        return res.status(404).json({message:"Product not found"});
+      }
+
+      
+      if (product.stock < productCount) {
+        return res.status(400).json({ message: `Insufficient stock. Only ${product.stock} items available.` });
+    }
+
+      let cart = await Cart.findOne({userId:user._id});
+
+      if(!cart){
+        cart = new Cart(
+          {
+            userId:user._id,
+            items:[],
+            totalPrice:0,
+            payableAmount:0
+          }
+        )
+      }
+
+      const existingItemIndex = cart.items.findIndex(item=>item.productId.toString()===productId);
+
+      if(existingItemIndex > -1){
+        const newProductCount = cart.items[existingItemIndex].productCount + productCount;
+
+
+        if (newProductCount > product.stock) {
+          return res.status(400).json({ message: `Not enough stock. Only ${product.stock} items available.` });
+        }
+
+        cart.items[existingItemIndex].productCount = newProductCount;
+        cart.items[existingItemIndex].productPrice = product.price * newProductCount;
+      }else{
+
+        //Add new item to the cart
+
+        cart.items.push({
+          productId,
+          productCount,
+          productPrice:product.price * productCount
+        })
+
+      }
+
+      // Update total price and payable amount
+      cart.totalPrice = cart.items.reduce((acc, item) => acc + item.productPrice, 0);
+      cart.payableAmount = cart.totalPrice;
+
+      product.stock -= productCount;
+      await product.save();
+
+
+      // Save the cart
+      await cart.save();
+
+      return res.status(200).json({ message: "Product added to cart successfully", cart });
+
+
+    }else{
+      res.redirect('/login')
+
+    }
+    
+  } catch (error) {
+
+    console.error(error);
+    return res.status(500).json({ message: "An error occurred while adding the product to the cart" });
+
     
   }
 }

@@ -1,8 +1,9 @@
 import express from 'express';
+import { isUser } from '../middleware/userSession.mjs';
 const userRouter = express.Router()
 
 import {getSignUp,signupPost, verifyOtp,getLogin,loginPost,googleAuth,googleAuthCallback,userLogout,resendOtp} from '../controller/userController/userAuth.mjs'
-import { productView,allProducts,cart  } from '../controller/adminController/productController.mjs';
+import { productView,allProducts,cart,addToCart  } from '../controller/adminController/productController.mjs';
 // import {} '../services/auth.mjs'
 
 import { home,userProfile,addressView,addNewAddress,addNewAddressPost,editAddress,editAddressPut,deleteAddress} from '../controller/userController/userController.mjs'; 
@@ -70,7 +71,8 @@ userRouter.delete('/deleteAddress/:addressId',deleteAddress);
 
 //----------------------------- User profile -------------------------------
 
-userRouter.get('/cart',cart)
+userRouter.get('/cart',cart);
+userRouter.post('/cart/add',addToCart)
 
 
 
