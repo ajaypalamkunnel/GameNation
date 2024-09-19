@@ -423,22 +423,78 @@ export const allProducts = async (req, res) => {
 
 
 export const cart = async(req,res)=>{
+  console.log("--- hi cart");
+  
   try {
+    if(req.session.user){
 
-    const email = req.session.user._id;
+      const email = req.session.user;
+  
+      const user = await User.findOne({email})
+      
+  
+      
+      const cart = await Cart.findOne({userId:user._id}).populate('items.productId');
 
-    console.log(email);
-    
+      console.log("cart---",cart);
+      
+      
+      
+      const categories = await category.find({ isActive: true });
 
-    const categories = await category.find({ isActive: true });
 
-    res.render('user/cart',{
-      title:'Cart',
-      categories,
-      user:req.session.user
-    })
+
+
+      if(!cart || cart.items.length === 0){
+
+      return res.render('user/cart',{
+          title:'Cart',
+          categories,
+          user:req.session.user,
+          cartItems:[],
+          totalPayable:0
+
+        })
+      }
+
+      const cartItems = cart.items.map((item)=>{
+        const product = item.productId;
+        const discountPercentage = product.discount || 0;
+        const discountedPrice = product.price * (1 - discountPercentage/100);
+        const totalItemPrice = discountedPrice * item.productCount;
+
+        return {
+          ...item._doc,
+          productName : product.product_name,
+          productImage: product.image[0],
+          productPrice: product.price,
+          discountedPrice,
+          totalItemPrice
+        };
+      });
+
+      const totalPayable = cartItems.reduce((acc,item)=> acc + item.totalItemPrice,0);
+
+      console.log(totalPayable);
+      
+
+      res.render('user/cart',{
+        title: 'Cart',
+        categories,
+        user:req.session.user,
+        cartItems,
+        totalPayable
+      })
+  
+    }else{
+      res.redirect('/login')
+    }
+
     
   } catch (error) {
+
+    console.log(`error while rendering ${error}`);
+    
     
   }
 }
@@ -473,6 +529,10 @@ export const addToCart = async(req,res)=>{
         return res.status(400).json({ message: `Insufficient stock. Only ${product.stock} items available.` });
     }
 
+
+    const discountPercentage = product.discount || 0;
+    const discountedPrice = product.price * (1-discountPercentage/100)
+
       let cart = await Cart.findOne({userId:user._id});
 
       if(!cart){
@@ -497,7 +557,7 @@ export const addToCart = async(req,res)=>{
         }
 
         cart.items[existingItemIndex].productCount = newProductCount;
-        cart.items[existingItemIndex].productPrice = product.price * newProductCount;
+        cart.items[existingItemIndex].productPrice = discountedPrice * newProductCount;
       }else{
 
         //Add new item to the cart
@@ -505,7 +565,7 @@ export const addToCart = async(req,res)=>{
         cart.items.push({
           productId,
           productCount,
-          productPrice:product.price * productCount
+          productPrice: discountedPrice * productCount
         })
 
       }
