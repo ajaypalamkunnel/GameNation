@@ -423,7 +423,7 @@ export const allProducts = async (req, res) => {
 
 
 export const cart = async(req,res)=>{
-  console.log("--- hi cart");
+  //console.log("--- hi cart");
   
   try {
     if(req.session.user){
@@ -436,7 +436,7 @@ export const cart = async(req,res)=>{
       
       const cart = await Cart.findOne({userId:user._id}).populate('items.productId');
 
-      console.log("cart---",cart);
+      //console.log("cart---",cart);
       
       
       
@@ -596,4 +596,102 @@ export const addToCart = async(req,res)=>{
 
     
   }
+}
+
+
+
+
+export const updateCartQuantity  = async(req,res)=>{
+    
+  try {
+    
+    if(req.session.user){
+
+      const {productId,action} = req.body;
+
+      const email = req.session.user
+
+      const user = await User.findOne({email});
+
+      const userId = user._id;
+
+     
+      
+
+      const product = await Product.findById(productId);
+
+      if (!product) {
+        return res.status(404).json({ message: "Product not found" });
+      }
+
+
+      const cart = await Cart.findOne({userId}).populate('items.productId');
+
+      
+      
+
+      if(!cart){
+        return res.status(404).json({message:"cart not found"})
+      }
+      
+      const cartItem = cart.items.find((item)=> item.productId._id.toString() === productId)
+
+      if(!cartItem){
+        return res.status(404).json({message: "product not found"})
+      }
+      console.log("product stock------",cartItem.productId.stock);
+      
+      if(action === 'increment'){
+        if(cartItem.productCount >= cartItem.productId.stock){
+          return res.status(400).json({message:"Not enough stock available"})
+        }
+        cartItem.productCount +=1;
+        product.stock -= 1;
+        await product.save();
+
+      }else if(action === 'decrement'){
+
+        if(cartItem.productCount === 1){
+          return res.status(400).json({message: "Cannot reduce quantity below 1"})
+        }
+
+        cartItem.productCount -= 1;
+        product.stock +=1;
+        await product.save();
+
+      }
+
+      const discount = cartItem.productId.discount || 0;
+      const discountedPrice = cartItem.productId.price * (1-discount/100);
+      cartItem.productPrice = discountedPrice * cartItem.productCount;
+
+      cart.totalPrice = cart.items.reduce((acc,item)=>acc+item.productPrice,0);
+      cart.payableAmount = cart.totalPrice;
+
+      await cart.save();
+
+      res.status(200).json({
+
+        message: "cart updated successfully",
+        productCount : cartItem.productCount,
+        productPrice:cartItem.productPrice,
+        totalPayable:cart.totalPrice
+
+      })
+
+
+       
+  
+    }else{
+      res.redirect('/login')
+    }
+  } catch (error) {
+    
+    console.error("Error updating cart:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+
+
+
+
 }
