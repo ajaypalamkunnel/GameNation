@@ -2,10 +2,10 @@ import express from 'express';
 const userRouter = express.Router()
 
 import {getSignUp,signupPost, verifyOtp,getLogin,loginPost,googleAuth,googleAuthCallback,userLogout,resendOtp} from '../controller/userController/userAuth.mjs'
-import { productView,allProducts } from '../controller/adminController/productController.mjs';
+import { productView,allProducts,cart  } from '../controller/adminController/productController.mjs';
 // import {} '../services/auth.mjs'
 
-import { home,userProfile,addressView,addNewAddress,addNewAddressPost,editAddress,editAddressPut,deleteAddress } from '../controller/userController/userController.mjs'; 
+import { home,userProfile,addressView,addNewAddress,addNewAddressPost,editAddress,editAddressPut,deleteAddress} from '../controller/userController/userController.mjs'; 
 import passport from 'passport';
 
 //----------------------------- login -------------------------------
@@ -66,6 +66,13 @@ userRouter.post('/addNewAddress',addNewAddressPost);
 userRouter.get('/editAddress/:addressId', editAddress); 
 userRouter.put('/editAddress/:addressId',editAddressPut);
 userRouter.delete('/deleteAddress/:addressId',deleteAddress);
+
+
+//----------------------------- User profile -------------------------------
+
+userRouter.get('/cart',cart)
+
+
 
 
 export default userRouter

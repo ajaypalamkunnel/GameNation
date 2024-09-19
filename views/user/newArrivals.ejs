@@ -20,8 +20,9 @@
     <!-- Horizontal Scrollable Container -->
     <div class="flex overflow-x-auto space-x-4 pb-4 scrollbar-hide">
       <% products.forEach(product => { %>
+        <a href="/productView/<%= product._id %>">
       <div class="relative w-72 shrink-0 rounded-lg bg-white shadow-md">
-        <a href="#">
+        <a href="/productView/<%= product._id %>">
           <!-- Product Image -->
           <img
             class="h-60 w-full object-cover object-center rounded-t-lg"
@@ -32,7 +33,7 @@
 
         <div class="p-5">
           <!-- Product Title -->
-          <a href="#">
+          <a href="/productView/<%= product._id %>">
             <h5 class="text-xl font-semibold tracking-tight text-slate-900">
               <%= product.product_name %>
             </h5>
@@ -46,6 +47,7 @@
           </div>
 
           <!-- Price and Add to Cart -->
+           <a href="/productView/<%= product._id %>">
           <div class="flex items-center justify-between">
             <p>
               <span class="text-3xl font-bold text-slate-900">
@@ -56,7 +58,7 @@
               </span>
             </p>
             <a
-              href="#"
+            href="/productView/<%= product._id %>"
               class="flex items-center rounded-md bg-slate-900 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-blue-300"
             >
               <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -69,8 +71,10 @@
               Add to cart
             </a>
           </div>
+          </a>
         </div>
       </div>
+    </a>
       <% }) %>
     </div>
   </div>

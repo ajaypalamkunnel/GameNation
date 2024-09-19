@@ -80,8 +80,23 @@
   
           <!-- Buttons -->
           <div class="mt-6 flex gap-4">
-            <button class="bg-yellow-500 text-gray-900 font-semibold py-2 px-6 rounded-lg hover:bg-yellow-400 transition">Add to cart</button>
-            <button class="bg-green-500 text-white font-semibold py-2 px-6 rounded-lg hover:bg-green-400 transition">Buy Now</button>
+            <% if (product.stock > 0) { %>
+              <!-- Enable buttons when in stock -->
+              <button class="bg-yellow-500 text-gray-900 font-semibold py-2 px-6 rounded-lg hover:bg-yellow-400 transition">
+                Add to cart
+              </button>
+              <button class="bg-green-500 text-white font-semibold py-2 px-6 rounded-lg hover:bg-green-400 transition">
+                Buy Now
+              </button>
+            <% } else { %>
+              <!-- Disable buttons and change style when out of stock -->
+              <button class="bg-gray-500 text-gray-400 font-semibold py-2 px-6 rounded-lg cursor-not-allowed" disabled>
+                Add to cart
+              </button>
+              <button class="bg-gray-500 text-gray-400 font-semibold py-2 px-6 rounded-lg cursor-not-allowed" disabled>
+                Buy Now
+              </button>
+            <% } %>
           </div>
   
           <!-- Delivery & Availability -->
@@ -174,12 +189,6 @@
     // Update the src attribute to the clicked thumbnail's image URL
     mainImage.src = imageUrl;
   }
-
-
-
-
-
-
 
   </script>
   

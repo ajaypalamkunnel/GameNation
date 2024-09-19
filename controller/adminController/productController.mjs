@@ -414,3 +414,24 @@ export const allProducts = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+
+
+
+
+
+export const cart = async(req,res)=>{
+  try {
+
+    const categories = await category.find({ isActive: true });
+
+    res.render('user/cart',{
+      title:'Cart',
+      categories,
+      user:req.session.user
+    })
+    
+  } catch (error) {
+    
+  }
+}
