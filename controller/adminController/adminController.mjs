@@ -1,4 +1,5 @@
 import category from "../../model/categoryScehema.mjs";
+import Product from "../../model/productSchema.mjs";
 import User from "../../model/userSchema.mjs";
 import mongoose from "mongoose";
 //---------------------- admin login get request ---------------------- 
@@ -215,3 +216,6 @@ export const toggleVerification = async(req,res)=>{
         res.json({success:false})
     }
 }
+
+
+

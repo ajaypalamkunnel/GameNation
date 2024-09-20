@@ -33,7 +33,7 @@
     <div class="flex justify-between items-center mb-6">
         <div class="flex space-x-2">
             <input type="text" id="search" placeholder="Search products..." class="p-2 rounded-lg w-80 focus:outline-none focus:ring-2 focus:ring-green-500">
-            <button class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">Search</button>
+            <button id="searchBtn" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">Search</button>
         </div>
         <button class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">Filter</button>
     </div>
@@ -63,3 +63,61 @@
         <% }) %>
     </div>
 </div>
+
+
+<script>
+  document.querySelector('#searchBtn').addEventListener('click',function(event){
+    event.preventDefault();
+
+    const query = document.querySelector('#search').value;
+
+    fetch(`/search?query=${encodeURIComponent(query)}`)
+
+    .then(response => response.json())
+    .then(data=>{
+
+       // Clear the current product list
+
+       const productList = document.querySelector('.grid');
+       productList.innerHTML = '';
+
+       data.products.forEach(product=>{
+        const productCard =`
+
+         <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <img src="${product.image[0]}" alt="${product.product_name}" class="w-full h-60 mt-2 p-5 py-0 rounded-lg object-cover">
+            <div class="p-4 flex justify-between">
+              <div>
+                <h3 class="text-lg font-semibold text-gray-900">${product.product_name}</h3>
+                <p class="text-gray-600 font-bold">₹ ${product.price}</p>
+              </div>
+              <div>
+                <a href="/productView/${product._id}" class="w-10 h-10 inline-flex items-center justify-center rounded-lg bg-[#3f9147] hover:bg-blue-700 active:bg-blue-600">
+                  <button type="button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14px" fill="#fff" viewBox="0 0 492.004 492.004">
+                      <path d="M382.678 226.804 163.73 7.86C158.666 2.792 151.906 0 144.698 0s-13.968 2.792-19.032 7.86l-16.124 16.12c-10.492 10.504-10.492 27.576 0 38.064L293.398 245.9l-184.06 184.06c-5.064 5.068-7.86 11.824-7.86 19.028 0 7.212 2.796 13.968 7.86 19.04l16.124 16.116c5.068 5.068 11.824 7.86 19.032 7.86s13.968-2.792 19.032-7.86L382.678 265c5.076-5.084 7.864-11.872 7.848-19.088.016-7.244-2.772-14.028-7.848-19.108z" />
+                    </svg>
+                  </button>
+                </a>
+              </div>
+            </div>
+          </div>
+
+        `;
+
+        productList.innerHTML += productCard
+       })
+
+    })
+
+    .catch(error => {
+        console.error('Error fetching the products:', error);
+      });
+
+
+
+  })
+
+
+
+</script>

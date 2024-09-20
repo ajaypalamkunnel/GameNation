@@ -364,11 +364,11 @@ export const productView = async(req,res)=>{
     if (!product || product.isDelete) {
       return res.status(404).json({ message: 'Product not found or deleted' });
     }
-    console.log("hiiiiii",product);
+    //console.log("hiiiiii",product);
 
     // res.status(200).json(product);
     let discountPrice = Math.ceil(product.price - (product.price * product.discount/100))
-    console.log(discountPrice);
+    //console.log(discountPrice);
     
     
     res.render('user/productView',
@@ -503,6 +503,8 @@ export const cart = async(req,res)=>{
 
 
 export const addToCart = async(req,res)=>{
+  console.log("not logged");
+  
   try {
 
     if(req.session.user){
@@ -523,6 +525,12 @@ export const addToCart = async(req,res)=>{
       if(!product){
         return res.status(404).json({message:"Product not found"});
       }
+
+      if(product.isDelete){
+        return res.status(404).json({message:"Product is not available"});
+
+      }
+      
 
       
       if (product.stock < productCount) {
@@ -585,7 +593,9 @@ export const addToCart = async(req,res)=>{
 
 
     }else{
+      console.log("please login ajay");
       res.redirect('/login')
+      
 
     }
     
@@ -694,4 +704,40 @@ export const updateCartQuantity  = async(req,res)=>{
 
 
 
+}
+
+
+
+
+
+
+
+export const searchProducts = async(req,res)=>{
+  try {
+      const query = req.query.query;
+
+      const searchCriteria ={
+
+          $or: [
+              { product_name: { $regex: query, $options: 'i' } }, // Case-insensitive search for product name
+              { genre: { $regex: query, $options: 'i' } },        // Case-insensitive search for genre
+              { developer: { $regex: query, $options: 'i' } },    // Search by developer
+              { publisher: { $regex: query, $options: 'i' } },    // Search by publisher
+              { country_of_orgin: { $regex: query, $options: 'i' } } // Search by country of origin
+            ],
+            isDelete: false // Ensure not deleted
+
+
+
+      };
+
+
+      const products = await Product.find(searchCriteria);
+      res.json({products});
+  } catch (error) {
+
+      console.error('Error searching products:', error);
+      res.status(500).json({ message: 'Error searching products' });
+      
+  }
 }
