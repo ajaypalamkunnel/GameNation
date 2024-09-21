@@ -5,6 +5,7 @@ import express from "express";
 import connectDB from "./config/db.mjs";
 import dotenv from "dotenv";
 import path from "path";
+import mongoose from "mongoose";
 import adminRouter from "./routes/adminRoutes.mjs";
 import userRouter from "./routes/userRoutes.mjs";
 import session from "express-session";
@@ -25,6 +26,7 @@ app.set("view engine", "ejs");
 
 app.use(layouts);
 app.set("layout", "./layouts/layout");
+
 
 
 //---------------------- public static files------------------------------

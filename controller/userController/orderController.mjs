@@ -50,7 +50,8 @@ export const orders = async(req,res)=>{
             .populate({
                 path:'products.product_id',
                 select:'product_name category price stock image',
-                model:Product
+                model:Product,
+                options: { strictPopulate: false }
             });
             console.log(orders);
             

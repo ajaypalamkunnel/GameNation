@@ -37,12 +37,12 @@
       </div>
 
       <% order.products.forEach(product=>{ %>
-      
+        
       <div class="flex flex-col md:flex-row mb-4">
         <!-- Product Image -->
         <div class="w-full md:w-1/4 mb-4 md:mb-0">
     <% if (product.product_id && product.product_id.image && product.product_id.image.length > 0) { %>
-        <img src="<%= product.product_id.image[0] %>" alt="<%= product.product_name %>" class="rounded-lg w-full">
+        <img src="<%= product.product_id.image[0] %>" alt="<%= product.product_name %>" class="rounded-lg w-1/2">
     <% } else { %>
         <!-- Fallback Image -->
         <img src="/path/to/default-image.jpg" alt="No image available" class="rounded-lg w-full">

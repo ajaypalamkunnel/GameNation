@@ -72,7 +72,7 @@ export const placeOrder = async(req,res)=>{
             const { addressId, paymentMethod, cartItems, totalPrice } = req.body;
             const user = await User.findOne({email:req.session.user});
 
-            console.log(cartItems);
+            console.log("--------",cartItems);
             
             
             
@@ -89,7 +89,7 @@ export const placeOrder = async(req,res)=>{
               const newOrder = new OrderSchema({
                 customer_id:user._id,
                 products: cartItems.map(item => ({
-                    product_id: item.productId._id,
+                    product_id: item.productId,
                     product_name: item.productName,
                     product_category: item.productId.category,
                     product_quantity: item.productQuantity,
