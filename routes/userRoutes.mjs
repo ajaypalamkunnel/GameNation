@@ -5,7 +5,7 @@ const userRouter = express.Router()
 import {getSignUp,signupPost, verifyOtp,getLogin,loginPost,googleAuth,googleAuthCallback,userLogout,resendOtp} from '../controller/userController/userAuth.mjs'
 import { productView,allProducts,cart,addToCart,updateCartQuantity,searchProducts,removeProductFromCart  } from '../controller/adminController/productController.mjs';
 // import {} '../services/auth.mjs'
-import { checkout } from '../controller/userController/checkoutController.mjs';
+import { checkout, placeOrder } from '../controller/userController/checkoutController.mjs';
 import { home,userProfile,addressView,addNewAddress,addNewAddressPost,editAddress,editAddressPut,deleteAddress} from '../controller/userController/userController.mjs'; 
 import passport from 'passport';
 
@@ -60,30 +60,34 @@ userRouter.get('/allProducts',allProducts)
 
 //----------------------------- User profile -------------------------------
 
-userRouter.get('/userProfile',userProfile);
-userRouter.get('/address',addressView);
-userRouter.get('/addNewAddress',addNewAddress);
-userRouter.post('/addNewAddress',addNewAddressPost);
-userRouter.get('/editAddress/:addressId', editAddress); 
-userRouter.put('/editAddress/:addressId',editAddressPut);
-userRouter.delete('/deleteAddress/:addressId',deleteAddress);
+userRouter.get('/userProfile',isUser,userProfile);
+userRouter.get('/address',isUser,addressView);
+userRouter.get('/addNewAddress',isUser,addNewAddress);
+userRouter.post('/addNewAddress',isUser,addNewAddressPost);
+userRouter.get('/editAddress/:addressId',isUser, editAddress); 
+userRouter.put('/editAddress/:addressId',isUser,editAddressPut);
+userRouter.delete('/deleteAddress/:addressId',isUser,deleteAddress);
 
 
 //----------------------------- cart management -------------------------------
 
-userRouter.get('/cart',cart);
-userRouter.post('/cart/add',addToCart);
-userRouter.post('/cart/update-quantity',updateCartQuantity);
+userRouter.get('/cart',isUser,cart);
+userRouter.post('/cart/add',isUser,addToCart);
+userRouter.post('/cart/update-quantity',isUser,updateCartQuantity);
+userRouter.post('/cart/remove-item',isUser,removeProductFromCart)
 
 
 
 //---------------------------- search management --------------
 
 userRouter.get('/search',searchProducts);
-userRouter.post('/cart/remove-item',removeProductFromCart)
 
 
-userRouter.get('/checkout',checkout)
+
+//---------------------------- checkout management --------------
+userRouter.get('/checkout',checkout);
+
+userRouter.post('/place-order',placeOrder)
 
 
 export default userRouter

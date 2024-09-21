@@ -36,27 +36,31 @@
             <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
               
   <!-- address card -->
-   <% addresses.forEach(address=>{ %>
-  <div class="rounded-lg border border-gray-200 bg-gray-50 p-4 ps-4 dark:border-gray-700 dark:bg-gray-800">
-    <div class="flex items-start">
-      <div class="flex h-5 items-center">
-        <input id="address-ajay" aria-describedby="address-ajay-text" type="radio" name="delivery-method" value="" class="text-primary-600 focus:ring-primary-600 dark:focus:ring-primary-600 h-4 w-4 border-gray-300 bg-white focus:ring-2 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800" />
-      </div>
-      
-      <div class="ms-4 text-sm">
-        <label for="address-ajay" class="font-medium leading-none text-gray-900 dark:text-white"><%= address.contactName %></label>
-        <p id="address-ajay-text" class="mt-1 text-xs font-normal text-gray-500 dark:text-gray-400">
-          <%= address.building %>, <%= address.city %>, <%= address.state %>, <%= address.country %><br />
-          Pincode: <%= address.pincode %><br />
-          Phone: <%= address.phonenumber %>
-        </p>
+  <% addresses.forEach((address, index) => { %>
+    <div class="address-container rounded-lg border border-gray-200 bg-gray-50 p-4 ps-4 dark:border-gray-700 dark:bg-gray-800">
+      <div class="flex items-start">
+        <div class="flex h-5 items-center">
+          <!-- Unique ID and Value for each address -->
+          <input id="address-<%= index %>" aria-describedby="address-<%= index %>-text" 
+                 type="radio" name="delivery-method" value="<%= address._id %>" 
+                 class="text-primary-600 focus:ring-primary-600 dark:focus:ring-primary-600 h-4 w-4 border-gray-300 bg-white focus:ring-2 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800" />
+        </div>
+        
+        <div class="ms-4 text-sm">
+          <!-- Label linked to the radio button using the unique ID -->
+          <label for="address-<%= index %>" class="font-medium leading-none text-gray-900 dark:text-white">
+            <%= address.contactName %>
+          </label>
+          <p id="address-<%= index %>-text" class="mt-1 text-xs font-normal text-gray-500 dark:text-gray-400">
+            <%= address.building %>, <%= address.city %>, <%= address.state %>, <%= address.country %><br />
+            Pincode: <%= address.pincode %><br />
+            Phone: <%= address.phonenumber %>
+          </p>
+        </div>
       </div>
     </div>
-  </div>
-
+  <% }) %>
   
-  <!-- address card -->
-   <% }) %>
              
             </div>
   
@@ -82,7 +86,12 @@
 
           <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Your Items</h3>
 <% items.forEach(item => { %>
-  <div class="flex justify-between border-b py-4">
+  <div class="cart-item flex justify-between border-b py-4" 
+       data-product-id="<%= item.productId._id %>" 
+       data-product-name="<%= item.productId.product_name %>" 
+       data-product-quantity="<%= item.productCount %>" 
+       data-product-price="<%= item.productPrice %>">
+    
     <div>
       <p class="font-medium text-gray-900 dark:text-white"><%= item.productId.product_name %></p>
       <p class="text-sm text-gray-500 dark:text-gray-400">Quantity: <%= item.productCount %></p>
@@ -92,18 +101,6 @@
     </div>
   </div>
 <% }) %>
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -149,11 +146,10 @@
                 </div>
   
                 <div class="mt-4 flex items-center gap-2">
-                  <button type="button" class="text-sm font-medium text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">Delete</button>
-  
-                  <div class="h-3 w-px shrink-0 bg-gray-200 dark:bg-gray-700"></div>
-  
-                  <button type="button" class="text-sm font-medium text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">Edit</button>
+                  <a href="javascript:void(0)" id="placeOrderBtn" class="inline-flex items-center justify-center px-4 py-2 bg-green-600 text-white font-medium text-sm rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                    Place Order
+                  </a>
+                 
                 </div>
               </div>
   
@@ -169,13 +165,7 @@
                   </div>
                 </div>
   
-                <div class="mt-4 flex items-center gap-2">
-                  <button type="button" class="text-sm font-medium text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">Delete</button>
-  
-                  <div class="h-3 w-px shrink-0 bg-gray-200 dark:bg-gray-700"></div>
-  
-                  <button type="button" class="text-sm font-medium text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">Edit</button>
-                </div>
+               
               </div>
             </div>
           </div>
@@ -188,7 +178,7 @@
             <div class="-my-3 divide-y divide-gray-200 dark:divide-gray-800">
               <dl class="flex items-center justify-between gap-4 py-3">
                 <dt class="text-base font-normal text-gray-500 dark:text-gray-400">Subtotal</dt>
-                <dd class="text-base font-medium text-gray-900 dark:text-white">₹ <%= cartTotal %></dd>
+                <dd class="text-base font-medium text-gray-900 dark:text-white">₹ <%= cartTotal.toFixed(2) %></dd>
               </dl>
   
               <dl class="flex items-center justify-between gap-4 py-3">
@@ -208,7 +198,7 @@
   
               <dl class="flex items-center justify-between gap-4 py-3">
                 <dt class="text-base font-bold text-gray-900 dark:text-white">Total</dt>
-                <dd class="text-base font-bold text-gray-900 dark:text-white">₹ <%= payableAmount %></dd>
+                <dd class="text-base font-bold text-gray-900 dark:text-white">₹ <%= payableAmount.toFixed(2) %></dd>
               </dl>
             </div>
           </div>
@@ -224,3 +214,81 @@
   </section>
 
 <%- include('footer') %>
+
+<script>
+
+  document.getElementById("placeOrderBtn").addEventListener("click",async function(){
+    const selectedAddress = document.querySelector("input[name='delivery-method']:checked");
+
+    if(!selectedAddress){
+      alert("Please select a delivery address.");
+      return;
+    }
+
+    const addressId = selectedAddress.value;
+
+    const paymentMethod = "Cash on delivery";
+
+    const cartItemsElements = document.querySelectorAll('.cart-item')
+
+    const cartData = []
+
+    cartItemsElements.forEach(itemElement =>{
+    const productId = itemElement.getAttribute('data-product-id');
+    const productName = itemElement.getAttribute('data-product-name');
+    const productQuantity = itemElement.getAttribute('data-product-quantity');
+    const productPrice = itemElement.getAttribute('data-product-price');
+
+    cartData.push({
+      productId:productId,
+      productName:productName,
+      productQuantity:parseInt(productQuantity),
+      productPrice:parseFloat(productPrice)
+    })
+
+    })
+
+    // Calculate total price from the cart items
+  const totalAmount = cartData.reduce((sum, item) => sum + (item.productQuantity * item.productPrice), 0);
+
+  const orderData = {
+    addressId: addressId,
+    paymentMethod : paymentMethod,
+    cartItems: cartData,
+    totalPrice : totalAmount
+  }
+
+  try {
+
+    const response = await fetch("/place-order",{
+      method:"POST",
+      headers:{
+        "Content-Type": "application/json"
+
+      },
+      body:JSON.stringify(orderData)
+    });
+
+    const result = await response.json();
+
+    if(response.ok){
+      alert("order placed succesfully");
+      // window.location.href = "/order-confirmation";
+
+    }else{
+      alert(result.message)
+    }
+    
+  } catch (error) {
+    console.error("Error placing order:", error);
+    alert("Something went wrong while placing your order. Please try again.");
+    
+  }
+
+
+
+  })
+
+
+  
+</script>
