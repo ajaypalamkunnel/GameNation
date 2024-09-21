@@ -140,7 +140,7 @@
                   </div>
   
                   <div class="ms-4 text-sm">
-                    <label for="pay-on-delivery" class="font-medium leading-none text-gray-900 dark:text-white"> Payment on delivery </label>
+                    <label for="pay-on-delivery" class="font-medium leading-none text-gray-900 dark:text-white"> Cash on delivery </label>
                     <p id="pay-on-delivery-text" class="mt-1 text-xs font-normal text-gray-500 dark:text-gray-400">+$15 payment processing fee</p>
                   </div>
                 </div>
@@ -273,7 +273,9 @@
 
     if(response.ok){
       alert("order placed succesfully");
-      // window.location.href = "/order-confirmation";
+      console.log("Order ID:", result.orderId);
+
+      window.location.href = `/orderSummary?orderId=${result.orderId}`;
 
     }else{
       alert(result.message)

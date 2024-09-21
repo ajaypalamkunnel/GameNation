@@ -72,13 +72,15 @@ export const placeOrder = async(req,res)=>{
             const { addressId, paymentMethod, cartItems, totalPrice } = req.body;
             const user = await User.findOne({email:req.session.user});
             
+            
+            
 
             const selectedAddress = await user.address.id(addressId);;
 
             if (!selectedAddress) {
                 return res.status(400).json({ message: "Address not found" });
               }
-              
+              console.log("selected address",selectedAddress);
               
 
               const newOrder = new OrderSchema({
@@ -114,8 +116,10 @@ export const placeOrder = async(req,res)=>{
               //clear the particular user cart
 
               await Cart.findOneAndUpdate({userId:user._id},{items:[],totalPrice:0})
+              console.log(newOrder._id);
+              
 
-              res.status(200).json({message:"Order placed succesfully"})
+              res.status(200).json({message:"Order placed succesfully",orderId: newOrder._id })
 
 
 

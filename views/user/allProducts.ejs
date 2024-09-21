@@ -39,9 +39,10 @@
     </div>
     
     <!-- Product List -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class=" flex flex-wrap overflow-x-auto space-x-4 p-2 m-2  scrollbar-hide">
         <!-- Product Card 1 -->
         <% products.forEach(product => { %>
+          <div class="mb-3 relative w-72 shrink-0 rounded-lg ">
          <a href="/productView/<%= product._id %>">
       <div class="relative w-72 shrink-0 rounded-lg bg-white shadow-md">
         <a href="/productView/<%= product._id %>">
@@ -97,6 +98,7 @@
         </div>
       </div>
     </a>
+  </div>
         <% }) %>
     </div>
 </div>
