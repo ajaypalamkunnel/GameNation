@@ -399,6 +399,13 @@ export const allProducts = async (req, res) => {
         path: 'category',  
         select: 'collectionName'
       });
+
+      products.forEach((product) => {
+        const discountPrice = Math.ceil(
+          product.price - (product.price * product.discount) / 100
+        );
+        product.discountPrice = discountPrice; // Append discountPrice to product
+      });
     
     // Fetch all active categories
     const categories = await category.find({ isActive: true });
@@ -604,6 +611,46 @@ export const addToCart = async(req,res)=>{
     console.error(error);
     return res.status(500).json({ message: "An error occurred while adding the product to the cart" });
 
+    
+  }
+}
+
+
+
+export const removeProductFromCart = async(req,res)=>{
+
+  
+  try {
+    const { productId } = req.body;
+    if(req.session.user){
+      console.log(productId);
+      
+
+      const email = req.session.user;
+
+      const user = await User.findOne({email})
+      const userId = user._id;
+      const userCart = await Cart.findOne({userId:userId});
+
+      userCart.items = userCart.items.filter(item=>item.productId.toString() !== productId)
+
+      userCart.totalPrice = userCart.items.reduce((total, item) => total + (item.productCount * item.productPrice), 0);
+      userCart.payableAmount = userCart.totalPrice; // If there are no discounts or taxes
+
+      await userCart.save();
+
+      res.status(200).json({
+        message: "Item remove successfully",
+        totalPayable: userCart.totalPrice
+      })
+
+    }else{
+      res.redirect('/login')
+    }
+    
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error removing item from cart' });
     
   }
 }

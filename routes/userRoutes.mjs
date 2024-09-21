@@ -3,7 +3,7 @@ import { isUser } from '../middleware/userSession.mjs';
 const userRouter = express.Router()
 
 import {getSignUp,signupPost, verifyOtp,getLogin,loginPost,googleAuth,googleAuthCallback,userLogout,resendOtp} from '../controller/userController/userAuth.mjs'
-import { productView,allProducts,cart,addToCart,updateCartQuantity,searchProducts  } from '../controller/adminController/productController.mjs';
+import { productView,allProducts,cart,addToCart,updateCartQuantity,searchProducts,removeProductFromCart  } from '../controller/adminController/productController.mjs';
 // import {} '../services/auth.mjs'
 import { checkout } from '../controller/userController/checkoutController.mjs';
 import { home,userProfile,addressView,addNewAddress,addNewAddressPost,editAddress,editAddressPut,deleteAddress} from '../controller/userController/userController.mjs'; 
@@ -76,9 +76,11 @@ userRouter.post('/cart/add',addToCart);
 userRouter.post('/cart/update-quantity',updateCartQuantity);
 
 
+
 //---------------------------- search management --------------
 
 userRouter.get('/search',searchProducts);
+userRouter.post('/cart/remove-item',removeProductFromCart)
 
 
 userRouter.get('/checkout',checkout)

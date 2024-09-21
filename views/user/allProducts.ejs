@@ -37,29 +37,66 @@
         </div>
         <button class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">Filter</button>
     </div>
-
+    
     <!-- Product List -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <!-- Product Card 1 -->
         <% products.forEach(product => { %>
-        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-            <img src="<%= product.image[0] %>" alt="Product 1" class="w-full h-60 mt-2 p-5 py-0 rounded-lg object-cover">
-            <div class="p-4 flex justify-between">
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-900"><%= product.product_name %></h3>
-                    <p class="text-gray-600 font-bold">₹ <%= product.price %></p>
-                </div>
-                <div>
-                    <a href="/productView/<%= product._id %>" class="w-10 h-10 inline-flex items-center justify-center rounded-lg bg-[#3f9147] hover:bg-blue-700 active:bg-blue-600">
-                        <button type="button" data-product-id="<%= product._id %>">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14px" fill="#fff" viewBox="0 0 492.004 492.004">
-                                <path d="M382.678 226.804 163.73 7.86C158.666 2.792 151.906 0 144.698 0s-13.968 2.792-19.032 7.86l-16.124 16.12c-10.492 10.504-10.492 27.576 0 38.064L293.398 245.9l-184.06 184.06c-5.064 5.068-7.86 11.824-7.86 19.028 0 7.212 2.796 13.968 7.86 19.04l16.124 16.116c5.068 5.068 11.824 7.86 19.032 7.86s13.968-2.792 19.032-7.86L382.678 265c5.076-5.084 7.864-11.872 7.848-19.088.016-7.244-2.772-14.028-7.848-19.108z" />
-                            </svg>
-                        </button>
-                    </a>
-                </div>
-            </div>
+         <a href="/productView/<%= product._id %>">
+      <div class="relative w-72 shrink-0 rounded-lg bg-white shadow-md">
+        <a href="/productView/<%= product._id %>">
+          <!-- Product Image -->
+          <img
+            class="h-60 w-full object-cover object-center rounded-t-lg"
+            src="<%= product.image[0] %>"
+            alt="product image"
+          />
+        </a>
+
+        <div class="p-5">
+          <!-- Product Title -->
+          <a href="/productView/<%= product._id %>">
+            <h5 class="text-xl font-semibold tracking-tight text-slate-900">
+              <%= product.product_name %>
+            </h5>
+          </a>
+
+          <!-- Discount Price -->
+          <div class="mt-2.5 mb-5 flex items-center">
+            <span class="mr-2 rounded bg-yellow-200 px-2.5 py-0.5 text-xs font-semibold">
+              ₹<%= product.discountPrice %>
+            </span>
+          </div>
+
+          <!-- Price and Add to Cart -->
+           <a href="/productView/<%= product._id %>">
+          <div class="flex items-center justify-between">
+            <p>
+              <span class="text-3xl font-bold text-slate-900">
+                ₹<%= product.discountPrice %>
+              </span>
+              <span class="text-sm text-slate-900 line-through">
+                ₹<%= product.price %>
+              </span>
+            </p>
+            <a
+            href="/productView/<%= product._id %>"
+              class="flex items-center rounded-md bg-slate-900 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-blue-300"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                />
+              </svg>
+              Add to cart
+            </a>
+          </div>
+          </a>
         </div>
+      </div>
+    </a>
         <% }) %>
     </div>
 </div>

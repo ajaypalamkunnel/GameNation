@@ -55,12 +55,15 @@
                         Add to Favorites
                       </button>
           
-                      <button type="button" class="inline-flex items-center text-sm font-medium text-red-600 hover:underline dark:text-red-500">
-                        <svg class="me-1.5 h-5 w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6" />
-                        </svg>
-                        Remove
-                      </button>
+                      <a href="javascript:void(0)" 
+                      class="remove-item inline-flex items-center text-sm font-medium text-red-600 hover:underline dark:text-red-500" 
+                      data-product-id="<%= item.productId._id %>">
+                     <svg class="me-1.5 h-5 w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                       <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 17.94 6M18 18 6.06 6" />
+                     </svg>
+                     Remove
+                   </a>
+                   
                     </div>
                   </div>
                 </div>
@@ -130,6 +133,9 @@
     document.addEventListener("DOMContentLoaded", function () {
       const incrementButtons = document.querySelectorAll("[data-input-counter-increment]");
       const decrementButtons = document.querySelectorAll("[data-input-counter-decrement]");
+      const removeButtons = document.querySelectorAll(".remove-item");
+      
+      
   
       // Add event listener for increment buttons
       incrementButtons.forEach(button => {
@@ -148,6 +154,21 @@
           await updateCartQuantity(productId, "decrement", index);
         });
       });
+
+
+      removeButtons.forEach(button => {
+      button.addEventListener("click", async function (event) {
+      event.preventDefault(); // Prevent default action
+      const productId = this.getAttribute("data-product-id") // Get product ID from href attribute or other attribute
+      console.log("hiiiii");
+      console.log(productId);
+      
+      
+      await removeCartItem(productId);
+    });
+  });
+
+      
   
       // Function to handle cart quantity update
       async function updateCartQuantity(productId, action, index) {
@@ -189,6 +210,54 @@
           console.error('Error updating cart:', error);
         }
       }
+
+      async function removeCartItem(productId){
+        try {
+          console.log("-----",productId);
+          
+          const response = await fetch('/cart/remove-item',{
+            method:'POST',
+            headers:{
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              productId:productId
+            })
+          })
+
+          const data = await response.json();
+
+          if(response.ok){
+            document.querySelector(`[data-product-id="${productId}"]`).remove();
+
+
+             // Update the total price in the summary section
+          const totalElement = document.querySelector('#totalPayable');
+          totalElement.textContent = `₹${data.totalPayable.toFixed(2)}`;
+
+          const OriginalPrice = document.querySelector('#Original-price');
+          OriginalPrice.textContent = `₹${data.totalPayable.toFixed(2)}`;
+
+
+          setTimeout(()=>{
+            location.reload()
+          },500)
+
+
+          }else{
+            alert(data.message)
+          }
+          
+        } catch (error) {
+          console.error('Error removing item from cart:', error);
+          
+        }
+      }
+
+
+
+
+
     });
   </script>
   
