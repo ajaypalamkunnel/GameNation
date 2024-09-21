@@ -1,0 +1,86 @@
+<%- include('header') %>
+
+
+<div class="container mx-auto p-4 bg-[#1e1e1e]">
+    <h1 class="text-3xl font-bold text-center text-white mb-8">My Orders</h1>
+
+    <% if(!orders || orders.length === 0){ %>
+
+        <p class="text-white text-center">You have no orders yet.</p>
+
+        <% }else{ %>
+
+        <% orders.forEach(order=>{ %>
+    <!-- Order Card 1 -->
+    <div class="bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
+      <div class="flex justify-between items-center mb-4">
+        <div>
+          <p class="text-white text-lg font-semibold">Order ID: <%= order._id %></p>
+          <p class="text-gray-400 text-sm">Ordered date: <%= new Date(order.createdAt).toLocaleDateString('en-GB') %></p>
+          <p class="text-<%= order.orderStatus === 'Delivered' ? 'green-400' : 'yellow-400' %> font-medium">Order status: <%= order.orderStatus %></p>
+        </div>
+        <% if (order.orderStatus === 'Confirmed' || order.orderStatus === 'Pending' ) { %>
+        <div>
+          <button class="bg-red-500 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-red-600">Cancel</button>
+        </div>
+        <% }else if(order.orderStatus === 'Delivered'){ %>
+        <div>
+            <button class="bg-red-500 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-red-600">Return</button>
+        </div>
+        <% }else{ %>
+            <div>
+                <p class="text-yellow-300 text-center">Returned</p>
+                
+            </div>
+            
+        <% } %>
+      </div>
+
+      <% order.products.forEach(product=>{ %>
+      
+      <div class="flex flex-col md:flex-row mb-4">
+        <!-- Product Image -->
+        <div class="w-full md:w-1/4 mb-4 md:mb-0">
+    <% if (product.product_id && product.product_id.image && product.product_id.image.length > 0) { %>
+        <img src="<%= product.product_id.image[0] %>" alt="<%= product.product_name %>" class="rounded-lg w-full">
+    <% } else { %>
+        <!-- Fallback Image -->
+        <img src="/path/to/default-image.jpg" alt="No image available" class="rounded-lg w-full">
+    <% } %>
+</div>
+
+  
+        <!-- Product Details -->
+        <div class="w-full md:w-3/4 md:pl-6">
+          <p class="text-white font-medium"><%= product.product_name %></p>
+          <p class="text-gray-400 text-sm">QTY: <%= product.product_quantity %></p>
+          <p class="text-gray-400 text-sm">Price: ₹ <%= product.product_price.toFixed(2) %></p>
+          <p class="text-white mt-4 font-bold">Total: ₹ <%= (product.product_price * product.product_quantity).toFixed(2) %></p>
+  
+          <!-- View Details Button -->
+          <div class="mt-4">
+            <button class="bg-green-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-green-600">View Details</button>
+          </div>
+        </div>
+      </div>
+      <% }) %>
+
+      <!-- Total Price for the Order -->
+      <div class="text-right mt-6">
+        <p class="text-white font-bold text-xl">Total: ₹<%= order.totalPrice.toFixed(2) %></p>
+    </div>
+    </div>
+
+    <% }) %>
+  
+<% } %>
+    
+  </div>
+  
+
+
+
+
+
+
+<%- include('footer') %>

@@ -3,41 +3,89 @@
     <form action="#" class="mx-auto max-w-screen-xl px-4 2xl:px-0">
       <div class="mx-auto max-w-3xl">
         <h2 class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">Order summary</h2>
-  
+
         <div class="mt-6 space-y-4 border-b border-t border-gray-200 py-8 dark:border-gray-700 sm:mt-8">
           <h4 class="text-lg font-semibold text-gray-900 dark:text-white">Billing & Delivery information</h4>
+  
+        <div class="flex justify-between">
+            <% 
+               // Parse the createdAt date into a JavaScript Date object
+             const orderedDate = new Date(order.createdAt);
+
+            // Get the date components
+              const year = orderedDate.getFullYear();
+              const month = (orderedDate.getMonth() + 1).toString().padStart(2, '0'); // getMonth is zero-indexed
+              const day = orderedDate.getDate().toString().padStart(2, '0');
+              const hours = orderedDate.getHours().toString().padStart(2, '0');
+              const minutes = orderedDate.getMinutes().toString().padStart(2, '0');
+              %>
   
           <dl>
             <dt class="text-base font-medium text-gray-900 dark:text-white"><%= order.address.contactName %></dt>
             <dd class="mt-1 text-base font-normal text-gray-500 dark:text-gray-400"><%= order.address.building %></dd>
-            <dd class="mt-1 text-base font-normal text-gray-500 dark:text-gray-400"><%= order.address.street %> <%= order.address.city %></dd>   
-            <dd class="mt-1 text-base font-normal text-gray-500 dark:text-gray-400"><%= order.address. %> <%= order.address.city %></dd>
-
+            <dd class="mt-1 text-base font-normal text-gray-500 dark:text-gray-400"><%= order.address.city %> <%= order.address.district %></dd>   
+            <dd class="mt-1 text-base font-normal text-gray-500 dark:text-gray-400">pincode: <%= order.address.pincode %></dd>
+            <dd class="mt-1 text-base font-normal text-gray-500 dark:text-gray-400"><%= order.address.state %>, <%= order.address.country %></dd>
+            
           </dl>
   
-          <button type="button" data-modal-target="billingInformationModal" data-modal-toggle="billingInformationModal" class="text-base font-medium text-primary-700 hover:underline dark:text-primary-500">Edit</button>
+          <dl>
+           
+            <dd class="mt-1 text-base font-normal text-gray-500 dark:text-gray-400">
+              <span class="text-white dark:text-white">Order ID: </span><%= order._id %>
+            </dd>
+            <dd class="mt-1 text-base font-normal text-gray-500 dark:text-gray-400">
+              <span class="text-white dark:text-white">Payment Method:</span> <%= order.paymentMethod %>
+            </dd>
+            <dd class="mt-1 text-base font-normal text-gray-500 dark:text-gray-400">
+              <span class="text-white dark:text-white">Payment Status:</span> <%= order.paymentStatus %>
+            </dd>
+            <dd class="mt-1 text-base font-normal text-gray-500 dark:text-gray-400">
+              <span class="text-white dark:text-white">Order Status:</span> <%= order.orderStatus %>
+            </dd>
+            <dd class="mt-1 text-base font-normal text-gray-500 dark:text-gray-400">
+              <span class="text-white dark:text-white">Ordered Date:</span> <%= `${day}-${month}-${year}` %>
+            </dd>
+          </dl>
+          
+          
         </div>
+        
+        
+        
+        
+      </div>
+     
+        </div>
+        
   
         <div class="mt-6 sm:mt-8">
           <div class="relative overflow-x-auto border-b border-gray-200 dark:border-gray-800">
             <table class="w-full text-left font-medium text-gray-900 dark:text-white md:table-fixed">
               <tbody class="divide-y divide-gray-200 dark:divide-gray-800">
                
-  
+                <% if(order.products.length > 0){ %>
+                  <% order.products.forEach((product,index)=>{ %>
                 <tr>
                   <td class="whitespace-nowrap py-4 md:w-[384px]">
                     <div class="flex items-center gap-4">
                       <a href="#" class="flex items-center aspect-square w-10 h-10 shrink-0">
-                        <img class="h-auto w-full max-h-full dark:hidden" src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/apple-watch-light.svg" alt="watch image" />
-                        <img class="hidden h-auto w-full max-h-full dark:block" src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/apple-watch-dark.svg" alt="watch image" />
-                      <a href="#" class="hover:underline">Apple Watch SE</a>
+                        <!-- <img class="h-auto w-full max-h-full dark:hidden" src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/apple-watch-light.svg" alt="watch image" />
+                        <img class="hidden h-auto w-full max-h-full dark:block" src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/apple-watch-dark.svg" alt="watch image" />-->
+                      <a href="#" class="hover:underline"><%= product.product_name %></a> 
                     </div>
                   </td>
   
-                  <td class="p-4 text-base font-normal text-gray-900 dark:text-white">x2</td>
+                  <td class="p-4 text-base font-normal text-gray-900 dark:text-white">x<%= product.product_quantity %></td>
   
-                  <td class="p-4 text-right text-base font-bold text-gray-900 dark:text-white">$799</td>
+                  <td class="p-4 text-right text-base font-bold text-gray-900 dark:text-white">₹ <%= product.product_price %></td>
                 </tr>
+                <% }) %>
+                <% }else { %>
+
+                  <p class="text-center text-gray-500">Your cart is empty</p>
+                <% } %>
+
               </tbody>
             </table>
           </div>
@@ -49,7 +97,7 @@
               <div class="space-y-2">
                 <dl class="flex items-center justify-between gap-4">
                   <dt class="text-gray-500 dark:text-gray-400">Original price</dt>
-                  <dd class="text-base font-medium text-gray-900 dark:text-white">₹ 6,592.00</dd>
+                  <dd class="text-base font-medium text-gray-900 dark:text-white">₹ <%= order.totalPrice.toFixed(2) %></dd>
                 </dl>
   
                 <dl class="flex items-center justify-between gap-4">
@@ -70,16 +118,14 @@
   
               <dl class="flex items-center justify-between gap-4 border-t border-gray-200 pt-2 dark:border-gray-700">
                 <dt class="text-lg font-bold text-gray-900 dark:text-white">Total</dt>
-                <dd class="text-lg font-bold text-gray-900 dark:text-white">₹7,191.00</dd>
+                <dd class="text-lg font-bold text-gray-900 dark:text-white">₹ <%= order.totalPrice.toFixed(2) %></dd>
               </dl>
             </div>
   
-            <div class="flex items-start sm:items-center">
-              <input id="terms-checkbox-2" type="checkbox" value="" class="h-4 w-4 rounded border-gray-300 bg-gray-100 text-primary-600 focus:ring-2 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-primary-600" />
-              <label for="terms-checkbox-2" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"> I agree with the <a href="#" title="" class="text-primary-700 underline hover:no-underline dark:text-primary-500">Terms and Conditions</a> of use of the Flowbite marketplace </label>
-            </div>
+           
   
             <div class="gap-4 sm:flex sm:items-center">
+              
               <button type="button" class="w-full rounded-lg  border border-gray-200 bg-white px-5  py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700">Return to Shopping</button>
   
               <button type="submit" class="mt-4 flex w-full items-center justify-center rounded-lg bg-primary-700  px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300  dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 sm:mt-0">Send the order</button>

@@ -8,7 +8,7 @@ import { productView,allProducts,cart,addToCart,updateCartQuantity,searchProduct
 import { checkout, placeOrder } from '../controller/userController/checkoutController.mjs';
 import { home,userProfile,addressView,addNewAddress,addNewAddressPost,editAddress,editAddressPut,deleteAddress} from '../controller/userController/userController.mjs'; 
 import passport from 'passport';
-import { orderSummary } from '../controller/userController/orderController.mjs';
+import { orders, orderSummary } from '../controller/userController/orderController.mjs';
 
 //----------------------------- login -------------------------------
 
@@ -91,6 +91,7 @@ userRouter.post('/place-order',isUser,placeOrder);
 userRouter.get('/orderSummary',isUser,orderSummary)
 
 
+userRouter.get('/orders',isUser,orders)
 
 
 
