@@ -589,8 +589,8 @@ export const addToCart = async(req,res)=>{
       cart.totalPrice = cart.items.reduce((acc, item) => acc + item.productPrice, 0);
       cart.payableAmount = cart.totalPrice;
 
-      product.stock -= productCount;
-      await product.save();
+      // product.stock -= productCount;
+      // await product.save();
 
 
       // Save the cart
@@ -760,8 +760,12 @@ export const updateCartQuantity  = async(req,res)=>{
 
 
 export const searchProducts = async(req,res)=>{
+  console.log("hi search");
+  
   try {
-      const query = req.query.query;
+      const query = req.query.query?.trim();
+      console.log(query);
+      
 
       const searchCriteria ={
 
@@ -779,8 +783,20 @@ export const searchProducts = async(req,res)=>{
       };
 
 
-      const products = await Product.find(searchCriteria);
-      res.json({products});
+      const products = await Product.find(searchCriteria).lean();
+      //console.log(products);
+
+      const productsWithDiscount = products.map(product => {
+        const discountPrice = Math.ceil(product.price - (product.price * product.discount) / 100);
+        return { ...product, discountPrice }; // Safely append discountPrice without modifying the original object
+      });
+
+      
+      
+
+
+      
+      res.json({products:productsWithDiscount});
   } catch (error) {
 
       console.error('Error searching products:', error);

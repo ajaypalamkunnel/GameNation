@@ -47,6 +47,8 @@ adminRouter.put('/deleteProduct/:id',isAdmin, deleteProduct);
 
 
 
+//-----------------------------order management--------------------------------
+
 
 
 

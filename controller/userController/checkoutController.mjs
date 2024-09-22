@@ -2,6 +2,7 @@ import addressSchema from "../../model/addressSchema.mjs";
 import Cart from "../../model/cartSchema.mjs";
 import category from "../../model/categoryScehema.mjs";
 import OrderSchema from "../../model/orderSchema.mjs";
+import Product from "../../model/productSchema.mjs";
 import User from "../../model/userSchema.mjs";
 
 export const checkout = async(req,res)=>{
@@ -84,6 +85,23 @@ export const placeOrder = async(req,res)=>{
                 return res.status(400).json({ message: "Address not found" });
               }
               console.log("selected address",selectedAddress);
+
+
+
+              for(const item of cartItems){
+                const product = await Product.findById(item.productId);
+
+                if (!product) {
+                    return res.status(404).json({ message: `Product ${item.productName} not found` });
+                  }
+
+                  if (product.stock < item.productQuantity) {
+                    return res.status(400).json({ message: `Insufficient stock for ${item.productName}. Only ${product.stock} available.` });
+                  }
+
+              }
+
+
               
 
               const newOrder = new OrderSchema({
@@ -116,6 +134,16 @@ export const placeOrder = async(req,res)=>{
               })
 
               await newOrder.save();
+
+
+              for(const item of cartItems){
+                const prodcut = await Product.findById(item.productId);
+                prodcut.stock -= item.productQuantity;
+                await prodcut.save()
+              }
+
+
+
 
               //clear the particular user cart
 
