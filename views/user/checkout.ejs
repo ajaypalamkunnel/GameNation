@@ -281,7 +281,11 @@
         time:1500
       })
 
-      window.location.href = `/orderSummary?orderId=${result.orderId}`;
+      setTimeout(()=>{
+        window.location.href = `/orderSummary?orderId=${result.orderId}`;
+
+      },2000)
+
 
     }else{
       alert(result.message)

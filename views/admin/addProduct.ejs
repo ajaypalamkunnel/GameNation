@@ -481,23 +481,69 @@
     const croppedCanvas = cropper.getCroppedCanvas();
     const croppedImageURL = croppedCanvas.toDataURL();
 
+    const imgWrapper = document.createElement("div");
+    imgWrapper.classList.add("relative", "inline-block");
+
     const imgElement = document.createElement("img");
     imgElement.src = croppedImageURL;
     imgElement.classList.add("rounded", "border", "border-gray-700", "p-2");
 
-    // Append the cropped image to the preview container
-    previewContainer.appendChild(imgElement);
 
-    // Store the cropped image in an array for submission
-    croppedImages.push(croppedImageURL);
+    const removeBtn = document.createElement("button");
+    removeBtn.innerHTML = "&times;"; // Cross icon
+    removeBtn.classList.add(
+    "absolute",
+    "top-0",
+    "right-0",
+    "bg-red-500",
+    "text-white",
+    "rounded-full",
+    "p-1",
+    "cursor-pointer"
+  );
+  removeBtn.title = "Remove Image";
 
-    cropper.destroy();
-    cropModal.classList.add("hidden");
-    fileCount += 1;
+  removeBtn.addEventListener('click', function(){
 
-    if (fileCount === 3) {
-      alert("All images cropped");
+    // Remove the image element from the DOM
+    previewContainer.removeChild(imgWrapper);
+
+    // Remove the image from the croppedImages array
+    const imageIndex = croppedImages.indexOf(croppedImageURL);
+    if (imageIndex > -1) {
+      croppedImages.splice(imageIndex, 1);
     }
+
+    // Decrement file count
+    fileCount -= 1;
+
+    // Notify user that an image has been removed
+    alert(`Image removed. You can now upload ${3 - fileCount} more image(s).`);
+
+  })
+
+
+    imgWrapper.appendChild(imgElement);
+    imgWrapper.appendChild(removeBtn);
+
+
+// Append the wrapper to the preview container
+  previewContainer.appendChild(imgWrapper);
+
+  // Store the cropped image in an array for submission
+  croppedImages.push(croppedImageURL);
+
+  // Hide the modal and destroy the cropper instance
+  cropper.destroy();
+  cropModal.classList.add("hidden");
+
+  // Increment file count
+  fileCount += 1;
+
+  // Check if the maximum file count has been reached
+  if (fileCount === 3) {
+    alert("All images cropped");
+  }
   });
 
   // Form validation and submission handler
