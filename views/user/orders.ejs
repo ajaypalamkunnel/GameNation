@@ -19,7 +19,7 @@
           <p class="text-gray-400 text-sm">Ordered date: <%= new Date(order.createdAt).toLocaleDateString('en-GB') %></p>
           <p class="text-<%= order.orderStatus === 'Delivered' ? 'green-400' : 'yellow-400' %> font-medium">Order status: <%= order.orderStatus %></p>
         </div>
-        <% if (order.orderStatus === 'Confirmed' || order.orderStatus === 'Pending' ) { %>
+        <% if (order.orderStatus === 'Confirmed' || order.orderStatus === 'Pending' || order.orderStatus === 'Shipped') { %>
         <div>
           <button class="bg-red-500 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-red-600">Cancel</button>
         </div>

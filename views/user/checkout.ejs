@@ -273,8 +273,13 @@
     const result = await response.json();
 
     if(response.ok){
-      alert("order placed succesfully");
-      console.log("Order ID:", result.orderId);
+      Swal.fire({
+        position:"center",
+        icon:"success",
+        title:"Order Place",
+        showConfirmButton: false,
+        time:1500
+      })
 
       window.location.href = `/orderSummary?orderId=${result.orderId}`;
 

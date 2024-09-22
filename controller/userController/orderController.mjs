@@ -81,3 +81,38 @@ export const orders = async(req,res)=>{
         
     }
 }
+
+
+// ---------------------------------- status change ------------------------------
+
+export const orderStatus = async(req,res)=>{
+
+    try {
+        const {orderId} = req.params;
+        const {status} = req.body;
+        const validStatuses = ['Pending', 'Shipped', 'Confirmed', 'Delivered', 'Cancelled', 'Returned'];
+
+        const currentOrder = await OrderSchema.findOne({_id:orderId});
+
+        if (!currentOrder) {
+            return res.status(404).send('Order not found');
+        }
+
+        if (validStatuses.indexOf(status) <= validStatuses.indexOf(currentOrder.status)) {
+            return res.status(400).send('Invalid status change');
+        }
+
+        currentOrder.orderStatus = status;
+        await currentOrder.save()
+
+        res.send('Order status updated');
+
+
+    } catch (error) {
+        
+        console.log(error);
+        res.status(500).send('server error')
+        
+    }
+
+}

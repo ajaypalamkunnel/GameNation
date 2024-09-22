@@ -1,4 +1,5 @@
 import category from "../../model/categoryScehema.mjs";
+import OrderSchema from "../../model/orderSchema.mjs";
 import Product from "../../model/productSchema.mjs";
 import User from "../../model/userSchema.mjs";
 import mongoose from "mongoose";
@@ -218,4 +219,54 @@ export const toggleVerification = async(req,res)=>{
 }
 
 
+export const ordersList = async(req,res)=>{
+    try {
+        if(req.session.admin){
 
+            const page = parseInt(req.query.page) || 1;
+            const limit = parseInt(req.query.limit) || 10;
+
+            const skip = (page - 1) * limit;
+
+            const orders = await OrderSchema.find({})
+            .populate({
+                path:'products.product_id',
+                select: 'name category'
+            })
+            .populate({
+                path:'customer_id',
+                select: 'username',
+                model:User
+            })
+            .skip(skip)
+            .limit(limit)
+            .lean()
+
+             // Get the total number of orders for pagination info
+            const totalOrders = await OrderSchema.countDocuments();
+            const totalPages = Math.ceil(totalOrders / limit);
+            
+            
+
+        
+
+            res.render('admin/orders',{
+                title:"Orders",
+                admin:req.session.admin,
+                orders,
+                currentPage: page,
+                totalPages,
+                limit
+
+
+            })
+        }else{
+            res.redirect('/admin/login')
+        }
+    } catch (error) {
+
+        console.log("error while rendring orders",error);
+        
+        
+    }
+}

@@ -703,8 +703,8 @@ export const updateCartQuantity  = async(req,res)=>{
           return res.status(400).json({message:"Not enough stock available"})
         }
         cartItem.productCount +=1;
-        product.stock -= 1;
-        await product.save();
+        // product.stock -= 1;
+        // await product.save();
 
       }else if(action === 'decrement'){
 
@@ -713,8 +713,8 @@ export const updateCartQuantity  = async(req,res)=>{
         }
 
         cartItem.productCount -= 1;
-        product.stock +=1;
-        await product.save();
+        // product.stock +=1;
+        // await product.save();
 
       }
 

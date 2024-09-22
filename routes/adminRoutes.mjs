@@ -1,10 +1,11 @@
 import express from 'express';
 import { isAdmin } from '../middleware/adminSession.mjs';
 const adminRouter = express.Router();
-import { getAdminLogin,loginPost,dashboard,addCategory,addCategoryPost,categoryView,updateCategory,customers,toggleVerification } from '../controller/adminController/adminController.mjs';
+import { getAdminLogin,loginPost,dashboard,addCategory,addCategoryPost,categoryView,updateCategory,customers,toggleVerification, ordersList } from '../controller/adminController/adminController.mjs';
 import { addProduct, addProductPost,viewProducts,editProduct,editProductPut,deleteProduct} from '../controller/adminController/productController.mjs';
 //import cloudinary from '../uploads/cloudinary.mjs';
 import {upload} from '../uploads/cloudinary.mjs'
+import { orderStatus } from '../controller/userController/orderController.mjs';
 
 //------------------------------------  Login  ------------------------------------------------
 
@@ -25,7 +26,7 @@ adminRouter.get('/dashboard',isAdmin,dashboard)
 adminRouter.get('/category',isAdmin,categoryView)
 adminRouter.get('/addCategory',isAdmin,addCategory)
 adminRouter.post('/addCategory',isAdmin,addCategoryPost)
-adminRouter.patch('/updateCategory/:id',updateCategory)
+adminRouter.patch('/updateCategory/:id',isAdmin,updateCategory)
 
 
 
@@ -49,7 +50,8 @@ adminRouter.put('/deleteProduct/:id',isAdmin, deleteProduct);
 
 //-----------------------------order management--------------------------------
 
-
+adminRouter.get('/ordersList',isAdmin,ordersList)
+adminRouter.post('/order/:orderId/status',isAdmin,orderStatus)
 
 
 

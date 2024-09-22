@@ -1,0 +1,123 @@
+<%- include('adminHeader') %>
+<div style="display: flex; height: 100vh">
+    <%- include('sidebar') %>
+
+    <div class="w-full min-h-screen bg-gray-900 p-6">
+        <div class="max-w-5xl mx-auto bg-gray-800 p-6 rounded-lg shadow-lg">
+          <!-- Header Section -->
+          <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl text-white font-semibold">Orders</h1>
+            <div class="relative">
+              <input type="text" placeholder="Search" class="pl-10 pr-4 py-2 rounded-full bg-gray-700 text-gray-300 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+              <svg class="w-5 h-5 text-gray-400 absolute top-2 left-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 21l-6-6m0 0a9 9 0 1112.73 0"></path>
+              </svg>
+            </div>
+          </div>
+      
+          <!-- Orders Table -->
+          <div class="overflow-x-auto">
+            <table class="table-auto w-full text-left text-gray-400">
+              <thead class="text-gray-300 bg-gray-700">
+                <tr>
+                  <th class="px-4 py-3">Id</th>
+                  <th class="px-4 py-3">Name</th>
+                  <th class="px-4 py-3">Payment</th>
+                  <th class="px-4 py-3">Status</th>
+                  <th class="px-4 py-3">Update</th>
+                  <th class="px-4 py-3">Price</th>
+                  <th class="px-4 py-3">Action</th>
+                </tr>
+              </thead>
+              <tbody class="bg-gray-800 divide-y divide-gray-700">
+                <% orders.forEach(order => { %>
+                <tr>
+                  <td class="px-4 py-4">#<%= order._id %></td>
+                  <td class="px-4 py-4"><%= order.customer_id.username %></td>
+                  <td class="px-4 py-4"><%= order.paymentMethod %></td>
+                  <td class="px-4 py-4 <%= order.orderStatus === 'Delivered' ? 'text-green-500' : order.orderStatus === 'Cancelled' ? 'text-red-500' : 'text-yellow-500' %>">
+                      <%= order.orderStatus %>
+                    </td>
+                    <td class="px-4 py-4">
+
+                        <% if(order.orderStatus !== 'Delivered' && order.Status !== 'Cancelled' && order.orderStatus !=='Returned'){ %>
+                            <select class="rounded-sm" name="" id="" onchange="updateOrderStatus('<%= order._id %>', this.value)">
+                                <option value="Confirmed">Confirmed</option>
+                                <option value="Shipped">Shipped</option>
+                                <option value="Delivered">Delivered</option>
+                                <option value="Cancelled">Cancelled</option>
+                                <option value="Returned">Returned</option>
+                            </select>
+                            <% } %>
+                        
+
+                    </td>
+                  <td class="px-4 py-4"><%= order.totalPrice.toFixed(2) %></td>
+                  <td class="px-4 py-4 flex space-x-2">
+                    <button class="bg-green-500 text-white px-3 py-1 rounded">Edit</button>
+                    <button class="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
+                  </td>
+                </tr>
+
+                <% }) %>
+               
+                
+              </tbody>
+            </table>
+          </div>
+      
+          <!-- Pagination -->
+          <!-- Pagination -->
+<div class="mt-6 flex justify-between items-center">
+    <% if (currentPage > 1) { %>
+      <a href="?page=<%= currentPage - 1 %>&limit=<%= limit %>" class="bg-gray-600 text-white px-4 py-2 rounded-lg">Prev</a>
+    <% } else { %>
+      <button disabled class="bg-gray-600 text-white px-4 py-2 rounded-lg opacity-50">Prev</button>
+    <% } %>
+    
+    <% if (currentPage < totalPages) { %>
+      <a href="?page=<%= currentPage + 1 %>&limit=<%= limit %>" class="bg-gray-600 text-white px-4 py-2 rounded-lg">Next</a>
+    <% } else { %>
+      <button disabled class="bg-gray-600 text-white px-4 py-2 rounded-lg opacity-50">Next</button>
+    <% } %>
+  </div>
+  
+        </div>
+      </div>
+      
+</div>
+
+
+<script>
+
+    function updateOrderStatus(orderId, newStatus){
+        fetch(`/admin/order/${orderId}/Status`,{
+            method: 'POST',
+            headers:{
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({status:newStatus})
+        })
+        .then(response =>{
+            if(response.ok){
+                Swal.fire({
+                    position:"top-center",
+                    icon: "success",
+                    title: "Status changed",
+                    showConfirmButton: false,
+                    time:1500
+
+                });
+                setTimeout(()=>{
+                    location.reload()
+                },1700)
+            }else{
+                response.text().then(text => alert(text));
+
+            }
+
+        })
+        .catch(error =>  console.error('Error:', error))
+    }
+
+</script>

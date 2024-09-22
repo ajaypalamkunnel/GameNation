@@ -206,7 +206,16 @@
       const data = await response.json();
 
       if(response.ok){
-        alert(data.message)
+        Swal.fire({
+          postion:"top-center",
+          icon:"success",
+          title:"Item added to cart",
+          showConfirmButton: false,
+          time:500
+
+        })
+        
+        
       }else{
         alert(data.message)
       }
