@@ -804,3 +804,39 @@ export const searchProducts = async(req,res)=>{
       
   }
 }
+
+
+
+export const allProductsFilter = async (req,res)=>{
+  try {
+
+    const {sort} = req.query;
+
+    let sortOption = {};
+
+    if(sort === 'lowToHigh'){
+      sortOption = {price:1};
+    }else if(sort === 'highToLow'){
+      sortOption = {price:-1};
+    }else if(sort === 'aToZ'){
+      sortOption = {product_name:1}
+    }else if(sort === 'zToA'){
+      sortOption = {product_name:-1}
+    }
+
+    const products = await Product.find().sort(sortOption).lean();
+
+    const productsWithDiscount = products.map(product => {
+      const discountPrice = Math.ceil(product.price - (product.price * product.discount) / 100);
+      return { ...product, discountPrice }; // Safely append discountPrice without modifying the original object
+    });
+
+    res.json({products:productsWithDiscount})
+    
+  } catch (error) {
+
+    console.error('Error fetching sorted products:', error);
+    res.status(500).json({ message: 'Failed to fetch products.' });
+    
+  }
+}

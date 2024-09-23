@@ -3,12 +3,12 @@ import { isUser } from '../middleware/userSession.mjs';
 const userRouter = express.Router()
 
 import {getSignUp,signupPost, verifyOtp,getLogin,loginPost,googleAuth,googleAuthCallback,userLogout,resendOtp} from '../controller/userController/userAuth.mjs'
-import { productView,allProducts,cart,addToCart,updateCartQuantity,searchProducts,removeProductFromCart  } from '../controller/adminController/productController.mjs';
+import { productView,allProducts,cart,addToCart,updateCartQuantity,searchProducts,removeProductFromCart, allProductsFilter  } from '../controller/adminController/productController.mjs';
 // import {} '../services/auth.mjs'
 import { checkout, placeOrder } from '../controller/userController/checkoutController.mjs';
 import { home,userProfile,addressView,addNewAddress,addNewAddressPost,editAddress,editAddressPut,deleteAddress} from '../controller/userController/userController.mjs'; 
 import passport from 'passport';
-import { orders, orderSummary } from '../controller/userController/orderController.mjs';
+import { orders, orderSummary, orderView } from '../controller/userController/orderController.mjs';
 
 //----------------------------- login -------------------------------
 
@@ -82,7 +82,7 @@ userRouter.post('/cart/remove-item',isUser,removeProductFromCart)
 //---------------------------- search management --------------
 
 userRouter.get('/search',searchProducts);
-
+userRouter.get('/allProducts/filter',allProductsFilter)
 
 
 //---------------------------- checkout management --------------
@@ -92,6 +92,7 @@ userRouter.get('/orderSummary',isUser,orderSummary)
 
 
 userRouter.get('/orders',isUser,orders)
+userRouter.get('/orderView',isUser,orderView)
 
 
 

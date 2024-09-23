@@ -116,3 +116,49 @@ export const orderStatus = async(req,res)=>{
     }
 
 }
+
+
+
+export const orderView = async(req,res)=>{
+
+    console.log("I am in orderview");
+    
+
+    try {
+        const {orderId} = req.query;
+
+        const email = req.session.user  
+        const user = await User.findOne({email})
+
+        const order = await OrderSchema.findOne({_id:orderId})
+        .populate({
+            path:'products.product_id',
+            select:'product_name category price discount stock image',
+            model:Product,
+            options: { strictPopulate: false }
+        });
+        console.log(order);
+        
+
+        //console.log(orderId);
+        const categories = await category.find({ isActive: true });
+
+        res.render('user/orderView',{
+            title:"Order Details",
+            categories,
+            user:req.session.user,
+            order:order
+
+        })
+        
+        
+    } catch (error) {
+
+        console.log("error in orderview ",error);
+    
+    }
+
+
+
+
+}

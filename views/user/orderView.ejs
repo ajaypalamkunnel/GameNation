@@ -1,0 +1,75 @@
+<%- include('header') %>
+
+<div class="min-h-screen bg-gray-900 text-white p-5 flex justify-center items-center">
+    <div class="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-3xl">
+      <!-- Order Details -->
+      <h1 class="text-3xl font-semibold mb-6 text-center">Orders Details</h1>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div>
+          <p><strong>Order ID:</strong> <%= order._id %></p>
+          <p><strong>Ordered date:</strong> <%= new Date(order.createdAt).toLocaleDateString('en-GB') %></p>
+          <% if(order.orderStatus !== 'Delivered'){ %>
+            <p><strong>Delivered date:</strong> Not deliverd yet</p>
+          <% }else{ %>
+          <p><strong>Delivered date:</strong> 07-04-2024</p>
+          <% } %>
+          <p><strong>Order status:</strong> <span class=" <%= order.orderStatus === 'Delivered' ? 'text-green-500' : order.orderStatus === 'Cancelled' ? 'text-red-500' : 'text-yellow-500' %> "><%= order.orderStatus %></span> </p>
+        </div>
+      </div>
+  
+      <!-- Delivery Address -->
+      <div class="mb-8">
+        <h2 class="text-xl font-semibold mb-2">Delivery Address</h2>
+        <p><%= order.address.contactName %>,</p>
+        <p><%= order.address.building %>,</p>
+        <p><%= order.address.city %>,</p>
+        <p> <%= order.address.district %>,  <%= order.address.state %></p>
+        <p> pincode: <%= order.address.pincode %></p>
+        <p><strong>Mobile:</strong> <%= order.address.phonenumber %></p>
+      </div>
+  
+      <!-- Payment Method -->
+      <div class="mb-8">
+        <h2 class="text-xl font-semibold mb-2">Payment Method</h2>
+        <p><%= order.paymentMethod %></p>
+      </div>
+  
+      <!-- Product Details -->
+      <div class="mb-8">
+        <% order.products.forEach(product=>{ %>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center bg-gray-700 p-4 rounded-lg">
+          <img class="w-1/2 h-3/4 object-cover rounded-lg" src="<%= product.product_id.image[0] %>" alt="FIFA 23 - PS5">
+          <div class="sm:col-span-2">
+            <p class="text-lg font-semibold"><%= product.product_name %></p>
+            <p><strong>QTY:</strong> <%= product.product_quantity %></p>
+            <p><strong>Price:</strong> ₹ <%= product.product_price.toFixed(2) %></p>
+          </div>
+        </div>
+        <% }) %>
+        <div class="flex justify-end mt-2">
+          <p class="font-semibold text-xl">Total: ₹ <%= order.totalPrice.toFixed(2) %></p>
+        </div>
+      </div>
+  
+      <!-- Order Summary -->
+      <div class="mb-8">
+        <h2 class="text-xl font-semibold mb-4">Order Summary</h2>
+        <div class="grid grid-cols-2">
+          <p class="font-semibold">Subtotal:</p>
+          <p class="text-right">₹ 2950.00</p>
+          <p class="font-semibold">Shipping:</p>
+          <p class="text-right">₹ 0.00</p>
+        </div>
+        <div class="flex justify-end mt-4">
+          <p class="font-semibold text-xl">Total: ₹ <%= order.totalPrice.toFixed(2) %></p>
+        </div>
+      </div>
+  
+      <!-- Download Invoice Button -->
+      <div class="text-center">
+        <a href="#" class="bg-green-500 hover:bg-green-600 text-white font-semibold px-6 py-3 rounded-lg">Download Invoice</a>
+      </div>
+    </div>
+  </div>
+
+  <%- include('footer') %>

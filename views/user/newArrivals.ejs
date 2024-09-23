@@ -40,10 +40,20 @@
           </a>
 
           <!-- Discount Price -->
-          <div class="mt-2.5 mb-5 flex items-center">
-            <span class="mr-2 rounded bg-yellow-200 px-2.5 py-0.5 text-xs font-semibold">
-              ₹<%= product.discountPrice %>
-            </span>
+          <div id="rating" class="mt-2.5 mb-5 flex items-center">
+            <% const totalStars = 5; %>
+            <% const filledStars = Math.round(3 || 0); %> <!-- Round rating to nearest integer -->
+            <% const emptyStars = totalStars - filledStars; %>
+  
+            <% for (let i = 0; i < filledStars; i++) { %>
+              <span class="text-yellow-500 text-xl">★</span>
+            <% } %>
+            <% for (let i = 0; i < emptyStars; i++) { %>
+              <span class="text-gray-400 text-xl">☆</span>
+            <% } %>
+  
+            <!-- Optional: Display numeric rating beside the stars -->
+            <span class="ml-2 text-sm text-gray-600">( <%= filledStars.toFixed(1) %> )</span>
           </div>
 
           <!-- Price and Add to Cart -->

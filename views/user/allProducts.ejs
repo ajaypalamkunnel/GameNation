@@ -35,7 +35,13 @@
             <input type="text" id="search" placeholder="Search products..." class="p-2 rounded-lg w-80 focus:outline-none focus:ring-2 focus:ring-green-500">
             <button id="searchBtn" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">Search</button>
         </div>
-        <button class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">Filter</button>
+        <select class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700" name="" id="" onchange="filter(this.value)">
+          <option value="">Filter</option>
+          <option value="lowToHigh">Price: Low to High</option>
+          <option value="highToLow">Price: High to Low</option>
+          <option value="aToZ">Name: A - Z</option>   <!-- A to Z sorting -->
+          <option value="zToA">Name: Z - A</option> 
+        </select>
     </div>
     
     <!-- Product List -->
@@ -56,10 +62,20 @@
                     </h5>
                   </a>
                   <!-- Discount Price -->
-                  <div class="mt-2.5 mb-5 flex items-center">
-                    <span class="mr-2 rounded bg-yellow-200 px-2.5 py-0.5 text-xs font-semibold">
-                      ₹<%= product.discountPrice %>
-                    </span>
+                  <div id="rating" class="mt-2.5 mb-5 flex items-center">
+                    <% const totalStars = 5; %>
+                    <% const filledStars = Math.round(3 || 0); %> <!-- Round rating to nearest integer -->
+                    <% const emptyStars = totalStars - filledStars; %>
+          
+                    <% for (let i = 0; i < filledStars; i++) { %>
+                      <span class="text-yellow-500 text-xl">★</span>
+                    <% } %>
+                    <% for (let i = 0; i < emptyStars; i++) { %>
+                      <span class="text-gray-400 text-xl">☆</span>
+                    <% } %>
+          
+                    <!-- Optional: Display numeric rating beside the stars -->
+                    <span class="ml-2 text-sm text-gray-600">( <%= filledStars.toFixed(1) %> )</span>
                   </div>
                   <!-- Price and Add to Cart -->
                   <a href="/productView/<%= product._id %>">
@@ -87,6 +103,75 @@
 
 
 <script>
+
+
+function filter(sortValue){
+  fetch(`/allProducts/filter?sort=${sortValue}`)
+
+    .then(response=>response.json())
+    .then(data=>{
+
+      const productList = document.querySelector('.product-list');
+      productList.innerHTML = '';
+
+      if(data.products.length>0){
+        data.products.forEach(product=>{
+          const productCard =
+          `
+
+          <div class="mb-3 relative w-72 shrink-0 rounded-lg">
+              <a href="/productView/${product._id}">
+                <div class="relative w-72 shrink-0 rounded-lg bg-white shadow-md">
+                  <!-- Product Image -->
+                  <img class="h-60 w-full object-cover object-center rounded-t-lg" src="${product.image[0]}" alt="${product.product_name}"/>
+                  <div class="p-5">
+                    <!-- Product Title -->
+                    <h5 class="text-xl font-semibold tracking-tight text-slate-900">${product.product_name}</h5>
+                    <!-- Discount Price -->
+                    <div class="mt-2.5 mb-5 flex items-center">
+                      <span class="mr-2 rounded bg-yellow-200 px-2.5 py-0.5 text-xs font-semibold">
+                        ₹${product.discountPrice}
+                      </span>
+                    </div>
+                    <!-- Price and Add to Cart -->
+                    <div class="flex items-center justify-between">
+                      <p>
+                        <span class="text-3xl font-bold text-slate-900">₹${product.discountPrice}</span>
+                        <span class="text-sm text-slate-900 line-through">₹${product.price}</span>
+                      </p>
+                      <a href="/productView/${product._id}" class="flex items-center rounded-md bg-slate-900 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-gray-700">
+                        Add to cart
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </a>
+            </div>
+
+          `;
+
+          productList.innerHTML += productCard
+        })
+      }else{
+
+        productList.innerHTML = `<p class="text-white">No products found.</p>`;
+        
+      }
+
+    })
+    .catch(error=>{
+      console.error('Error fetching the filtered products:', error);
+    })
+
+ 
+  
+}
+
+
+
+
+
+
  document.querySelector('#searchBtn').addEventListener('click', function (event) {
     event.preventDefault();
 
