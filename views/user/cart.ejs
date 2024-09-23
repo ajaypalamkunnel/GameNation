@@ -39,7 +39,7 @@
           
                     <!-- Price with unique ID -->
                     <div class="text-end md:order-4 md:w-32">
-                      <p id="product-price-<%= index %>" class="text-base font-bold text-gray-900 dark:text-white">₹<%= item.discountedPrice.toFixed(2) %></p>
+                      <p id="product-price-<%= index %>" class="text-base font-bold text-gray-900 dark:text-white">₹<%= item.discountedPrice.toFixed(2) * item.productCount %></p>
                       <p class="text-sm text-gray-500">Original: ₹<%= item.productPrice.toFixed(2) %></p>
                     </div>
                   </div>

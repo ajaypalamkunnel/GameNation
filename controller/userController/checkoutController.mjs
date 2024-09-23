@@ -75,8 +75,12 @@ export const placeOrder = async(req,res)=>{
 
             console.log("--------",cartItems);
             
+            let orderTotal = cartItems.reduce((sum,item)=>{
+                return sum = sum + item.productPrice
+            },0)
+            console.log("order total = ",orderTotal);
             
-            
+           
             
 
             const selectedAddress = await user.address.id(addressId);;
@@ -115,7 +119,7 @@ export const placeOrder = async(req,res)=>{
                     product_status: "Pending" // Set initial product status
                   })),
                   totalQuantity: cartItems.reduce((sum,item)=>sum+item.productQuantity,0),
-                  totalPrice:totalPrice,
+                  totalPrice:orderTotal,
                   address:{
                     contactName: selectedAddress.contactName,
                     building: selectedAddress.building,
