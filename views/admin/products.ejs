@@ -4,15 +4,16 @@
     
 
     <div class="overflow-x-auto flex-grow: 2; font-[sans-serif] w-full">
-      <form class="w-full  flex items-center bg-gray-800">
-        <input type="text" class="w-3/6 mt-5  ml-4 mb-3 border rounded-lg p-2  h-8 text-sm" placeholder="Search by user name...">
+      
+      <form action="/admin/products" method="GET" class="w-full  flex items-center bg-gray-800">
+        <input id="searchInput"  type="text" name="search" value="<%= searchQuery %>" class="w-3/6 mt-5  ml-4 mb-3 border rounded-lg p-2 h-8 text-sm" placeholder="Search by product name or publisher...">
         <button type="submit" class="bg-green-400  ml-4 mt-5 mb-3 text-white p-2 h-8 text-sm rounded-lg hover:bg-blue-700">Search</button>
-        
+        <button id="clearSearchBtn" type="button" class="bg-red-400 ml-2 mt-5 mb-3 text-white p-2 h-8 text-sm rounded-lg hover:bg-red-600">Clear Search</button>
         <a href="/admin/addProduct" class="bg-green-400  ml-4 mt-5 mb-3 text-white p-2 h-8 text-sm rounded-lg hover:bg-blue-700">Add product</a>
-        
-  
-    </form>
-    <div id="toast-message" class=" hidden font-[sans-serif] space-y-6 mx-auto w-max mt-20 left-3/4 transition-opacity duration-300 z-[1000]   fixed inset-0">
+      </form>
+
+    
+      <div id="toast-message" class=" hidden font-[sans-serif] space-y-6 mx-auto w-max mt-20 left-3/4 transition-opacity duration-300 z-[1000]   fixed inset-0">
       <div class="bg-white shadow-[0_3px_10px_-3px_rgba(6,81,237,0.3)] border-t-4 border-green-500 text-gray-800 flex items-center w-max max-w-sm p-4 rounded-md"
           role="alert">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-[18px] shrink-0 fill-green-500 inline mr-3" viewBox="0 0 512 512">
@@ -108,7 +109,7 @@
               <!-- Previous Page Link -->
               <% if (hasPreviousPage) { %>
               <li class="flex items-center justify-center cursor-pointer bg-gray-200 w-8 h-8 rounded">
-                <a href="?page=<%= currentPage - 1 %>&limit=<%= limit %>">
+                <a href="?page=<%= currentPage - 1 %>&limit=<%= limit %>&search=<%= searchQuery %>">
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-3 fill-gray-500" viewBox="0 0 55.753 55.753">
                     <path d="M12.745 23.915c.283-.282.59-.52.913-.727L35.266 1.581a5.4 5.4 0 0 1 7.637 7.638L24.294 27.828l18.705 18.706a5.4 5.4 0 0 1-7.636 7.637L13.658 32.464a5.367 5.367 0 0 1-.913-.727 5.367 5.367 0 0 1-1.572-3.911 5.369 5.369 0 0 1 1.572-3.911z" />
                   </svg>
@@ -119,14 +120,14 @@
               <!-- Page Numbers -->
               <% for (let i = 1; i <= totalPages; i++) { %>
               <li class="flex items-center justify-center cursor-pointer text-sm w-8 h-8 rounded <%= currentPage === i ? 'bg-[#007bff] text-white' : '' %>">
-                <a href="?page=<%= i %>&limit=<%= limit %>"><%= i %></a>
+                <a href="?page=<%= i %>&limit=<%= limit %>&search=<%= searchQuery %>"><%= i %></a>
               </li>
               <% } %>
       
               <!-- Next Page Link -->
               <% if (hasNextPage) { %>
               <li class="flex items-center justify-center cursor-pointer bg-gray-200 w-8 h-8 rounded">
-                <a href="?page=<%= currentPage + 1 %>&limit=<%= limit %>">
+                <a href="?page=<%= currentPage + 1 %>&limit=<%= limit %>&search=<%= searchQuery %>">
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-3 fill-gray-500 rotate-180" viewBox="0 0 55.753 55.753">
                     <path d="M12.745 23.915c.283-.282.59-.52.913-.727L35.266 1.581a5.4 5.4 0 0 1 7.637 7.638L24.294 27.828l18.705 18.706a5.4 5.4 0 0 1-7.636 7.637L13.658 32.464a5.367 5.367 0 0 1-.913-.727 5.367 5.367 0 0 1-1.572-3.911 5.369 5.369 0 0 1 1.572-3.911z" />
                   </svg>
@@ -222,6 +223,14 @@ function showToast(message, isError = false) {
     }, 300); // Delay to allow fade out effect
   }, 3000);
 }
+
+
+document.getElementById('clearSearchBtn').addEventListener('click',function(){
+  console.log("hiiiii");
+  
+  document.getElementById('searchInput').value = '';
+  window.location.href = '/admin/products';
+})
 
 
 

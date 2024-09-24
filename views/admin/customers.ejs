@@ -4,12 +4,14 @@
 
     <div class="font-[sans-serif] flex-grow: 2; overflow-x-auto w-full">
          <!-- Search box -->
-     <form class="w-full  flex items-center bg-gray-800">
-        <input type="text" class="w-3/6 mt-5  ml-4 mb-3 border rounded-lg p-2  h-8 text-sm" placeholder="Search by user name...">
-        <button type="submit" class="bg-green-400  ml-4 mt-5 mb-3 text-white p-2 h-8 text-sm rounded-lg hover:bg-blue-700">Search</button>
-        
+         <form class="w-full flex items-center bg-gray-800" method="GET" action="/admin/customers">
+          <input id="searchInput" type="text" name="search" class="w-3/6 mt-5 ml-4 mb-3 border rounded-lg p-2 h-8 text-sm"
+                 placeholder="Search by user name or email..." value="<%= searchQuery %>">
+          <button type="submit" class="bg-green-400 ml-4 mt-5 mb-3 text-white p-2 h-8 text-sm rounded-lg hover:bg-blue-700">Search</button>
+          <button id="clearSearchBtn" type="button" class="bg-red-400 ml-2 mt-5 mb-3 text-white p-2 h-8 text-sm rounded-lg hover:bg-red-600">Clear Search</button>
 
-    </form>
+        </form>
+        
         <table class="min-w-full bg-white">
           <thead class="whitespace-nowrap">
             <tr>
@@ -68,26 +70,20 @@
           </tbody>
         </table>
   <!-- Pagination Controls -->
-        <div class="flex justify-end ml-5 items-center mt-5">
-          <p class="text-sm text-gray-500 flex-1">Showing <%= users.length %> of <%= totalPages*limit %> entries</p>
+  <div class="flex mt-5 space-x-2">
+    <% if(currentPage > 1){ %>
+      <a href="?page=<%= currentPage - 1 %>&limit=<%= limit %>&search=<%= searchQuery %>" class="p-2 bg-blue-100 text-gray-500 rounded">Previous</a>
+    <% } %>
+    <% for (let i = 1; i <= totalPages; i++) { %>
+      <a href="?page=<%= i %>&limit=<%= limit %>&search=<%= searchQuery %>" class="p-2 <%= i === currentPage ? 'bg-[#007bff] text-white' : 'bg-blue-100 text-gray-500' %> rounded">
+        <%= i %>
+      </a>
+    <% } %>
+    <% if (currentPage < totalPages) { %>
+      <a href="?page=<%= currentPage + 1 %>&limit=<%= limit %>&search=<%= searchQuery %>" class="p-2 bg-blue-100 text-gray-500 rounded">Next</a>
+    <% } %>
+  </div>
   
-          <div class="flex space-x-2">
-            <% if(currentPage > 1){ %>
-              <a href="?page=<%= currentPage - 1 %>&limit=<%= limit %>" class="p-2 bg-blue-100 text-gray-500 rounded">Previous</a>
-              <% } %>
-              <% for (let i = 1; i <= totalPages; i++) { %>
-                <a href="?page=<%= i %>&limit=<%= limit %>" class="p-2 <%= i === currentPage ? 'bg-[#007bff] text-white' : 'bg-blue-100 text-gray-500' %> rounded">
-                  <%= i %>
-                </a>
-              <% } %>
-              <% if (currentPage < totalPages) { %>
-                <a href="?page=<%= currentPage + 1 %>&limit=<%= limit %>" class="p-2 bg-blue-100 text-gray-500 rounded">Next</a>
-              <% } %>
-            
-  
-            
-          </div>
-        </div>
       </div>
 
 </div>
@@ -121,52 +117,12 @@
     }
   }
 
-
+  document.getElementById('clearSearchBtn').addEventListener('click',function(){
+    document.getElementById('searchInput').value = '';
+    window.location.href = '/admin/customers';
+  })
 
 
 
 </script>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            <!-- <div id="editCategoryModal" class="fixed inset-0 z-[1000] hidden flex h-full w-full flex-wrap items-center justify-center overflow-auto p-4 font-[sans-serif] before:fixed before:inset-0 before:h-full before:w-full before:bg-[rgba(0,0,0,0.5)]">
-              <div class="relative w-full max-w-lg rounded-md bg-white p-8 shadow-lg">
-                <svg onclick="closeModal()" xmlns="http://www.w3.org/2000/svg" class="float-right w-3.5 shrink-0 cursor-pointer fill-gray-800 hover:fill-red-500" viewBox="0 0 320.591 320.591">
-                  <path d="M30.391 318.583a30.37 30.37 0 0 1-21.56-7.288c-11.774-11.844-11.774-30.973 0-42.817L266.643 10.665c12.246-11.459 31.462-10.822 42.921 1.424 10.362 11.074 10.966 28.095 1.414 39.875L51.647 311.295a30.366 30.366 0 0 1-21.256 7.288z" data-original="#000000"></path>
-                  <path d="M287.9 318.583a30.37 30.37 0 0 1-21.257-8.806L8.83 51.963C-2.078 39.225-.595 20.055 12.143 9.146c11.369-9.736 28.136-9.736 39.504 0l259.331 257.813c12.243 11.462 12.876 30.679 1.414 42.922-.456.487-.927.958-1.414 1.414a30.368 30.368 0 0 1-23.078 7.288z" data-original="#000000"></path>
-                </svg>
-                <div class="my-8 text-center">
-                    <input id="categoryName" type="text" placeholder="Category name" class="mt-6 w-full rounded-md bg-[#f0f1f2] px-4 py-2.5 text-sm text-gray-800 outline-blue-600 focus:bg-transparent" />
-                    <div class="mt-4">
-                        <label for="isBlocked" class="text-gray-800">Is Blocked:</label>
-                        <select id="isBlocked" name="isBlocked" class="mt-2 w-full rounded-md bg-[#f0f1f2] px-4 py-2.5 text-sm text-gray-800 outline-none">
-                            <option value="false">False</option>
-                            <h4 class="text-2xl font-bold text-gray-800">Edit Category</h4>
-                      <option value="true">True</option>
-                    </select>
-                    <p id="isBlockedError" class="mt-1 hidden text-sm text-red-500">Please select if the category is blocked or not.</p>
-                  </div>
-                </div>
-                <button id="updateCategoryButton" type="button" class="w-full rounded-md bg-green-600 px-5 py-2.5 text-sm text-white outline-none hover:bg-green-700">Update</button>
-              </div>
-            </div> -->

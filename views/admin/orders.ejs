@@ -1,5 +1,22 @@
 <%- include('adminHeader') %>
+
+<style>
+
+  /* Custom CSS to hide the scrollbar */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari, and Opera */
+}
+
+</style>
+
+
 <div style="display: flex; height: 100vh">
+  
     <%- include('sidebar') %>
 
     <div class="w-full min-h-screen bg-gray-900 p-6">
@@ -54,7 +71,10 @@
                     </td>
                   <td class="px-4 py-4"><%= order.totalPrice.toFixed(2) %></td>
                   <td class="px-4 py-4 flex space-x-2">
-                    <button class="bg-green-500 text-white px-3 py-1 rounded">Edit</button>
+                    <!-- View button to open the modal and fetch order details -->
+                  <button onclick="viewOrder('<%= order._id %>')" class="bg-green-500 text-white px-3 py-1 rounded">View</button>
+
+                    
                     <button class="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
                   </td>
                 </tr>
@@ -65,6 +85,67 @@
               </tbody>
             </table>
           </div>
+
+
+
+          <!-- Order Details Modal -->
+<!-- Order Details Modal -->
+<div id="orderModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex justify-center items-center hidden z-50">
+  <div class="bg-gray-800 p-4 rounded-lg shadow-lg w-full max-w-lg relative"> <!-- Reduced max-width and padding -->
+    <!-- Close Button -->
+    <button id="closeModalBtn" class="absolute top-4 right-4 text-white bg-red-500 hover:bg-red-600 p-2 rounded-full">
+      &times;
+    </button>
+
+    <!-- Modal Content -->
+    <div class="text-white" id="modalContent">
+      <h1 class="text-2xl font-semibold mb-4 text-center">Order Details</h1> <!-- Reduced heading size -->
+      
+      <!-- Order Info and Address -->
+      <div class="flex justify-between mb-6"> <!-- Reduced spacing -->
+        <div>
+          <p class="text-sm"><strong>Order ID:</strong> <span id="modalOrderId"></span></p> <!-- Reduced text size -->
+          <p class="text-sm"><strong>Ordered date:</strong> <span id="modalOrderedDate"></span></p>
+          <p class="text-sm"><strong>Delivered date:</strong> <span id="modalDeliveredDate"></span></p>
+          <p class="text-sm"><strong>Order status:</strong> <span id="modalOrderStatus"></span></p>
+        </div>
+
+        <!-- Delivery Address -->
+        <div>
+          <h2 class="text-lg font-semibold mb-2">Delivery Address</h2> <!-- Reduced heading size -->
+          <p class="text-sm" id="modalAddress"></p> <!-- Reduced text size -->
+        </div>
+      </div>
+
+      <!-- Product Details -->
+      <div class="max-h-60 overflow-y-auto mb-4" id="modalProducts"> <!-- Reduced height and added scroll -->
+        <!-- Product details will be inserted here -->
+      </div>
+
+      <!-- Total Price -->
+      <div class="flex justify-end mt-2">
+        <p class="font-semibold text-sm text-white">Total: ₹ <span id="modalTotalPrice"></span></p> <!-- Reduced text size -->
+      </div>
+
+      <!-- Download Invoice Button -->
+      <div class="text-center mt-4">
+        <a href="#" class="bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded-lg text-sm">Download Invoice</a> <!-- Reduced button size -->
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
       
           <!-- Pagination -->
           <!-- Pagination -->
@@ -119,5 +200,73 @@
         })
         .catch(error =>  console.error('Error:', error))
     }
+
+
+
+
+    const orderModal = document.getElementById('orderModal')
+    const closeModalBtn = document.getElementById('closeModalBtn');
+
+    function viewOrder(orderId){
+      fetch(`/admin/orderViewAdmin?orderId=${orderId}`)
+      .then(response=>response.json())
+      .then(data=>{
+
+        document.getElementById('modalOrderId').innerText = data._id;
+        document.getElementById('modalOrderedDate').innerText = new Date(data.createdAt).toLocaleDateString('en-GB');
+        document.getElementById('modalDeliveredDate').innerText = data.orderStatus === 'Delivered' ? new Date(data.deliveredAt).toLocaleDateString('en-GB') : 'Not delivered yet';
+        document.getElementById('modalOrderStatus').innerText = data.orderStatus;
+
+
+        const address = data.address;
+        document.getElementById('modalAddress').innerHTML = `
+          ${address.contactName}, ${address.building} ${address.city},<br>
+          ${address.district}, ${address.state}, ${address.pincode}<br>
+          Mobile: ${address.phonenumber}
+        `;
+
+
+        const productsContainer = document.getElementById('modalProducts');
+        productsContainer.innerHTML = '';  // Clear previous content
+        data.products.forEach(product => {
+          productsContainer.innerHTML += `
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 my-2 items-center bg-gray-700 p-4 rounded-lg">
+              <img class="w-1/2 h-3/4 object-cover rounded-lg" src="${product.product_id.image[0]}" alt="${product.product_name}">
+              <div class="sm:col-span-2">
+                <p class="text-lg font-semibold">${product.product_name}</p>
+                <p><strong>QTY:</strong> ${product.product_quantity}</p>
+                <p><strong>Price:</strong> ₹ ${product.product_price.toFixed(2)}</p>
+              </div>
+            </div>
+          `;
+        });
+
+        document.getElementById('modalTotalPrice').innerText = data.totalPrice.toFixed(2);
+
+
+        orderModal.classList.remove('hidden');
+        orderModal.classList.add('flex');
+   
+
+      })
+
+      .catch(error => console.error('Error fetching order details:', error));
+    }
+
+    closeModalBtn.addEventListener('click',()=>{
+      orderModal.classList.add('hidden');
+      orderModal.classList.remove('flex')
+    })
+
+    window.addEventListener('click',(event)=>{
+
+      if(event.target === orderModal){
+
+        orderModal.classList.add('hidden');
+        orderModal.classList.remove('flex');
+
+      }
+
+    });
 
 </script>

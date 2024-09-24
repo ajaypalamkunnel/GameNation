@@ -1,7 +1,7 @@
 import express from 'express';
 import { isAdmin } from '../middleware/adminSession.mjs';
 const adminRouter = express.Router();
-import { getAdminLogin,loginPost,dashboard,addCategory,addCategoryPost,categoryView,updateCategory,customers,toggleVerification, ordersList } from '../controller/adminController/adminController.mjs';
+import { getAdminLogin,loginPost,dashboard,addCategory,addCategoryPost,categoryView,updateCategory,customers,toggleVerification, ordersList, orderViewAdmin, searchCustomer } from '../controller/adminController/adminController.mjs';
 import { addProduct, addProductPost,viewProducts,editProduct,editProductPut,deleteProduct} from '../controller/adminController/productController.mjs';
 //import cloudinary from '../uploads/cloudinary.mjs';
 import {upload} from '../uploads/cloudinary.mjs'
@@ -34,6 +34,7 @@ adminRouter.patch('/updateCategory/:id',isAdmin,updateCategory)
 //-----------------------------display Category-------------------------------
 adminRouter.get('/customers',isAdmin,customers)
 adminRouter.post('/toggleVerification',toggleVerification)
+adminRouter.get('/searchCustomer',isAdmin,searchCustomer)
 
 
 
@@ -52,6 +53,7 @@ adminRouter.put('/deleteProduct/:id',isAdmin, deleteProduct);
 
 adminRouter.get('/ordersList',isAdmin,ordersList)
 adminRouter.post('/order/:orderId/status',isAdmin,orderStatus)
+adminRouter.get('/orderViewAdmin',isAdmin,orderViewAdmin)
 
 
 

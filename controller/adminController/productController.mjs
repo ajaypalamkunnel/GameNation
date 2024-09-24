@@ -121,19 +121,38 @@ export const viewProducts = async(req,res)=>{
 
   try {
 
+
+    const searchQuery = req.query.search || '';
+
+    console.log("hi iam search quer",searchQuery);
+    
+
     const page = parseInt(req.query.page)||1;
     const limit = parseInt(req.query.limit)||10;
-
-
     const skip = (page-1) * limit;
 
-    const totalProducts = await Product.countDocuments();
 
+    const searchFilter = {
 
-    const products = await Product.find({}) .populate({
+      $or:[
+        {product_name:{$regex:searchQuery,$options:'i'}},
+        {publisher:{$regex:searchQuery,$options:'i'}}
+      ]
+      
+    }
+    
+    const products = await Product.find(searchFilter)
+    .populate({
       path: 'category', // Path to the 'category' field in Product schema
       select: 'collectionName' // Select only 'collectionName' from Category
-    }).limit(limit).skip(skip)
+    })
+    .limit(limit)
+    .skip(skip)
+
+
+    const totalProducts = await Product.countDocuments(searchFilter);
+
+
 
     //console.log("------",products.category);
     
@@ -149,7 +168,8 @@ export const viewProducts = async(req,res)=>{
       totalPages,
       hasNextPage: page < totalPages,
       hasPreviousPage: page>1,
-      limit
+      limit,
+      searchQuery
     })
     
   } catch (error) {
@@ -393,12 +413,23 @@ export const productView = async(req,res)=>{
 
 export const allProducts = async (req, res) => {
   try {
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+
+    const skip = (page - 1) * limit
+
+    const totalProducts = await Product.countDocuments({isDelete:false})
     
     const products = await Product.find({ isDelete: false }) // Fetch all non-deleted products
       .populate({
         path: 'category',  
         select: 'collectionName'
-      });
+      })
+      .skip(skip)
+      .limit(limit);
+
+      const totalPages = Math.ceil(totalProducts/limit)
 
       products.forEach((product) => {
         const discountPrice = Math.ceil(
@@ -415,7 +446,10 @@ export const allProducts = async (req, res) => {
       title: 'All Products',
       products,
       categories,
-      user: req.session.user
+      user: req.session.user,
+      currentPage:page,
+      totalPages
+      
     });
 
   } catch (error) {

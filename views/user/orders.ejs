@@ -58,13 +58,13 @@
           <p class="text-white mt-4 font-bold">Total: ₹ <%= (product.product_price * product.product_quantity).toFixed(2) %></p>
   
           <!-- View Details Button -->
-          <div class="mt-4">
-            <a href="/orderView?orderId=<%= order._id %>" class="bg-green-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-green-600">view details</a>
-          </div>
         </div>
       </div>
       <% }) %>
-
+      <div class="mt-10">
+        <a href="/orderView?orderId=<%= order._id %>" class="bg-green-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-green-600">view details</a>
+      </div>
+    
       <!-- Total Price for the Order -->
       <div class="text-right mt-6">
         <p class="text-white font-bold text-xl">Total: ₹<%= order.totalPrice.toFixed(2) %></p>

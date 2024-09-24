@@ -1,3 +1,4 @@
+import e from "connect-flash";
 import category from "../../model/categoryScehema.mjs";
 import OrderSchema from "../../model/orderSchema.mjs";
 import Product from "../../model/productSchema.mjs";
@@ -83,7 +84,8 @@ export const addCategoryPost = async (req,res)=>{
     try {
         const {categoryName,isBlocked} = req.body;
 
-        const existingCategory = await category.findOne({collectionName:categoryName.trim()})
+        const existingCategory = await category.findOne({
+            collectionName:categoryName.trim()})
 
 
         if(existingCategory){
@@ -169,15 +171,38 @@ export const customers = async(req,res)=>{
     try {
         if(req.session.admin){
 
+            const searchQuery = req.query.search || '';
+
+            console.log(searchQuery);
+            
+
             const page = parseInt(req.query.page)||1;
             const limit = parseInt(req.query.limit)||5;
 
             const skip = (page-1) * limit;
 
+            
+            
+            
+            
+            const searchFilter = {
+                $or:[
+                    {username: {$regex: searchQuery,$options:'i'}},
+                    {email :{$regex:searchQuery,$options:'i'}}
+                    
+                ]
+            }
+            
+            const users = await User.find(searchFilter)
+            .skip(skip)
+            .limit(limit)
+            
+            
             const totalUsers = await User.countDocuments({});
 
 
-            const users = await User.find({}).skip(skip).limit(limit);
+
+
 
             const totalPages = Math.ceil(totalUsers/limit);
             res.render('admin/customers',{
@@ -185,7 +210,8 @@ export const customers = async(req,res)=>{
                 users:users,
                 currentPage:page,
                 totalPages:totalPages,
-                limit:limit
+                limit:limit,
+                searchQuery
 
             });
 
@@ -269,4 +295,37 @@ export const ordersList = async(req,res)=>{
         
         
     }
+}
+
+
+
+
+
+export const orderViewAdmin = async(req,res)=>{
+
+    const {orderId} = req.query;
+    try{
+
+        const order = await OrderSchema.findOne({_id:orderId})
+        .populate('customer_id')
+        .populate({
+            path:'products.product_id',
+            select:'product_name category price discount stock image',
+            model:Product,
+            options: { strictPopulate: false }
+    
+        });
+
+        res.json(order)
+    }catch(error){
+        res.status(500).json({ error: 'Error fetching order details' });
+    }
+
+
+}
+
+
+
+export const searchCustomer = async(req,res)=>{
+
 }
