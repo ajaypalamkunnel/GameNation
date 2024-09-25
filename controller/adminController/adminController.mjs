@@ -249,12 +249,37 @@ export const ordersList = async(req,res)=>{
     try {
         if(req.session.admin){
 
-            const page = parseInt(req.query.page) || 1;
-            const limit = parseInt(req.query.limit) || 10;
+            const {status,paymentMethod,startDate,endDate,page=1,limit=10} = req.query;
+
+            const filter = {};
+
+            if(status){
+                filter.orderStatus = status;
+            }
+
+            if(paymentMethod){
+                filter.paymentMethod = paymentMethod;
+            }
+
+            if(startDate || endDate){
+                filter.createdAt = {};
+                if(startDate){
+                    filter.createdAt.$gte = new Date(startDate)
+                }
+                if(endDate){
+                    filter.createdAt.$lte = new Date(endDate)
+                }
+            }
+
+
+
+
+            // const page = parseInt(req.query.page) || 1;
+            // const limit = parseInt(req.query.limit) || 10;
 
             const skip = (page - 1) * limit;
 
-            const orders = await OrderSchema.find({})
+            const orders = await OrderSchema.find(filter)
             .populate({
                 path:'products.product_id',
                 select: 'name category'
@@ -266,10 +291,11 @@ export const ordersList = async(req,res)=>{
             })
             .skip(skip)
             .limit(limit)
+            .sort({createdAt:-1})
             .lean()
 
              // Get the total number of orders for pagination info
-            const totalOrders = await OrderSchema.countDocuments();
+            const totalOrders = await OrderSchema.countDocuments(filter);
             const totalPages = Math.ceil(totalOrders / limit);
             
             
@@ -282,7 +308,9 @@ export const ordersList = async(req,res)=>{
                 orders,
                 currentPage: page,
                 totalPages,
-                limit
+                limit,
+                totalOrders,
+                filters:{status, paymentMethod, startDate, endDate}
 
 
             })

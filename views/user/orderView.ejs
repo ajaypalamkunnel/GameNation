@@ -1,7 +1,7 @@
 <%- include('header') %>
 
 <div class="min-h-screen bg-gray-900 text-white p-5 flex justify-center items-center">
-    <div class="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-3xl">
+    <div class="order-details bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-3xl">
       <!-- Order Details -->
       <h1 class="text-3xl font-semibold mb-6 text-center">Orders Details</h1>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -66,10 +66,43 @@
       </div>
   
       <!-- Download Invoice Button -->
-      <div class="text-center">
-        <a href="#" class="bg-green-500 hover:bg-green-600 text-white font-semibold px-6 py-3 rounded-lg">Download Invoice</a>
-      </div>
+     
     </div>
+    
+  </div>
+  
+  <div class="bg-gray-900 py-8 p-2 text-center">
+    <a href="#" id="downloadInvoice" class="bg-green-500 hover:bg-green-600 text-white font-semibold px-6 py-4  rounded-lg">Download Invoice</a>
   </div>
 
+  <script>
+    document.getElementById('downloadInvoice').addEventListener('click', function(event) {
+      event.preventDefault();  // Prevent the default anchor behavior
+  
+      // Get the order-details div
+      const orderDetails = document.querySelector('.order-details');
+  
+      // Use html2canvas to capture the order details as a canvas
+      html2canvas(orderDetails, { scale: 2 }).then(canvas => {
+        // Initialize jsPDF
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');  // p for portrait, mm for millimeters, a4 paper size
+  
+        // Convert the canvas to image format
+        const imgData = canvas.toDataURL('image/png');
+  
+        // Calculate image size and position for A4 page (210mm x 297mm)
+        const imgWidth = 210;  // Full width of A4
+        const pageHeight = 297;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width; // Maintain aspect ratio
+  
+        // Add the image to the PDF
+        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+  
+        // Save the PDF as "invoice.pdf"
+        pdf.save('invoice.pdf');
+      });
+    });
+  </script>
+  
   <%- include('footer') %>

@@ -25,10 +25,34 @@
           <div class="flex justify-between items-center mb-6">
             <h1 class="text-2xl text-white font-semibold">Orders</h1>
             <div class="relative">
+              <form action="/admin/ordersList" method="GET" class="flex items-center bg-gray-800 p-4">
+                <!-- Status Filter -->
+                <select name="status" class="w-1/4 p-2 rounded-lg bg-gray-700 text-white mr-4">
+                    <option value="">All Statuses</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Confirmed">Confirmed</option>
+                    <option value="Shipped">Shipped</option>
+                    <option value="Delivered">Delivered</option>
+                    <option value="Cancelled">Cancelled</option>
+                </select>
+                
+                <!-- Payment Method Filter -->
+                <select name="paymentMethod" class="w-1/4 p-2 rounded-lg bg-gray-700 text-white mr-4">
+                    <option value="">All Payment Methods</option>
+                    <option value="Cash on delivery">Cash on Delivery</option>
+                    <option value="razorpay">Razorpay</option>
+                    <option value="Wallet">Wallet</option>
+                </select>
+                
+                <!-- Date Range Filter (Optional) -->
+                <input type="date" name="startDate" class="p-2 rounded-lg bg-gray-700 text-white mr-2" placeholder="Start Date">
+                <input type="date" name="endDate" class="p-2 rounded-lg bg-gray-700 text-white mr-4" placeholder="End Date">
+                
+                <!-- Submit Filter Button -->
+                <button type="submit" class="bg-green-500 text-white p-2 rounded-lg hover:bg-green-600">Filter</button>
+            </form>
               <input type="text" placeholder="Search" class="pl-10 pr-4 py-2 rounded-full bg-gray-700 text-gray-300 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400">
-              <svg class="w-5 h-5 text-gray-400 absolute top-2 left-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 21l-6-6m0 0a9 9 0 1112.73 0"></path>
-              </svg>
+              
             </div>
           </div>
       
@@ -74,8 +98,6 @@
                     <!-- View button to open the modal and fetch order details -->
                   <button onclick="viewOrder('<%= order._id %>')" class="bg-green-500 text-white px-3 py-1 rounded">View</button>
 
-                    
-                    <button class="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
                   </td>
                 </tr>
 
@@ -129,8 +151,8 @@
 
       <!-- Download Invoice Button -->
       <div class="text-center mt-4">
-        <a href="#" class="bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded-lg text-sm">Download Invoice</a> <!-- Reduced button size -->
-      </div>
+        <button id="downloadInvoice" class="bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded-lg text-sm">Download Invoice</button>
+        </div>
     </div>
   </div>
 </div>
@@ -151,13 +173,13 @@
           <!-- Pagination -->
 <div class="mt-6 flex justify-between items-center">
     <% if (currentPage > 1) { %>
-      <a href="?page=<%= currentPage - 1 %>&limit=<%= limit %>" class="bg-gray-600 text-white px-4 py-2 rounded-lg">Prev</a>
+      <a href="?page=<%= currentPage - 1 %>&limit=<%= limit %>&status=<%= filters.status %>&paymentMethod=<%= filters.paymentMethod %>&startDate=<%= filters.startDate %>&endDate=<%= filters.endDate %>" class="bg-gray-600 text-white px-4 py-2 rounded-lg">Prev</a>
     <% } else { %>
       <button disabled class="bg-gray-600 text-white px-4 py-2 rounded-lg opacity-50">Prev</button>
     <% } %>
     
     <% if (currentPage < totalPages) { %>
-      <a href="?page=<%= currentPage + 1 %>&limit=<%= limit %>" class="bg-gray-600 text-white px-4 py-2 rounded-lg">Next</a>
+      <a href="?page=<%= currentPage + 1 %>&limit=<%= limit %>&status=<%= filters.status %>&paymentMethod=<%= filters.paymentMethod %>&startDate=<%= filters.startDate %>&endDate=<%= filters.endDate %>" class="bg-gray-600 text-white px-4 py-2 rounded-lg">Next</a>
     <% } else { %>
       <button disabled class="bg-gray-600 text-white px-4 py-2 rounded-lg opacity-50">Next</button>
     <% } %>
@@ -268,5 +290,47 @@
       }
 
     });
+
+
+
+    document.getElementById('downloadInvoice').addEventListener('click', function(event) {
+      event.preventDefault();  // Prevent the default anchor behavior
+      console.log("hiiiiii");
+      
+  
+      // Get the order-details div
+      const orderDetails = document.getElementById('orderModal');
+  
+      // Use html2canvas to capture the order details as a canvas
+      html2canvas(orderDetails, { scale: 2 }).then(canvas => {
+        // Initialize jsPDF
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');  // p for portrait, mm for millimeters, a4 paper size
+  
+        // Convert the canvas to image format
+        const imgData = canvas.toDataURL('image/png');
+  
+        // Calculate image size and position for A4 page (210mm x 297mm)
+        const imgWidth = 210;  // Full width of A4
+        const pageHeight = 297;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width; // Maintain aspect ratio
+  
+        // Add the image to the PDF
+        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+  
+        // Save the PDF as "invoice.pdf"
+        pdf.save('invoice.pdf');
+      });
+    });
+
+
+
+
+
+
+
+
+
+
 
 </script>

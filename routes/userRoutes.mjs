@@ -3,10 +3,10 @@ import { isUser } from '../middleware/userSession.mjs';
 const userRouter = express.Router()
 
 import {getSignUp,signupPost, verifyOtp,getLogin,loginPost,googleAuth,googleAuthCallback,userLogout,resendOtp} from '../controller/userController/userAuth.mjs'
-import { productView,allProducts,cart,addToCart,updateCartQuantity,searchProducts,removeProductFromCart, allProductsFilter  } from '../controller/adminController/productController.mjs';
+import { productView,allProducts,cart,addToCart,updateCartQuantity,searchProducts,removeProductFromCart, allProductsSort  } from '../controller/adminController/productController.mjs';
 // import {} '../services/auth.mjs'
 import { checkout, placeOrder } from '../controller/userController/checkoutController.mjs';
-import { home,userProfile,addressView,addNewAddress,addNewAddressPost,editAddress,editAddressPut,deleteAddress} from '../controller/userController/userController.mjs'; 
+import { home,userProfile,addressView,addNewAddress,addNewAddressPost,editAddress,editAddressPut,deleteAddress, filterDataFetch} from '../controller/userController/userController.mjs'; 
 import passport from 'passport';
 import { orders, orderSummary, orderView } from '../controller/userController/orderController.mjs';
 
@@ -82,7 +82,9 @@ userRouter.post('/cart/remove-item',isUser,removeProductFromCart)
 //---------------------------- search management --------------
 
 userRouter.get('/search',searchProducts);
-userRouter.get('/allProducts/filter',allProductsFilter)
+userRouter.get('/allProducts/sort',allProductsSort);
+userRouter.get('/allproducts/filter-modal',filterDataFetch);
+userRouter.get('/allproducts/filter',)
 
 
 //---------------------------- checkout management --------------

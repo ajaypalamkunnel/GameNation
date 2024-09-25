@@ -841,7 +841,7 @@ export const searchProducts = async(req,res)=>{
 
 
 
-export const allProductsFilter = async (req,res)=>{
+export const allProductsSort = async (req,res)=>{
   try {
 
     const {sort} = req.query;
@@ -874,3 +874,6 @@ export const allProductsFilter = async (req,res)=>{
     
   }
 }
+
+
+export const allProductsFilter = async(req,res)=>{}

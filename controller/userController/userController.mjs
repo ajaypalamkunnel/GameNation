@@ -295,7 +295,19 @@ console.log("---deleteAddress");
 
 
 
+export const filterDataFetch = async(req,res)=>{
 
+  console.log("filllll");
+  
+
+  const categories = await category.find({isActive: true})
+
+
+  res.json({
+    categories
+  })
+
+}
 
 
 

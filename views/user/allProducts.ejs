@@ -36,14 +36,99 @@
             <button id="searchBtn" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">Search</button>
             <button id="clearSearchBtn" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">Clear</button>
         </div>
-        <select class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700" name="" id="" onchange="filter(this.value)">
+        <div>
+        <select class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700" name="" id="" onchange="sort(this.value)">
           <option value="">Sort</option>
           <option value="lowToHigh">Price: Low to High</option>
           <option value="highToLow">Price: High to Low</option>
           <option value="aToZ">Name: A - Z</option>   <!-- A to Z sorting -->
           <option value="zToA">Name: Z - A</option> 
         </select>
+        <button id="filterBtn" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">Filter</button>
+      </div>
     </div>
+
+
+
+
+    <!-------------------------- Filter Modal --------------------------------->
+    
+    
+    <div id="filterModal" class="fixed inset-1 bg-gray-900  bg-opacity-75 flex justify-center items-center hidden z-50">
+  <div class="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-xl relative">
+    <button id="closeFilterModal" class="absolute top-4 right-4 text-white bg-red-500 hover:bg-red-600 p-2 rounded-full">&times;</button>
+    
+    <h2 class="text-2xl font-semibold mb-4 text-white text-center">Apply Filters</h2>
+    
+    <form id="filterForm" class="space-y-4">
+      <!-- Category -->
+      <div>
+        <label for="category" class="text-white">Category:</label>
+        <select id="category" name="category" class="w-full bg-gray-700 text-white p-2 rounded-lg">
+          <option value="">Select Category</option>
+          
+          <!-- Dynamically populated with categories from DB -->
+        </select>
+      </div>
+      <!-- Release Date Range -->
+      <!-- <div>
+        <label for="releaseDate" class="text-white">Release Date Range:</label>
+        <input type="date" id="releaseDateStart" name="releaseDateStart" class="bg-gray-700 text-white p-2 rounded-lg">
+        to
+        <input type="date" id="releaseDateEnd" name="releaseDateEnd" class="bg-gray-700 text-white p-2 rounded-lg">
+      </div> -->
+      
+      <!-- Publisher -->
+      <!-- <div>
+        <label for="publisher" class="text-white">Publisher:</label>
+        <input type="text" id="publisher" name="publisher" class="w-full bg-gray-700 text-white p-2 rounded-lg">
+      </div>
+       -->
+      <!-- Price Range -->
+      <!-- <div>
+        <label for="priceRange" class="text-white">Price Range:</label>
+        <input type="number" id="minPrice" name="minPrice" class="bg-gray-700 text-white p-2 rounded-lg" placeholder="Min Price">
+        to
+        <input type="number" id="maxPrice" name="maxPrice" class="bg-gray-700 text-white p-2 rounded-lg" placeholder="Max Price">
+      </div> -->
+      
+      <!-- Internet Requirement -->
+      <!-- <div>
+        <label for="internetRequirement" class="text-white">Internet Requirement:</label>
+        <select id="internetRequirement" name="internetRequirement" class="w-full bg-gray-700 text-white p-2 rounded-lg">
+          <option value="">Select</option>
+          <option value="true">Required</option>
+          <option value="false">Not Required</option>
+        </select>
+      </div> -->
+
+      <!-- Genre -->
+      <!-- <div>
+        <label for="genre" class="text-white">Genre:</label>
+        <input type="text" id="genre" name="genre" class="w-full bg-gray-700 text-white p-2 rounded-lg">
+      </div> -->
+
+      <!-- Game Play Hour Range -->
+      <!-- <div>
+        <label for="playHourRange" class="text-white">Game Play Hour Range:</label>
+        <input type="number" id="minPlayHour" name="minPlayHour" class="bg-gray-700 text-white p-2 rounded-lg" placeholder="Min Hours">
+        to
+        <input type="number" id="maxPlayHour" name="maxPlayHour" class="bg-gray-700 text-white p-2 rounded-lg" placeholder="Max Hours">
+      </div> -->
+
+      <button type="submit" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg w-full">Apply Filters</button>
+    </form>
+  </div>
+</div>
+
+
+
+
+<!-------------------------- Filter Modal --------------------------------->
+
+
+
+
     
     <!-- Product List -->
     <div class="flex flex-wrap space-x-4 p-2 m-2 product-list scrollbar-hide">
@@ -139,8 +224,8 @@
 <script>
 
 
-function filter(sortValue){
-  fetch(`/allProducts/filter?sort=${sortValue}`)
+function sort(sortValue){
+  fetch(`/allProducts/sort?sort=${sortValue}`)
 
     .then(response=>response.json())
     .then(data=>{
@@ -280,6 +365,66 @@ document.querySelector("#clearSearchBtn").addEventListener('click',function(even
   document.querySelector('#search').value = '';
 
 })
+
+
+
+
+
+
+
+
+
+
+
+
+//--------------------- filter ---------------------------------------
+document.getElementById('filterBtn').addEventListener('click', () => {
+
+  
+productDataFetch()
+
+  document.getElementById('filterModal').classList.remove('hidden');
+});
+
+
+function productDataFetch(){
+
+  fetch(`/allproducts/filter-modal`,{
+    method:'GET',
+    headers:{
+      'Content-Type': 'application/json'
+    }
+
+  })
+  .then(response=>response.json())
+  .then((data)=>{
+    const categoryDropdown = document.getElementById('category');
+    categoryDropdown.innerHTML = '<option value="">Select Category</option>';
+
+    data.categories.forEach((cat)=>{
+      console.log("----",cat.collectionName);
+      
+      const option = document.createElement('option');
+      option.value = cat.collectionName;
+      option.textContent = cat.collectionName;
+      categoryDropdown.appendChild(option)
+    })
+
+  })
+  .catch((error)=>{
+    
+  })
+
+
+}
+
+document.getElementById('closeFilterModal').addEventListener('click', () => {
+  document.getElementById('filterModal').classList.add('hidden');
+});
+
+
+
+//---------------------filter ---------------------------------------
 
 
 </script>
