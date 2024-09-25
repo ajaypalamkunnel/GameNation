@@ -2,7 +2,7 @@ import express from 'express';
 import { isUser } from '../middleware/userSession.mjs';
 const userRouter = express.Router()
 
-import {getSignUp,signupPost, verifyOtp,getLogin,loginPost,googleAuth,googleAuthCallback,userLogout,resendOtp} from '../controller/userController/userAuth.mjs'
+import {getSignUp,signupPost, verifyOtp,getLogin,loginPost,googleAuth,googleAuthCallback,userLogout,resendOtp, passwordChangeGet, passwordChange} from '../controller/userController/userAuth.mjs'
 import { productView,allProducts,cart,addToCart,updateCartQuantity,searchProducts,removeProductFromCart, allProductsSort  } from '../controller/adminController/productController.mjs';
 // import {} '../services/auth.mjs'
 import { checkout, placeOrder } from '../controller/userController/checkoutController.mjs';
@@ -95,6 +95,13 @@ userRouter.get('/orderSummary',isUser,orderSummary)
 
 userRouter.get('/orders',isUser,orders)
 userRouter.get('/orderView',isUser,orderView)
+
+
+//---------------------------- checkout management --------------
+
+userRouter.get('/passwordChangePage',isUser,passwordChangeGet)
+userRouter.patch('/passwordChange',isUser,passwordChange)
+
 
 
 

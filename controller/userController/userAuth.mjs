@@ -4,6 +4,7 @@ import nodemailer from 'nodemailer'
 import bcrypt from 'bcrypt'
 import passport from "passport";
 import { title } from "process";
+import category from "../../model/categoryScehema.mjs";
 //---------------------- user signup get request ---------------------- 
 
 export const getSignUp = (req,res)=>{
@@ -306,3 +307,64 @@ export const googleAuthCallback = (req, res, next) => {
     })
 
   }
+
+
+
+export const passwordChangeGet = async (req,res)=>{
+    const categories = await category.find({isActive:true});
+
+    res.render('user/passwordChange',{
+        title:'Password Change',
+        categories,
+        user:req.session.user
+
+    })
+
+
+
+}
+
+
+export const passwordChange = async(req,res)=>{
+    try {
+
+        const {currentPassword,newPassword} = req.body;
+
+        const user = await User.findOne({email:req.session.user});
+    
+        const iscurrentPasswordValid = await bcrypt.compare(currentPassword,user.password);
+
+        const hashedPassword = await bcrypt.hash(newPassword,10)
+
+        if(!iscurrentPasswordValid){
+            return res.status(400).json({message:"current password is incorrect"})
+        }
+    
+        
+
+            const passwordUpdated = await User.findByIdAndUpdate(
+                user._id,
+                {
+                    password : hashedPassword
+                },
+                {new:true}
+
+            )
+    
+        if(passwordUpdated){
+            return res.status(200).json({message:"password successfully updated"})
+        }else{
+            return res.status(500).json({message: "Error updating the password"})
+        }
+    
+        
+    } catch (error) {
+        console.log("Errror in passoword change:",error);
+        return res.status(500).json({message:"Server error occurred while changing the password." })
+        
+    }
+
+   
+    
+
+}
