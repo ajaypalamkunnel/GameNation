@@ -45,6 +45,7 @@
           <option value="zToA">Name: Z - A</option> 
         </select>
         <button id="filterBtn" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">Filter</button>
+        <button id="clearBtn" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">Clear Filter</button>
       </div>
     </div>
 
@@ -70,6 +71,15 @@
           <!-- Dynamically populated with categories from DB -->
         </select>
       </div>
+
+      <div>
+        <label for="minPrice" class="text-white">Min Price:</label>
+        <input type="number" id="minPrice" name="minPrice" class="w-full bg-gray-700 text-white p-2 rounded-lg">
+        <label for="maxPrice" class="text-white">Max Price:</label>
+        <input type="number" id="maxPrice" name="maxPrice" class="w-full bg-gray-700 text-white p-2 rounded-lg">
+      </div>
+
+
       <!-- Release Date Range -->
       <!-- <div>
         <label for="releaseDate" class="text-white">Release Date Range:</label>
@@ -190,7 +200,7 @@
       <nav class="inline-flex space-x-2">
         <% if (currentPage > 1) { %>
           <!-- Previous Button -->
-          <a href="/allProducts?page=<%= currentPage - 1 %>&limit=10"
+          <a href="/allProducts?page=<%= currentPage - 1 %>&limit=10&category=<%= category %>&minPrice=<%= minPrice %>&maxPrice=<%= maxPrice %>"
              class="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700">
             Previous
           </a>
@@ -198,7 +208,7 @@
     
         <!-- Page Numbers -->
         <% for (let i = 1; i <= totalPages; i++) { %>
-          <a href="/allProducts?page=<%= i %>&limit=10"
+          <a href="/allProducts?page=<%= i %>&limit=10&category=<%= category %>&minPrice=<%= minPrice %>&maxPrice=<%= maxPrice %>"
              class="px-4 py-2 rounded <% if (i === currentPage) { %> bg-green-600 text-white <% } else { %> bg-gray-800 text-white hover:bg-gray-700 <% } %>">
             <%= i %>
           </a>
@@ -206,7 +216,7 @@
     
         <% if (currentPage < totalPages) { %>
           <!-- Next Button -->
-          <a href="/allProducts?page=<%= currentPage + 1 %>&limit=10"
+          <a href="/allProducts?page=<%= currentPage + 1 %>&limit=10&category=<%= category %>&minPrice=<%= minPrice %>&maxPrice=<%= maxPrice %>"
              class="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700">
             Next
           </a>
@@ -367,16 +377,6 @@ document.querySelector("#clearSearchBtn").addEventListener('click',function(even
 })
 
 
-
-
-
-
-
-
-
-
-
-
 //--------------------- filter ---------------------------------------
 document.getElementById('filterBtn').addEventListener('click', () => {
 
@@ -405,7 +405,7 @@ function productDataFetch(){
       console.log("----",cat.collectionName);
       
       const option = document.createElement('option');
-      option.value = cat.collectionName;
+      option.value = cat._id;
       option.textContent = cat.collectionName;
       categoryDropdown.appendChild(option)
     })
@@ -418,9 +418,41 @@ function productDataFetch(){
 
 }
 
+
+
+document.getElementById('filterForm').addEventListener('submit',function(event){
+  event.preventDefault()
+
+  const category = document.getElementById('category').value;
+  const minPrice = document.getElementById('minPrice').value;
+  const maxPrice = document.getElementById('maxPrice').value;
+
+  console.log(minPrice,"--------",maxPrice,"-------",category);
+  
+
+  let quertParams = new URLSearchParams({
+    category,
+    minPrice,
+    maxPrice,
+    page:1
+  
+  })
+
+  
+  window.location.href = `/allProducts?category=${category}&minPrice=${minPrice}&maxPrice=${maxPrice}`
+})
+
+
+document.getElementById('clearBtn').addEventListener('click',()=>{
+  window.location.href = '/allProducts';
+})
+
 document.getElementById('closeFilterModal').addEventListener('click', () => {
   document.getElementById('filterModal').classList.add('hidden');
 });
+
+
+
 
 
 

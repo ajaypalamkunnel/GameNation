@@ -413,45 +413,93 @@ export const productView = async(req,res)=>{
 
 export const allProducts = async (req, res) => {
   try {
-
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
 
-    const skip = (page - 1) * limit
+    // Base filter: Non-deleted products
+    let matchStage = { isDelete: false };
 
-    const totalProducts = await Product.countDocuments({isDelete:false})
-    
-    const products = await Product.find({ isDelete: false }) // Fetch all non-deleted products
-      .populate({
-        path: 'category',  
-        select: 'collectionName'
-      })
-      .skip(skip)
-      .limit(limit);
+    // Fix: Properly instantiate ObjectId when filtering by category
+    if (req.query.category) {
+      matchStage.category = new mongoose.Types.ObjectId(req.query.category); // Use 'new'
+    }
 
-      const totalPages = Math.ceil(totalProducts/limit)
+    // Build the aggregation pipeline
+    const pipeline = [
+      { $match: matchStage },
 
-      products.forEach((product) => {
-        const discountPrice = Math.ceil(
-          product.price - (product.price * product.discount) / 100
-        );
-        product.discountPrice = discountPrice; // Append discountPrice to product
+      // Add the discounted price field
+      {
+        $addFields: {
+          discountPrice: {
+            $ceil: {
+              $subtract: ["$price", { $multiply: ["$price", { $divide: ["$discount", 100] }] }]
+            }
+          }
+        }
+      }
+    ];
+
+    // If price range is provided, filter after calculating the discount
+    if (req.query.minPrice && req.query.maxPrice) {
+      const minPrice = parseInt(req.query.minPrice);
+      const maxPrice = parseInt(req.query.maxPrice);
+
+      pipeline.push({
+        $match: {
+          discountPrice: { $gte: minPrice, $lte: maxPrice }
+        }
       });
-    
+    }
+
+    // Join with category collection to get category name
+    pipeline.push(
+      {
+        $lookup: {
+          from: "categories",
+          localField: "category",
+          foreignField: "_id",
+          as: "category"
+        }
+      },
+      { $unwind: "$category" }, // Flatten the category array
+      {
+        $project: {
+          product_name: 1,
+          price: 1,
+          discountPrice: 1,
+          stock: 1,
+          image: 1,
+          category: "$category.collectionName"
+        }
+      },
+      { $skip: skip },
+      { $limit: limit }
+    );
+
+    // Execute the aggregation
+    const products = await Product.aggregate(pipeline);
+
+    // Calculate total number of products for pagination
+    const totalProducts = await Product.countDocuments(matchStage);
+    const totalPages = Math.ceil(totalProducts / limit);
+
     // Fetch all active categories
     const categories = await category.find({ isActive: true });
 
-    // Render the 'allProducts' page with the products, categories, and user session
+    // Render the page
     res.render('user/allProducts', {
       title: 'All Products',
       products,
       categories,
       user: req.session.user,
-      currentPage:page,
-      totalPages
-      
+      currentPage: page,
+      totalPages,
+      category: req.query.category || '',
+      minPrice: req.query.minPrice || '',
+      maxPrice: req.query.maxPrice || ''
     });
-
   } catch (error) {
     console.error('Error fetching product details:', error);
     res.status(500).json({ message: 'Server error' });
@@ -812,10 +860,7 @@ export const searchProducts = async(req,res)=>{
             ],
             isDelete: false // Ensure not deleted
 
-
-
       };
-
 
       const products = await Product.find(searchCriteria).lean();
       //console.log(products);
@@ -825,11 +870,7 @@ export const searchProducts = async(req,res)=>{
         return { ...product, discountPrice }; // Safely append discountPrice without modifying the original object
       });
 
-      
-      
-
-
-      
+  
       res.json({products:productsWithDiscount});
   } catch (error) {
 
