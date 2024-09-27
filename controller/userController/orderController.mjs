@@ -36,7 +36,7 @@ export const orderSummary = async(req,res)=>{
 
 
 export const orders = async(req,res)=>{
-    console.log("hi i am orders");
+    
     
     try {
         if(req.session.user){
@@ -53,7 +53,7 @@ export const orders = async(req,res)=>{
                 model:Product,
                 options: { strictPopulate: false }
             });
-            console.log(orders);
+            
             
 
             res.render('user/orders',{
@@ -65,11 +65,6 @@ export const orders = async(req,res)=>{
 
 
             })
-
-
-
-
-
 
         }else{
             res.redirect('/login')
@@ -137,7 +132,6 @@ export const orderView = async(req,res)=>{
             model:Product,
             options: { strictPopulate: false }
         });
-        console.log(order);
         
 
         //console.log(orderId);
@@ -158,6 +152,80 @@ export const orderView = async(req,res)=>{
     
     }
 
+}
+
+export const cancelOrder = async(req,res)=>{
+
+    console.log("hiiiii cancelOrder");
+    
+    try {
+        const user = req.session.user;
+        const {orderId,cancelReason} = req.body;
+
+        if(!orderId){
+            console.log(orderId);      
+            return res.status(400).json({message:"Order ID not provided."})
+        }
+
+        const order = await OrderSchema.findByIdAndUpdate(orderId, { orderStatus: "Cancelled", isCancelled: true });
+        if (!order) {
+            console.log("order");
+            return res.status(404).json({ message: "Order not found or access denied." });
+        }
+        return res.status(200).json({message:"order cancelled successfully"})
+
+    } catch (error) {
+
+        console.log("error while cancelling order ", error);
+        
+        
+    }
+
+}
+
+export const returnOrder = async(req,res)=>{
+    console.log("hi return order");
+    
+
+    try {
+        const {orderId,returnReason} = req.body;
+
+        if(!orderId||!returnReason){
+            return res.status(400).json({status:'error',message:'order Id and return reason are required'})
+        }
+        const order = await OrderSchema.findById(orderId);
+        if(!order){
+            return res.status(404).json({status:'error',message:'Order not found'});
+        }
+
+        if(order.orderStatus==='Returned' || order.orderStatus === 'Cancelled'){
+            
+            return res.status(400).json({status:'error',message: 'Order is already return or cancelled'})
+        }
+
+        order.orderStatus = 'Returned';
+        order.isCancelled = true;
+
+        await order.save();
+        
+
+        for(let product of order.products){
+            const productDoc = await Product.findById(product.product_id);
+
+            if(productDoc){
+                productDoc.stock += parseInt(product.product_quantity,10);
+                await productDoc.save()
+            }
+        }
+
+        return res.status(200).json({status:'success',message:'Order returned successfully'})
+        
+    } catch (error) {
+        console.error("Error while returning order: ",error);
+        return res.status(500).json({status:'error',message:'Internal server error'})
+        
+        
+    }
 
 
 

@@ -83,9 +83,9 @@ export const addCategoryPost = async (req,res)=>{
 
     try {
         const {categoryName,isBlocked} = req.body;
-
+        
         const existingCategory = await category.findOne({
-            collectionName:categoryName.trim()})
+            collectionName:categoryName.trim().toLowerCase().replace(/\s+/g, '')})
 
 
         if(existingCategory){
@@ -93,16 +93,14 @@ export const addCategoryPost = async (req,res)=>{
             return res.redirect('/admin/addCategory?success=false')
         }
 
-
-
         const newCategory = new category({
-            collectionName: categoryName,
+            collectionName: categoryName.trim().toLowerCase().replace(/\s+/g, ''),
             isActive:isBlocked==='true'
         })
 
         await newCategory.save()
         req.flash('success', 'Category added successfully!');
-       return res.redirect('addCategory/?success=true')
+        return res.redirect('addCategory/?success=true')
         
     } catch (error) {
 

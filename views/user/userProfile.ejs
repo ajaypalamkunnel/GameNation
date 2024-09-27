@@ -20,9 +20,9 @@
                     <!-- User Info -->
                     <h2 class="text-xl font-bold"><%=userProfile.username%></h2>
                     <p class="text-sm mt-1"><%=userProfile.email%></p>
-                    <!-- <p class="text-sm mt-1 text-center">Sulthan Bathery, Wayanad,<br>Poomala P O</p> -->
-                    <!-- Edit Profile Link -->
-                    <a href="#" class="mt-4 text-blue-300 hover:text-blue-400 text-sm">Edit Profile Picture</a>
+                    <p class="text-sm mt-1"><%=userProfile.phone === "" ? '--' : userProfile.phone%></p>
+
+                    
                 </div>
 
                 <!-- Right Form Section -->
@@ -31,16 +31,17 @@
                     <h2 class="text-lg font-semibold text-gray-800 mb-6">Edit Your Profile</h2>
 
                     <!-- Edit Profile Form -->
-                    <form action="#" method="POST">
+                    <form id="profileUpdateForm">
                         <!-- Name Fields -->
                         <div class="flex flex-col md:flex-row md:space-x-4">
                             <div class="w-full mb-4">
                                 <label for="firstName" class="block text-gray-600 text-sm">UserName</label>
-                                <input type="text" id="Username" value="<%=userProfile.username%>" class="w-full mt-1 p-2 border border-gray-300 text-black rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                                <input type="text" disabled id="Username" value="<%=userProfile.username%>" class="w-full mt-1 p-2 border border-gray-300 text-black rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
                             </div>
                             <div class="w-full mb-4">
                                 <label for="lastName" class="block text-gray-600 text-sm">Phone</label>
-                                <input type="number" id="lastName" value="" class="w-full mt-1 p-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                                <input type=tel"  id="phone" value="" class="w-full mt-1 p-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                                <p id="phoneError" class="text-red-500 text-sm mt-1 hidden">Please enter a valid 10 digit mobile number.</p>
                             </div>
                         </div>
 
@@ -48,35 +49,14 @@
                         <div class="flex flex-col md:flex-row md:space-x-4">
                             <div class="w-full mb-4">
                                 <label for="email" class="block text-gray-600 text-sm">Email</label>
-                                <input type="email" id="email" value="<%=userProfile.email%>" class="w-full mt-1 p-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                                <input type="email" disabled id="email" value="<%=userProfile.email%>" class="w-full mt-1 p-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
                             </div>
                             
                         </div>
-
-                        <!-- Password Change Section -->
-                        <!-- <h3 class="text-gray-800 mt-6 mb-4">Password Changes</h3>
-
-                        <div class="flex flex-col space-y-4">
-                            <div>
-                                <label for="currentPassword" class="block text-gray-600 text-sm">Current Password</label>
-                                <input type="password" id="currentPassword" class="w-full mt-1 p-2 border border-gray-300 rounded-md text-black focus:outline-none focus:ring-2 focus:ring-green-500">
-                            </div>
-
-                            <div>
-                                <label for="newPassword" class="block text-gray-600 text-sm">New Password</label>
-                                <input type="password" id="newPassword" class="w-full mt-1 p-2 border border-gray-300 rounded-md text-black focus:outline-none focus:ring-2 focus:ring-green-500">
-                            </div>
-
-                            <div>
-                                <label for="confirmPassword" class="block text-gray-600 text-sm">Confirm New Password</label>
-                                <input type="password" id="confirmPassword" class="w-full mt-1 p-2 border border-gray-300 rounded-md text-black focus:outline-none focus:ring-2 focus:ring-green-500">
-                            </div>
-                        </div> -->
-
                         <!-- Buttons -->
                         <div class="flex justify-between mt-6">
                             <button type="button" class="bg-transparent text-gray-500 py-2 px-4 rounded-md hover:text-gray-700 focus:outline-none">Cancel</button>
-                            <button type="submit" class="bg-green-500 text-white py-2 px-6 rounded-md hover:bg-green-600 focus:outline-none">Save Changes</button>
+                            <button type="submit" id="submitProfile" class="bg-green-500 text-white py-2 px-6 rounded-md hover:bg-green-600 focus:outline-none">Save Changes</button>
                         </div>
                     </form>
                 </div>
@@ -84,3 +64,66 @@
         </div>
     </div>
 </div>
+
+
+<script>
+
+   document.getElementById('profileUpdateForm').addEventListener('submit',(event)=>{
+
+    const phoneError = document.getElementById('phoneError')
+
+    event.preventDefault(   )
+    const phone = document.getElementById('phone').value;
+    const phoneRegex = /^[6-9]\d{9}$/;
+    
+    if(!phoneRegex.test(phone)){
+        phoneError.classList.remove('hidden');
+        return
+    }
+
+    const data = {
+        phone: phone
+    }
+
+    fetch('/updateMobile',{
+        method:'PATCH',
+        headers:{
+            'Content-Type': 'application/json'
+        },
+        body:JSON.stringify(data)
+
+    })
+    .then(response => response.json())
+    .then(result=>{
+        if(result.status === 'success'){
+            Swal.fire({
+                icon:"success",
+                title:"Phone Updated",
+                text: "Your phone number has been updated successfully."
+            })
+            .then(()=>{
+                window.location.reload()
+            })
+        }else{
+            Swal.fire({
+                icon:"error",
+                title:"update failed",
+                text: result.message || "Failed to update phone number."
+            })
+        }
+    })
+    .catch(error=>{
+        console.error("Error updating phone:", error);
+        Swal.fire({
+            icon:"error",
+            title:data,
+            text: "An error occurred while updating your phone number."
+
+        })
+    })
+
+
+    
+   })
+
+</script>

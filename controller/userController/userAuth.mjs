@@ -5,6 +5,7 @@ import bcrypt from 'bcrypt'
 import passport from "passport";
 import { title } from "process";
 import category from "../../model/categoryScehema.mjs";
+import { log } from "console";
 //---------------------- user signup get request ---------------------- 
 
 export const getSignUp = (req,res)=>{
@@ -75,12 +76,7 @@ export const signupPost = async(req,res)=>{
 
         const existingUser = await User.findOne({email});
 
-        // if(existingUser){
-        //    console.log("Email already exists");
-           
-        //     req.flash("error_msg", 'Email already exists');
-        //     return res.redirect('/signup')
-        // }
+        
 
         if (existingUser) {
             console.log("Email already exists");
@@ -115,18 +111,14 @@ export const signupPost = async(req,res)=>{
         //sent OTP email
 
         await sendOtpEmail(email,otp)
-    //     req.flash('success_msg', 'OTP sent to email');
-    //    return res.redirect('/signup');
+    
     return res.status(200).json({
         success: true,
         message: 'OTP sent to email'
     });  
         
     } catch (error) {
-        // console.log(`Error during signup: ${error}`);
-        // req.flash('error_msg','Server error. Please try again later.');
-        // return res.redirect('/signup');
-
+        
         console.error(`Error during signup: ${error}`);
         return res.status(500).json({
             success: false,
@@ -246,7 +238,66 @@ export const resendOtp = async (req, res) => {
 
 
 
+//--------------------- forgot otp  mail-----------
 
+
+export const forgotOtpMail = async(req,res)=>{
+
+    console.log('forgotOtpMail');
+    try {
+        const data = req.body;
+        console.log(data.email);
+        
+    
+        const user = await User.findOne({email:data.email});
+    
+        if(!user){
+            return res.status(404).json({status:'notFound',message:'User not found'})
+        }
+
+        const otp = generateOtp();
+        const otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
+        req.session.otp = otp;
+
+       await sendOtpEmail(data.email,otp);
+       req.session.otpMail = data.email
+
+       return res.status(200).json({status:'success',message:'OTP sent to email'})
+
+
+        
+    } catch (error) {
+        console.log('error in forgotOtpMail',error);
+        
+    }
+
+}
+
+
+export const validateForgotOtp = async(req,res)=>{
+    try {
+
+        
+
+        const {otp} = req.body;
+
+        console.log(otp,"---",req.session.otp);
+        
+
+        if(otp == req.session.otp){
+            req.session.otp = null;
+            return res.status(200).json({status:'success',message:'OTP validated successfully'})
+        }
+
+        return res.status(400).json({status:'error',message:'Invalid OTP'})
+        
+    } catch (error) {
+
+        console.log('Error while validating OTP : ',error);
+        
+        
+    }
+}
 
 
 
@@ -290,6 +341,70 @@ export const googleAuthCallback = (req, res, next) => {
       });
     })(req, res, next); // Make sure to pass next here
   };
+
+
+
+  export const forgotPassword = async(req,res)=>{
+    try {
+        res.render('user/forgotPassword',{
+            title:'Forgot Password'
+        })
+        
+    } catch (error) {
+        console.log("error while loading ",error);
+        
+    }
+
+
+  }
+  export const forgotPasswordMail = async(req,res)=>{
+    try {
+        res.render('user/forgotPasswordMail',{
+            title:'Forgot Password'
+        })
+        
+    } catch (error) {
+        console.log("error while loading ",error);
+        
+    }
+
+
+  }
+
+  export const forgotPasswordPost = async(req,res)=>{
+
+    try {
+        const {confirmPassword} = req.body;
+
+        const user = await User.findOne({email:req.session.otpMail})
+
+        if(!user){
+            return res.status(404).json({status:'notFound',message:'User not found'})
+        }
+
+        const hashedPassword = await bcrypt.hash(confirmPassword, 10);
+
+        user.password =  hashedPassword;
+
+        await user.save();
+        req.session.otpMail = null;
+
+        return res.status(200).json({status:'success',message:'Password changed successfully'})
+        
+    } catch (error) {
+        console.log("error while changing password",error);
+        
+    }
+
+  }
+
+
+
+
+
+
+
+
 
 
 
@@ -364,7 +479,27 @@ export const passwordChange = async(req,res)=>{
         
     }
 
-   
-    
+}
 
+export const updateMobile = async(req,res)=>{
+    try {
+
+        const {phone} = req.body;
+
+        const user = await User.findOne({email:req.session.user})
+
+        if(!user){
+            return res.status(404).json({status:'error',message:"user not found"})
+        }
+
+        user.phone = phone;
+        await user.save();
+
+        return res.status(200).json({status:'success',message:"Mobile number update successfully"});
+      
+    } catch (error) {
+        console.log("Errror in update mobile:",error);
+        return res.status(500).json({status:'error',message:"Server error occurred while updating mobile" })
+        
+    }
 }

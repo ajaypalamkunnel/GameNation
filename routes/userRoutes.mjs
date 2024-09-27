@@ -2,19 +2,24 @@ import express from 'express';
 import { isUser } from '../middleware/userSession.mjs';
 const userRouter = express.Router()
 
-import {getSignUp,signupPost, verifyOtp,getLogin,loginPost,googleAuth,googleAuthCallback,userLogout,resendOtp, passwordChangeGet, passwordChange} from '../controller/userController/userAuth.mjs'
+import {getSignUp,signupPost, verifyOtp,getLogin,loginPost,googleAuth,googleAuthCallback,userLogout,resendOtp, passwordChangeGet, passwordChange, updateMobile, forgotPassword, forgotPasswordPost, forgotPasswordMail, forgotOtpMail, validateForgotOtp} from '../controller/userController/userAuth.mjs'
 import { productView,allProducts,cart,addToCart,updateCartQuantity,searchProducts,removeProductFromCart, allProductsSort  } from '../controller/adminController/productController.mjs';
 // import {} '../services/auth.mjs'
 import { checkout, placeOrder } from '../controller/userController/checkoutController.mjs';
 import { home,userProfile,addressView,addNewAddress,addNewAddressPost,editAddress,editAddressPut,deleteAddress, filterDataFetch} from '../controller/userController/userController.mjs'; 
 import passport from 'passport';
-import { orders, orderSummary, orderView } from '../controller/userController/orderController.mjs';
+import { cancelOrder, orders, orderSummary, orderView, returnOrder } from '../controller/userController/orderController.mjs';
 
 //----------------------------- login -------------------------------
 
 userRouter.get('/login',getLogin);
 userRouter.post('/login',loginPost)
 userRouter.get('/logout',userLogout)
+userRouter.get('/forgotPassword',forgotPassword)
+userRouter.get('/forgotPasswordMail',forgotPasswordMail)
+userRouter.post('/forgotPasswordMailPost',forgotOtpMail)
+userRouter.post('/forgotPassword',forgotPasswordPost)
+userRouter.post('/validateForgotOtp',validateForgotOtp)
 
 
 //----------------------------- signup -------------------------------
@@ -25,7 +30,6 @@ userRouter.post('/signup',signupPost)
 
 //----------------------------- OTP verification -------------------------------
 userRouter.post('/verify-otp', verifyOtp)
-
 userRouter.post('/resend-otp',resendOtp)
 
 
@@ -91,16 +95,16 @@ userRouter.get('/allproducts/filter',)
 userRouter.get('/checkout',isUser,checkout);
 userRouter.post('/place-order',isUser,placeOrder);
 userRouter.get('/orderSummary',isUser,orderSummary)
-
-
 userRouter.get('/orders',isUser,orders)
 userRouter.get('/orderView',isUser,orderView)
-
+userRouter.post('/cancelOrder',isUser,cancelOrder);
+userRouter.post('/returnOrder',isUser,returnOrder);
 
 //---------------------------- checkout management --------------
 
 userRouter.get('/passwordChangePage',isUser,passwordChangeGet)
 userRouter.patch('/passwordChange',isUser,passwordChange)
+userRouter.patch('/updateMobile',isUser,updateMobile)
 
 
 
