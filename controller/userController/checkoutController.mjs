@@ -62,6 +62,32 @@ export const checkout = async(req,res)=>{
 }
 
 
+function orderIdGenerator(){
+    // Simulate a storage for used OTPs (for demo purposes, use a database in real scenarios)
+const usedOrderId = new Set();
+
+// Function to generate a unique 6-digit OTP
+function generateUniqueOtp() {
+    let otp;
+
+    do {
+        // Generate a random 6-digit number between 100000 and 999999
+        otp = Math.floor(100000 + Math.random() * 900000);
+    } while (usedOrderId.has(otp));  // Check if OTP is already used
+
+    // Store the OTP as used
+    usedOrderId.add(otp);
+
+    return otp;
+}
+
+// Example usage:
+const otp = generateUniqueOtp();
+return otp
+    
+}
+
+
 
 export const placeOrder = async(req,res)=>{
     console.log("hi i am place order");
@@ -71,6 +97,7 @@ export const placeOrder = async(req,res)=>{
         if(req.session.user){
 
             const { addressId, paymentMethod, cartItems, totalPrice } = req.body;
+            const order_id = orderIdGenerator()
             const user = await User.findOne({email:req.session.user});
 
             console.log("--------",cartItems);
@@ -110,6 +137,7 @@ export const placeOrder = async(req,res)=>{
 
               const newOrder = new OrderSchema({
                 customer_id:user._id,
+                order_id:order_id,
                 products: cartItems.map(item => ({
                     product_id: item.productId,
                     product_name: item.productName,
@@ -155,7 +183,7 @@ export const placeOrder = async(req,res)=>{
               console.log(newOrder._id);
               
 
-              res.status(200).json({message:"Order placed succesfully",orderId: newOrder._id })
+              res.status(200).json({message:"Order placed succesfully",orderId: newOrder.order_id })
 
 
 

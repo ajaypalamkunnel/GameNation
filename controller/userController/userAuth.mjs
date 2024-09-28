@@ -401,14 +401,6 @@ export const googleAuthCallback = (req, res, next) => {
 
 
 
-
-
-
-
-
-
-
-
   export const userLogout = (req,res)=>{
 
     req.session.destroy((err)=>{

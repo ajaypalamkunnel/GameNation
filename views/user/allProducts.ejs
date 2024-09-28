@@ -141,11 +141,13 @@
 
     
     <!-- Product List -->
-    <div class="flex flex-wrap space-x-4 p-2 m-2 product-list scrollbar-hide">
+    <div class="product-list scrollbar-hide flex flex-wrap  gap-x-4 justify-center">
+      <!-- <div class="flex flex-wrap  gap-x-4 justify-center"> -->
         <% products.forEach(product => { %>
-          <div class="mb-3 relative w-72 shrink-0 rounded-lg">
+
+          <div class="mb-3 w-72 rounded-lg">
              <a href="/productView/<%= product._id %>">
-              <div class="relative w-72 shrink-0 rounded-lg bg-white shadow-md">
+              <div class="  rounded-lg bg-white shadow-md">
                 <a href="/productView/<%= product._id %>">
                   <!-- Product Image -->
                   <img class="h-60 w-full object-cover object-center rounded-t-lg" src="<%= product.image[0] %>" alt="product image"/>
@@ -194,6 +196,7 @@
             </a>
           </div>
         <% }) %>
+      <!-- </div> -->
     </div>
 
     <div class="flex justify-center mt-8">
@@ -248,9 +251,9 @@ function sort(sortValue){
           const productCard =
           `
 
-          <div class="mb-3 relative w-72 shrink-0 rounded-lg">
+          <div class="mb-3 w-72 rounded-lg">
               <a href="/productView/${product._id}">
-                <div class="relative w-72 shrink-0 rounded-lg bg-white shadow-md">
+                <div class=" w-72 rounded-lg bg-white shadow-md">
                   <!-- Product Image -->
                   <img class="h-60 w-full object-cover object-center rounded-t-lg" src="${product.image[0]}" alt="${product.product_name}"/>
                   <div class="p-5">
@@ -317,7 +320,7 @@ function sort(sortValue){
             if (data.products.length > 0) {
                 data.products.forEach(product => {
                     const productCard = `
-                        <div class="mb-3 relative w-72 shrink-0 rounded-lg">
+                        <div class="mb-3 w-72 rounded-lg">
                            <a href="/productView/${product._id}">
                               <div class="relative w-72 shrink-0 rounded-lg bg-white shadow-md">
                                 <a href="/productView/${product._id}">

@@ -73,7 +73,7 @@
               <tbody class="bg-gray-800 divide-y divide-gray-700">
                 <% orders.forEach(order => { %>
                 <tr>
-                  <td class="px-4 py-4">#<%= order._id %></td>
+                  <td class="px-4 py-4">#<%= order.order_id %></td>
                   <td class="px-4 py-4"><%= order.customer_id.username %></td>
                   <td class="px-4 py-4"><%= order.paymentMethod %></td>
                   <td class="px-4 py-4 <%= order.orderStatus === 'Delivered' ? 'text-green-500' : order.orderStatus === 'Cancelled' ? 'text-red-500' : 'text-yellow-500' %>">
@@ -234,7 +234,7 @@
       .then(response=>response.json())
       .then(data=>{
 
-        document.getElementById('modalOrderId').innerText = data._id;
+        document.getElementById('modalOrderId').innerText = data.order_id;
         document.getElementById('modalOrderedDate').innerText = new Date(data.createdAt).toLocaleDateString('en-GB');
         document.getElementById('modalDeliveredDate').innerText = data.orderStatus === 'Delivered' ? new Date(data.deliveredAt).toLocaleDateString('en-GB') : 'Not delivered yet';
         document.getElementById('modalOrderStatus').innerText = data.orderStatus;

@@ -11,7 +11,7 @@ export const orderSummary = async(req,res)=>{
         const orderId = req.query.orderId;
         console.log("Order ID from query:", orderId);
 
-        const order = await OrderSchema.findById(orderId);
+        const order = await OrderSchema.findOne({order_id:orderId});
         const categories = await category.find({ isActive: true });
 
         if(!order){
@@ -24,10 +24,6 @@ export const orderSummary = async(req,res)=>{
             categories,
             title:'Summary'
         })
-
-
-
-
 
     }else{
         res.redirect('/login')
@@ -47,6 +43,7 @@ export const orders = async(req,res)=>{
             const categories = await category.find({ isActive: true });
 
             const orders = await OrderSchema.find({customer_id:user._id})
+            .sort({createdAt:-1})
             .populate({
                 path:'products.product_id',
                 select:'product_name category price stock image',

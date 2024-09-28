@@ -56,14 +56,12 @@ userRouter.get('/auth/google/callback', googleAuthCallback);
 //----------------------------- Home -------------------------------
         
 userRouter.get('/home',home)
-
 userRouter.get('/productView/:id',productView)
-
 userRouter.get('/allProducts',allProducts)
 
 
 
-//----------------------------- User profile -------------------------------
+//----------------------------- User profile & address -------------------------------
 
 userRouter.get('/userProfile',isUser,userProfile);
 userRouter.get('/address',isUser,addressView);

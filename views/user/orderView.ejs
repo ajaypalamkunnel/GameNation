@@ -6,7 +6,7 @@
       <h1 class="text-3xl font-semibold mb-6 text-center">Orders Details</h1>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <div>
-          <p><strong>Order ID:</strong> <%= order._id %></p>
+          <p><strong>Order ID:</strong> <%= order.order_id %></p>
           <p><strong>Ordered date:</strong> <%= new Date(order.createdAt).toLocaleDateString('en-GB') %></p>
           <% if(order.orderStatus !== 'Delivered'){ %>
             <p><strong>Delivered date:</strong> Not deliverd yet</p>
