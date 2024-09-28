@@ -236,7 +236,7 @@
 
         document.getElementById('modalOrderId').innerText = data.order_id;
         document.getElementById('modalOrderedDate').innerText = new Date(data.createdAt).toLocaleDateString('en-GB');
-        document.getElementById('modalDeliveredDate').innerText = data.orderStatus === 'Delivered' ? new Date(data.deliveredAt).toLocaleDateString('en-GB') : 'Not delivered yet';
+        document.getElementById('modalDeliveredDate').innerText = data.orderStatus === 'Delivered' ? new Date(data.deliveredDate).toLocaleDateString('en-GB') : 'Not delivered yet';
         document.getElementById('modalOrderStatus').innerText = data.orderStatus;
 
 

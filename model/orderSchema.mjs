@@ -76,6 +76,12 @@ const orderSchema = mongoose.Schema({
         type: Number,
         default: 0
     },
+    deliveredDate:{
+        type: Date,
+        required:false
+        
+
+    },
     orderStatus: {
         type: String,
         enum:['Pending', 'Shipped', 'Confirmed', 'Delivered', 'Cancelled', 'Returned']

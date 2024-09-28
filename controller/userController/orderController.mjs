@@ -94,8 +94,15 @@ export const orderStatus = async(req,res)=>{
             return res.status(400).send('Invalid status change');
         }
 
-        currentOrder.orderStatus = status;
-        await currentOrder.save()
+        if(status=='Delivered'){
+            currentOrder.orderStatus = status;
+            currentOrder.deliveredDate = Date.now()
+            await currentOrder.save()
+        }else{
+            currentOrder.orderStatus = status;
+            await currentOrder.save()
+
+        }
 
         res.send('Order status updated');
 

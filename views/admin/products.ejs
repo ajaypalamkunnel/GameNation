@@ -30,6 +30,7 @@
           <thead class="bg-gray-100 whitespace-nowrap">
             <tr>
               <th class="p-4 text-left text-sm font-semibold text-black">Product</th>
+              <th class="p-4 text-left text-sm font-semibold text-black">Discounted price</th>
               <th class="p-4 text-left text-sm font-semibold text-black">Price</th>
               <th class="p-4 text-left text-sm font-semibold text-black">In stock</th>
               <th class="p-4 text-left text-sm font-semibold text-black">Publisher</th>
@@ -48,6 +49,10 @@
                     <p class="text-sm text-black"><%= product.product_name %></p>
                   </div>
                 </div>
+              </td>
+              <td class="p-4 text-sm">
+                <% let discountPrice = Math.ceil(product.price - (product.price * product.discount/100))  %>
+                ₹<%= discountPrice %>
               </td>
               <td class="p-4 text-sm">
                 ₹<%= product.price %>

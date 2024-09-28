@@ -117,7 +117,7 @@
           >
             <% categories.forEach((category) => { %>
               <li
-                class="cursor-pointer px-5 py-3 text-sm hover:bg-gray-600 <% if(category.collectionName === cat.collectionName) { %> bg-gray-600 <% } %>"
+                class="cursor-pointer px-5 py-3 text-sm hover:bg-gray-600 <% if(category.collectionName === cat.collectionName) { %> bg-gray-900 <% } %>"
                 onclick="selectCategory('<%= category.collectionName %>', '<%= category._id %>')"
               >
                 <%= category.collectionName %>
@@ -684,6 +684,7 @@
           croppedImages = []; // Reset cropped images array
           removedImages = []; // Reset removed images array
           fileCount = 0; // Reset file count
+          window.location.href = '/admin/products'
         }
       })
       .catch((error) => {

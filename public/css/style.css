@@ -1810,6 +1810,10 @@ video {
   fill: #fff;
 }
 
+.fill-red-800 {
+  fill: #991b1b;
+}
+
 .object-cover {
   -o-object-fit: cover;
      object-fit: cover;
