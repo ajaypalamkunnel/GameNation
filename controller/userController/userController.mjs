@@ -264,50 +264,43 @@ export const editAddressPut = async (req, res) => {
 };
 
 
-export const deleteAddress = async(req,res)=>{
-console.log("---deleteAddress");
-
+export const deleteAddress = async (req, res) => {
   try {
-    const addressId= req.params.addressId;
+    const addressId = req.params.addressId;
 
-    const user = await User.findOne({'address._id':addressId});
+    const user = await User.findOne({ "address._id": addressId });
 
-    if(!user){
-      return res.status(404).json({success:false,message:'User not found'});
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
 
-    user.address.pull({_id:addressId});
+    user.address.pull({ _id: addressId });
 
     await user.save();
 
-    return res.status(200).json({ success: true, message: 'Address deleted successfully' });
-    
+    return res
+      .status(200)
+      .json({ success: true, message: "Address deleted successfully" });
   } catch (error) {
-    console.error('Error deleting address:', error);
-    return res.status(500).json({ success: false, message: 'Server error' });
-    
+    console.error("Error deleting address:", error);
+    return res.status(500).json({ success: false, message: "Server error" });
   }
-
-}
-
+};
 
 
 
 
 
-export const filterDataFetch = async(req,res)=>{
 
-  console.log("filllll");
-  
-
-  const categories = await category.find({isActive: true})
-
+export const filterDataFetch = async (req, res) => {
+  const categories = await category.find({ isActive: true });
 
   res.json({
-    categories
-  })
-
-}
+    categories,
+  });
+};
 
 
 

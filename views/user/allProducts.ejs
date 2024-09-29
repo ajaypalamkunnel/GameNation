@@ -37,7 +37,7 @@
             <button id="clearSearchBtn" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">Clear</button>
         </div>
         <div>
-        <select class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700" name="" id="" onchange="sort(this.value)">
+        <select class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700" name="" id="sortDropdown" onchange="sort(this.value)">
           <option value="">Sort</option>
           <option value="lowToHigh">Price: Low to High</option>
           <option value="highToLow">Price: High to Low</option>
@@ -79,67 +79,13 @@
         <input type="number" id="maxPrice" name="maxPrice" class="w-full bg-gray-700 text-white p-2 rounded-lg">
       </div>
 
-
-      <!-- Release Date Range -->
-      <!-- <div>
-        <label for="releaseDate" class="text-white">Release Date Range:</label>
-        <input type="date" id="releaseDateStart" name="releaseDateStart" class="bg-gray-700 text-white p-2 rounded-lg">
-        to
-        <input type="date" id="releaseDateEnd" name="releaseDateEnd" class="bg-gray-700 text-white p-2 rounded-lg">
-      </div> -->
-      
-      <!-- Publisher -->
-      <!-- <div>
-        <label for="publisher" class="text-white">Publisher:</label>
-        <input type="text" id="publisher" name="publisher" class="w-full bg-gray-700 text-white p-2 rounded-lg">
-      </div>
-       -->
-      <!-- Price Range -->
-      <!-- <div>
-        <label for="priceRange" class="text-white">Price Range:</label>
-        <input type="number" id="minPrice" name="minPrice" class="bg-gray-700 text-white p-2 rounded-lg" placeholder="Min Price">
-        to
-        <input type="number" id="maxPrice" name="maxPrice" class="bg-gray-700 text-white p-2 rounded-lg" placeholder="Max Price">
-      </div> -->
-      
-      <!-- Internet Requirement -->
-      <!-- <div>
-        <label for="internetRequirement" class="text-white">Internet Requirement:</label>
-        <select id="internetRequirement" name="internetRequirement" class="w-full bg-gray-700 text-white p-2 rounded-lg">
-          <option value="">Select</option>
-          <option value="true">Required</option>
-          <option value="false">Not Required</option>
-        </select>
-      </div> -->
-
-      <!-- Genre -->
-      <!-- <div>
-        <label for="genre" class="text-white">Genre:</label>
-        <input type="text" id="genre" name="genre" class="w-full bg-gray-700 text-white p-2 rounded-lg">
-      </div> -->
-
-      <!-- Game Play Hour Range -->
-      <!-- <div>
-        <label for="playHourRange" class="text-white">Game Play Hour Range:</label>
-        <input type="number" id="minPlayHour" name="minPlayHour" class="bg-gray-700 text-white p-2 rounded-lg" placeholder="Min Hours">
-        to
-        <input type="number" id="maxPlayHour" name="maxPlayHour" class="bg-gray-700 text-white p-2 rounded-lg" placeholder="Max Hours">
-      </div> -->
-
       <button type="submit" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg w-full">Apply Filters</button>
     </form>
   </div>
 </div>
 
-
-
-
 <!-------------------------- Filter Modal --------------------------------->
 
-
-
-
-    
     <!-- Product List -->
     <div class="product-list scrollbar-hide flex flex-wrap  gap-x-4 justify-center">
       <!-- <div class="flex flex-wrap  gap-x-4 justify-center"> -->
@@ -186,18 +132,55 @@
                           ₹<%= product.price %>
                         </span>
                       </p>
-                      <a href="/productView/<%= product._id %>" class="flex items-center rounded-md bg-slate-900 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-gray-700">
+                      <button class="add-to-cart-btn flex items-center rounded-md bg-slate-900 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-gray-700" data-product-id="<%= product._id %>">
                         Add to cart
-                      </a>
+                    </button>
+                      
                     </div>
                   </a>
                 </div>
               </div>
             </a>
           </div>
+
+          
+<!-- search product display -->
+<!-- Hidden product card template -->
+<div id="product-template" class="hidden">
+  <div class="mb-3 w-72 rounded-lg product-card">
+    <a href="#" class="product-link">
+      <div class="rounded-lg bg-white shadow-md">
+        <img class="h-60 w-full object-cover object-center rounded-t-lg product-image" src="#" alt="product image" />
+        <div class="p-5">
+          <h5 class="text-xl font-semibold tracking-tight text-slate-900 product-name"></h5>
+          <div id="rating" class="mt-2.5 mb-5 flex items-center product-rating">
+            <!-- Stars go here -->
+          </div>
+          <div class="flex items-center justify-between">
+            <p>
+              <span class="text-3xl font-bold text-slate-900 product-discountPrice"></span>
+              <span class="text-sm text-slate-900 line-through product-price"></span>
+            </p>
+            <button class="add-to-cart-btn flex items-center rounded-md bg-slate-900 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-gray-700" data-product-id="">
+              Add to cart
+            </button>
+          </div>
+        </div>
+      </div>
+    </a>
+  </div>
+</div>
+
+
         <% }) %>
       <!-- </div> -->
     </div>
+
+
+
+
+
+
 
     <div class="flex justify-center mt-8">
       <nav class="inline-flex space-x-2">
@@ -238,144 +221,138 @@
 
 
 function sort(sortValue){
-  fetch(`/allProducts/sort?sort=${sortValue}`)
+  const query = document.querySelector('#search').value;
+  const category = document.getElementById('category').value || '';
+  const minPrice = document.getElementById('minPrice').value || '';
+  const maxPrice = document.getElementById('maxPrice').value || '';
 
-    .then(response=>response.json())
-    .then(data=>{
+  let queryParams = new URLSearchParams({
+    sort: sortValue,
+    query: query,
+    category: category,
+    minPrice: minPrice,
+    maxPrice: maxPrice,
+    page: 1 // Reset to page 1 when sorting
+  });
 
-      const productList = document.querySelector('.product-list');
-      productList.innerHTML = '';
-
-      if(data.products.length>0){
-        data.products.forEach(product=>{
-          const productCard =
-          `
-
-          <div class="mb-3 w-72 rounded-lg">
-              <a href="/productView/${product._id}">
-                <div class=" w-72 rounded-lg bg-white shadow-md">
-                  <!-- Product Image -->
-                  <img class="h-60 w-full object-cover object-center rounded-t-lg" src="${product.image[0]}" alt="${product.product_name}"/>
-                  <div class="p-5">
-                    <!-- Product Title -->
-                    <h5 class="text-xl font-semibold tracking-tight text-slate-900">${product.product_name}</h5>
-                    <!-- Discount Price -->
-                    <div class="mt-2.5 mb-5 flex items-center">
-                      <span class="mr-2 rounded bg-yellow-200 px-2.5 py-0.5 text-xs font-semibold">
-                        ₹${product.discountPrice}
-                      </span>
-                    </div>
-                    <!-- Price and Add to Cart -->
-                    <div class="flex items-center justify-between">
-                      <p>
-                        <span class="text-3xl font-bold text-slate-900">₹${product.discountPrice}</span>
-                        <span class="text-sm text-slate-900 line-through">₹${product.price}</span>
-                      </p>
-                      <a href="/productView/${product._id}" class="flex items-center rounded-md bg-slate-900 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-gray-700">
-                        Add to cart
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </a>
-            </div>
-
-          `;
-
-          productList.innerHTML += productCard
-        })
-      }else{
-
-        productList.innerHTML = `<p class="text-white">No products found.</p>`;
-        
-      }
-
-    })
-    .catch(error=>{
-      console.error('Error fetching the filtered products:', error);
-    })
-
- 
-  
+  window.location.href = `/allProducts?${queryParams.toString()}`;
 }
 
+document.querySelector('#searchBtn').addEventListener('click', function (event) {
+  event.preventDefault();
+  
+  const query = document.querySelector('#search').value;
 
+  fetch(`/search?query=${encodeURIComponent(query)}`)
+    .then(response => response.json())
+    .then(data => {
+      console.log(data);
+      
+      const productList = document.querySelector('.product-list');
+      productList.innerHTML = ''; // Clear current list
 
+      if (data.products.length > 0) {
+        data.products.forEach(product => {
+          // Create the product card elements manually
+          const productCard = document.createElement('div');
+          productCard.classList.add('mb-3', 'w-72', 'rounded-lg');
 
+          const productLink = document.createElement('a');
+          productLink.href = `/productView/${product._id}`;
 
+          const productWrapper = document.createElement('div');
+          productWrapper.classList.add('rounded-lg', 'bg-white', 'shadow-md');
 
- document.querySelector('#searchBtn').addEventListener('click', function (event) {
-    event.preventDefault();
+          const productImage = document.createElement('img');
+          productImage.classList.add('h-60', 'w-full', 'object-cover', 'object-center', 'rounded-t-lg');
+          productImage.src = product.image[0];
+          productImage.alt = 'Product Image';
 
-    const query = document.querySelector('#search').value;
+          const productInfo = document.createElement('div');
+          productInfo.classList.add('p-5');
 
-    // Fetch search results
-    fetch(`/search?query=${encodeURIComponent(query)}`)
-        .then(response => response.json())
-        .then(data => {
-            // Clear the current product list
-            const productList = document.querySelector('.product-list');
-            productList.innerHTML = ''; // Clear the current list before appending new products
+          const productName = document.createElement('h5');
+          productName.classList.add('text-xl', 'font-semibold', 'tracking-tight', 'text-slate-900');
+          productName.textContent = product.product_name;
 
-            if (data.products.length > 0) {
-                data.products.forEach(product => {
-                    const productCard = `
-                        <div class="mb-3 w-72 rounded-lg">
-                           <a href="/productView/${product._id}">
-                              <div class="relative w-72 shrink-0 rounded-lg bg-white shadow-md">
-                                <a href="/productView/${product._id}">
-                                  <!-- Product Image -->
-                                  <img class="h-60 w-full object-cover object-center rounded-t-lg" src="${product.image[0]}" alt="${product.product_name}"/>
-                                </a>
-                                <div class="p-5">
-                                  <!-- Product Title -->
-                                  <a href="/productView/${product._id}">
-                                    <h5 class="text-xl font-semibold tracking-tight text-slate-900">${product.product_name}</h5>
-                                  </a>
-                                  <!-- Discount Price -->
-                                  <div class="mt-2.5 mb-5 flex items-center">
-                                    <span class="mr-2 rounded bg-yellow-200 px-2.5 py-0.5 text-xs font-semibold">
-                                      ₹${product.discountPrice}
-                                    </span>
-                                  </div>
-                                  <!-- Price and Add to Cart -->
-                                  <a href="/productView/${product._id}">
-                                    <div class="flex items-center justify-between">
-                                      <p>
-                                        <span class="text-3xl font-bold text-slate-900">
-                                          ₹${product.discountPrice}
-                                        </span>
-                                        <span class="text-sm text-slate-900 line-through">
-                                          ₹${product.price}
-                                        </span>
-                                      </p>
-                                      <a href="/productView/${product._id}" class="flex items-center rounded-md bg-slate-900 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-gray-700">
-                                        Add to cart
-                                      </a>
-                                    </div>
-                                  </a>
-                                </div>
-                              </div>
-                            </a>
-                          </div>
-                    `;
-                    productList.innerHTML += productCard;
-                });
-            } else {
-                productList.innerHTML = `<p class="text-white">No products found for "${query}".</p>`;
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching the products:', error);
+          const ratingContainer = document.createElement('div');
+          ratingContainer.classList.add('mt-2.5', 'mb-5', 'flex', 'items-center');
+          const totalStars = 5;
+          const filledStars = Math.round(product.rating || 0); // Use product rating
+          const emptyStars = totalStars - filledStars;
+
+          // Add filled stars
+          for (let i = 0; i < filledStars; i++) {
+            const star = document.createElement('span');
+            star.classList.add('text-yellow-500', 'text-xl');
+            star.textContent = '★';
+            ratingContainer.appendChild(star);
+          }
+
+          // Add empty stars
+          for (let i = 0; i < emptyStars; i++) {
+            const star = document.createElement('span');
+            star.classList.add('text-gray-400', 'text-xl');
+            star.textContent = '☆';
+            ratingContainer.appendChild(star);
+          }
+
+          const productPriceContainer = document.createElement('div');
+          productPriceContainer.classList.add('flex', 'items-center', 'justify-between');
+
+          const priceInfo = document.createElement('p');
+          const discountPrice = document.createElement('span');
+          discountPrice.classList.add('text-3xl', 'font-bold', 'text-slate-900');
+          discountPrice.textContent = `₹${product.discountPrice}`;
+          const originalPrice = document.createElement('span');
+          originalPrice.classList.add('text-sm', 'text-slate-900', 'line-through');
+          originalPrice.textContent = `₹${product.price}`;
+
+          priceInfo.appendChild(discountPrice);
+          priceInfo.appendChild(originalPrice);
+
+          const addToCartBtn = document.createElement('button');
+          addToCartBtn.classList.add('add-to-cart-btn', 'flex', 'items-center', 'rounded-md', 'bg-slate-900', 'px-5', 'py-2.5', 'text-center', 'text-sm', 'font-medium', 'text-white', 'hover:bg-gray-700');
+          addToCartBtn.textContent = 'Add to cart';
+          addToCartBtn.setAttribute('data-product-id', product._id);
+
+          // Event listener for add to cart
+          addToCartBtn.addEventListener('click', function () {
+            const productId = this.getAttribute('data-product-id');
+            addToCart(productId);
+          });
+
+          // Assemble the product card
+          productPriceContainer.appendChild(priceInfo);
+          productPriceContainer.appendChild(addToCartBtn);
+
+          productInfo.appendChild(productName);
+          productInfo.appendChild(ratingContainer);
+          productInfo.appendChild(productPriceContainer);
+
+          productWrapper.appendChild(productImage);
+          productWrapper.appendChild(productInfo);
+          productLink.appendChild(productWrapper);
+          productCard.appendChild(productLink);
+
+          // Append the product card to the product list
+          productList.appendChild(productCard);
         });
+      } else {
+        productList.innerHTML = `<p class="text-white">No products found for "${query}".</p>`;
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching the products:', error);
+    });
 });
+
 
 document.querySelector("#clearSearchBtn").addEventListener('click',function(event){
 
   event.preventDefault();
 
-  location.reload()
-  document.querySelector('#search').value = '';
+  window.location.href = '/allProducts'
 
 })
 
@@ -457,6 +434,61 @@ document.getElementById('closeFilterModal').addEventListener('click', () => {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+const addToCart = async (productId)=>{
+    try {
+      const response = await fetch('/cart/add',{
+        method:'POST',
+        headers:{
+          'content-Type' : 'application/json'
+        },
+        body:JSON.stringify({
+          productId : productId,
+          productCount:1
+        })
+      })
+
+      const data = await response.json();
+
+      if(response.ok){
+        Swal.fire({
+          postion:"top-center",
+          icon:"success",
+          title:"Item added to cart",
+          showConfirmButton: false,
+          time:500
+
+        })
+        
+        
+      }else{
+        alert(data.message)
+      }
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      
+    }
+  }
+
+
+  document.querySelectorAll('.add-to-cart-btn').forEach(button=>{
+    button.addEventListener('click',function(){
+      const productId = this.getAttribute('data-product-id');
+      addToCart(productId)
+    })
+  })
 
 
 //---------------------filter ---------------------------------------

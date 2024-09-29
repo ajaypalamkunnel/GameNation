@@ -29,6 +29,7 @@
         <table class="min-w-full w-full bg-white">
           <thead class="bg-gray-100 whitespace-nowrap">
             <tr>
+              <th class="p-4 text-left text-sm font-semibold text-black">No</th>
               <th class="p-4 text-left text-sm font-semibold text-black">Product</th>
               <th class="p-4 text-left text-sm font-semibold text-black">Discounted price</th>
               <th class="p-4 text-left text-sm font-semibold text-black">Price</th>
@@ -40,8 +41,11 @@
           </thead>
       
           <tbody class="whitespace-nowrap divide-y divide-gray-200">
-            <% products.forEach(product => { %>
+            <% products.forEach((product,index)=> { %>
             <tr>
+              <td class="p-4 text-sm">
+                <%= index+1 %>
+              </td>
               <td class="p-4 text-sm">
                 <div class="flex items-center cursor-pointer">
                   <img src="<%= product.image[0] %>" class="w-10 h-10 p-1.5 shrink-0 bg-gray-100" />
@@ -50,6 +54,7 @@
                   </div>
                 </div>
               </td>
+              
               <td class="p-4 text-sm">
                 <% let discountPrice = Math.ceil(product.price - (product.price * product.discount/100))  %>
                 ₹<%= discountPrice %>

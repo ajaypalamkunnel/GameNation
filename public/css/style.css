@@ -600,6 +600,10 @@ video {
   border-width: 0;
 }
 
+.visible {
+  visibility: visible;
+}
+
 .fixed {
   position: fixed;
 }
@@ -1808,10 +1812,6 @@ video {
 
 .fill-white {
   fill: #fff;
-}
-
-.fill-red-800 {
-  fill: #991b1b;
 }
 
 .object-cover {

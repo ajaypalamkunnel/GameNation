@@ -19,7 +19,7 @@ export const getAdminLogin = (req,res)=>{
         return res.redirect('/admin/loginAdmin');
     }
 
-    // res.render("admin/loginAdmin")
+    
 }
 
 //---------------------- admin login post request ---------------------- 
@@ -28,7 +28,7 @@ export const loginPost = (req,res)=>{
     try {
         if(req.body.username === process.env.ADMINUSERNAME && req.body.password === process.env.ADMINPASSWORD){
             req.session.admin = req.body.username;
-          return  res.redirect('/admin/dashboard')
+            return  res.redirect('/admin/dashboard')
         }else{
             req.flash("error","invalid credential")
             return  res.redirect('/admin/login')
@@ -37,10 +37,11 @@ export const loginPost = (req,res)=>{
         console.error("Error during admin login:", error);
         req.flash("error", "An error occurred during login. Please try again.");
         return res.redirect('/admin/loginAdmin');
-
+        
     }
 }
 
+//---------------------- admin dashboard ---------------------- 
 
 export const dashboard = (req,res)=>{
     try {
@@ -56,7 +57,7 @@ export const dashboard = (req,res)=>{
 
 
 
-//---------------------------- user login -------------------------------------
+//---------------------------- add category page -------------------------------------
 
 
 export const addCategory = (req,res)=>{
@@ -72,15 +73,16 @@ export const addCategory = (req,res)=>{
             res.redirect('/admin/login')
         }
     } catch (error) {
-    console.log(`error while rendering add category ${error} `)
+        console.log(`error while rendering add category ${error} `)
         
     }
 }
 
+//---------------------------- add category post -------------------------------------
 
 export const addCategoryPost = async (req,res)=>{
     
-
+    
     try {
         const {categoryName,isBlocked} = req.body;
         
@@ -88,31 +90,32 @@ export const addCategoryPost = async (req,res)=>{
             collectionName:categoryName.trim().toLowerCase().replace(/\s+/g, '')})
 
 
-        if(existingCategory){
-            req.flash('error','category already exist');
-            return res.redirect('/admin/addCategory?success=false')
+            if(existingCategory){
+                req.flash('error','category already exist');
+                return res.redirect('/admin/addCategory?success=false')
         }
 
         const newCategory = new category({
             collectionName: categoryName.trim().toLowerCase().replace(/\s+/g, ''),
             isActive:isBlocked==='true'
         })
-
+        
         await newCategory.save()
         req.flash('success', 'Category added successfully!');
         return res.redirect('addCategory/?success=true')
         
     } catch (error) {
-
+        
         console.log("Error adding category:", error);
-
+        
         res.redirect('/addCategory?success=false')
         
         
     }
-
+    
 }
 
+//----------------------------category view -------------------------------------
 
 
 export const categoryView = async(req,res)=>{
@@ -133,6 +136,8 @@ export const categoryView = async(req,res)=>{
         res.status(500).send('Internal Server Error');
     }
 }
+
+//----------------------------category update -------------------------------------
 
 export const updateCategory = async(req,res)=>{
 
@@ -161,7 +166,7 @@ export const updateCategory = async(req,res)=>{
     }
 }
 
-
+//----------------------------customers -------------------------------------
 
 
 export const customers = async(req,res)=>{
@@ -171,7 +176,7 @@ export const customers = async(req,res)=>{
 
             const searchQuery = req.query.search || '';
 
-            console.log(searchQuery);
+            
             
 
             const page = parseInt(req.query.page)||1;
@@ -223,16 +228,13 @@ export const customers = async(req,res)=>{
    
    }
 
-
+//----------------------------block/unblock user-------------------------------------
 
 export const toggleVerification = async(req,res)=>{
     const {userId,isVerified} = req.body;
     try {
-        console.log(isVerified);
-        
-    //    const resss = await User.findOneAndUpdate({email:email},{isVerified:isVerified})
-        await User.updateOne({_id:userId},{$set:{isVerified:isVerified}})
        
+        await User.updateOne({_id:userId},{$set:{isVerified:isVerified}})
        
         res.json({success:true})      
     } catch (error) {
@@ -242,6 +244,7 @@ export const toggleVerification = async(req,res)=>{
     }
 }
 
+//----------------------------orders Listing poge -------------------------------------
 
 export const ordersList = async(req,res)=>{
     try {
@@ -270,11 +273,6 @@ export const ordersList = async(req,res)=>{
             }
 
 
-
-
-            // const page = parseInt(req.query.page) || 1;
-            // const limit = parseInt(req.query.limit) || 10;
-
             const skip = (page - 1) * limit;
 
             const orders = await OrderSchema.find(filter)
@@ -296,10 +294,6 @@ export const ordersList = async(req,res)=>{
             const totalOrders = await OrderSchema.countDocuments(filter);
             const totalPages = Math.ceil(totalOrders / limit);
             
-            
-
-        
-
             res.render('admin/orders',{
                 title:"Orders",
                 admin:req.session.admin,
@@ -317,18 +311,15 @@ export const ordersList = async(req,res)=>{
         }
     } catch (error) {
 
-        console.log("error while rendring orders",error);
-        
-        
+        console.log("error while rendring orders",error); 
     }
 }
 
 
-
+//----------------------------ordres view for admin-------------------------------------
 
 
 export const orderViewAdmin = async(req,res)=>{
-
     const {orderId} = req.query;
     try{
 
@@ -346,11 +337,7 @@ export const orderViewAdmin = async(req,res)=>{
     }catch(error){
         res.status(500).json({ error: 'Error fetching order details' });
     }
-
-
 }
-
-
 
 export const searchCustomer = async(req,res)=>{
 
