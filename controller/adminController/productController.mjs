@@ -559,6 +559,13 @@ export const addToCart = async (req, res) => {
 
       const product = await Product.findById(productId);
 
+      let cart = await Cart.findOne({ userId: user._id });
+
+      if(cart.items.length > 4){
+        return res.status(400).json({message: "Your cart is full"})
+      }
+      
+
       if (!product) {
         return res.status(404).json({ message: "Product not found" });
       }
@@ -576,7 +583,6 @@ export const addToCart = async (req, res) => {
       const discountPercentage = product.discount || 0;
       const discountedPrice = product.price * (1 - discountPercentage / 100);
 
-      let cart = await Cart.findOne({ userId: user._id });
 
       if (!cart) {
         cart = new Cart({
@@ -715,6 +721,12 @@ export const updateCartQuantity = async (req, res) => {
           return res
             .status(400)
             .json({ message: "Not enough stock available" });
+        }
+
+        if(cartItem.productCount > 4){
+          return res
+            .status(400)
+            .json({message:"You can purchase only 5 quantity"})
         }
         cartItem.productCount += 1;
         // product.stock -= 1;

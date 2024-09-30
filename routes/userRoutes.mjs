@@ -6,7 +6,7 @@ import {getSignUp,signupPost, verifyOtp,getLogin,loginPost,googleAuth,googleAuth
 import { productView,allProducts,cart,addToCart,updateCartQuantity,searchProducts,removeProductFromCart, allProductsSort  } from '../controller/adminController/productController.mjs';
 // import {} '../services/auth.mjs'
 import { checkout, placeOrder } from '../controller/userController/checkoutController.mjs';
-import { home,userProfile,addressView,addNewAddress,addNewAddressPost,editAddress,editAddressPut,deleteAddress, filterDataFetch} from '../controller/userController/userController.mjs'; 
+import { home,userProfile,addressView,addNewAddress,addNewAddressPost,editAddress,editAddressPut,deleteAddress, filterDataFetch, wishList, addWisList, removeWishList} from '../controller/userController/userController.mjs'; 
 import passport from 'passport';
 import { cancelOrder, orders, orderSummary, orderView, returnOrder } from '../controller/userController/orderController.mjs';
 
@@ -103,6 +103,13 @@ userRouter.post('/returnOrder',isUser,returnOrder);
 userRouter.get('/passwordChangePage',isUser,passwordChangeGet)
 userRouter.patch('/passwordChange',isUser,passwordChange)
 userRouter.patch('/updateMobile',isUser,updateMobile)
+
+
+//---------------------------- wishList --------------
+
+userRouter.get('/wishList',isUser,wishList)
+userRouter.post('/addWishList',isUser,addWisList)
+userRouter.delete('/removeWishListItem',isUser,removeWishList)
 
 
 

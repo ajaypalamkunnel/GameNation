@@ -33,7 +33,7 @@
   
 
     <div class="bg-gray-900 text-white max-w-4xl w-full rounded-xl shadow-lg p-6">
-      <div class="flex flex-col lg:flex-row gap-6">
+      <div class=" basic-info flex flex-col lg:flex-row gap-6">
         <!-- Left Side (Image, Ratings) -->
         <div class="flex flex-col items-center lg:w-1/3">
           <!-- Main Image (Zoom on Hover) -->
@@ -52,9 +52,30 @@
         <!-- Right Side (Product Info) -->
         <div class="flex flex-col lg:w-2/3">
           <!-- Product Name and Price -->
-          <h1 class="text-3xl font-bold"><%= product.product_name%></h1>
+           <div class="flex justify-between">
+             <h1 class="text-3xl font-bold"><%= product.product_name%></h1>
+             <button id="heartButton" class="focus:outline-none items-end" onclick="addToWishList('<%= product._id %>')">
+              <svg
+                id="heartIcon"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+                stroke="currentColor"
+                class="w-12 h-12 text-red-600">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                />
+              </svg>
+            </button>
+
+           </div>
           <p class="text-gray-400"><%= product.publisher%></p>
-  
+          
+          
+         
           <!-- Rating and Price Section -->
           <div class="flex items-center gap-2 mt-4">
             <div class="flex items-center text-yellow-400">
@@ -84,7 +105,7 @@
               <!-- Enable buttons when in stock -->
               <button class="add-to-cart-btn bg-yellow-500 text-gray-900 font-semibold py-2 px-6 rounded-lg hover:bg-yellow-400 transition" data-product-id="<%= product._id %>">
                 Add to cart
-            </button>
+              </button>
               <button class="bg-green-500 text-white font-semibold py-2 px-6 rounded-lg hover:bg-green-400 transition">
                 Buy Now
               </button>
@@ -129,6 +150,7 @@
               <p>Easy return</p>
             </div>
           </div>
+         
         </div>
       </div>
   
@@ -233,24 +255,68 @@
     })
   })
 
+function addToWishList(productId){
 
+  console.log(productId);
+  
 
+  fetch('/addWishList',{
+    method:'POST',
+    headers:{
+          'content-Type' : 'application/json'
+        },
+    body:JSON.stringify(
+      {productId:productId}
+    )
+  })
 
+  .then(response=>response.json())
+  .then(result=>{
+    if(result.status === 'success'){
+      Swal.fire({
+        icon:'sucess',
+        title:'Added to wishList',
+        text:result.message||'product added to wishlist successfully'
+      }).then(()=>{
+        window.location.reload()
+      })
+    }else if(result.status === 'alreadyIn'){
+      Swal.fire({
+        icon:'warning',
+        title:'Product already in wishlist',
+        text:result.message||'Product already in wishList'
+      })
 
+    }else{
+      Swal.fire({
+          icon:"error",
+          title:"update failed",
+          text: result.message || "Failed to add wishlist."
+      })
+    }
+  }).catch(error=>{
+    console.log('error while adding wishList',error);
+    Swal.fire({
+            icon:"error",
+            title:error,
+            text: "An error occurred while adding to wishlist."
 
+        })
+    
+  })
 
+}
 
+const heartButton = document.getElementById('heartButton');
+const heartIcon = document.getElementById('heartIcon');
 
-
-
-
-
-
-
-
-
-
-
+heartButton.addEventListener('click', () => {
+  if (heartIcon.getAttribute('fill') === 'none') {
+    heartIcon.setAttribute('fill', 'currentColor');  // Fill the heart
+  } else {
+    heartIcon.setAttribute('fill', 'none');  // Hollow the heart
+  }
+});
 
 
 
