@@ -1,0 +1,68 @@
+<link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+<%- include('adminHeader') %>
+    <div style="display: flex; height: 100vh">
+        <%- include('sidebar') %>
+            <div class="font-[sans-serif] flex-grow: 2; p-4 overflow-x-auto w-full">
+
+                <div class="container flex flex-col mx-auto mt-5">
+                  <div class="flex justify-end">
+
+                    <a class="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 focus:outline-none" href="/admin/addCoupon">Add new</a>
+                  </div>
+                    <h2 class="text-2xl font-semibold mb-4">Coupon List</h2>
+                    
+                    <!-- Coupon Table -->
+                    <table id="couponsTable" class="display rounded-sm bg-gray-900  p-4">
+                      <thead class="text-white">
+                        <tr >
+                          <th>Coupon Code</th>
+                          <th>Discount Type</th>
+                          <th>Discount Value</th>
+                          <th>Minimum Order Amount</th>
+                          <th>Start Date</th>
+                          <th>End Date</th>
+                          <th>Usage Count</th>
+                          <th>Active</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody >
+                        <% coupons.forEach(coupon => { %>
+                          <tr >
+                            <td class="bg-gray-900"><%= coupon.couponCode %></td>
+                            <td><%= coupon.discountType %></td>
+                            <td>₹<%= coupon.discountValue %></td>
+                            <td>₹<%= coupon.minimumOrderAmount %></td>
+                            <td><%= new Date(coupon.startDate).toLocaleDateString() %></td>
+                            <td><%= new Date(coupon.endDate).toLocaleDateString() %></td>
+                            <td><%= coupon.usageCount %></td>
+                            <td>
+                              <% if (coupon.isActive) { %>
+                                <span class="text-green-500">Active</span>
+                              <% } else { %>
+                                <span class="text-red-500">Inactive</span>
+                              <% } %>
+                            </td>
+                            <td>
+                              <!-- Actions (e.g., Edit/Delete) -->
+                              <a href="/admin/editCoupon/<%= coupon._id %>" class="text-blue-500">Edit</a> | 
+                              <a href="/admin/deleteCoupon/<%= coupon._id %>" class="text-red-500">Delete</a>
+                            </td>
+                          </tr>
+                        <% }) %>
+                      </tbody>
+                    </table>
+                  </div>
+
+            </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+
+    <script>
+        // Initialize DataTables
+        $(document).ready(function() {
+          $('#couponsTable').DataTable();
+        });
+    </script>

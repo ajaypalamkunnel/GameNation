@@ -416,7 +416,7 @@ export const allProducts = async (req, res) => {
           sortStage = { product_name: -1 }; // Alphabetical Z-A
           break;
         default:
-          sortStage = { _id: -1 }; // Default: Newest first
+          sortStage = { createdAt: -1 }; // Default: Newest first
       }
       pipeline.push({ $sort: sortStage });
     } else {
