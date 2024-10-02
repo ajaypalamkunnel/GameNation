@@ -180,7 +180,7 @@ export const editProduct = async (req, res) => {
     });
     const categories = await category.find({ isActive: true });
 
-    const cat = product.category.collectionName;
+    const cat = product.category;
 
     res.render("admin/editProduct", {
       title: "Edit product",
@@ -195,7 +195,6 @@ export const editProduct = async (req, res) => {
 };
 
 //---------------------------------Edit products put-----------------------------------
-
 export const editProductPut = async (req, res) => {
   try {
     const {
@@ -219,47 +218,49 @@ export const editProductPut = async (req, res) => {
 
     const productId = req.params.id;
 
+    // Ensure categoryId is converted to ObjectId
+    const categoryObjectId = mongoose.Types.ObjectId.isValid(categoryId)
+      ? new mongoose.Types.ObjectId(categoryId)
+      : null;
+
+    if (!categoryObjectId) {
+      return res.status(400).json({ error: "Invalid category ID" });
+    }
+
     const product = await Product.findById(productId);
 
     if (!product) {
       return res.status(404).json({ error: "Product not found" });
     }
 
-    // Process removed images (if any)
-    const removedImages = Object.keys(req.body)
-      .filter((key) => key.startsWith("removedImage"))
-      .map((key) => req.body[key]);
+    // If the product image array has 3 images, remove them
+    if (product.image.length === 3) {
+      product.image = []; // Remove all images from the array
+    }
 
-    // Remove the images from the product document
+
     product.image = product.image.filter((img) => !removedImages.includes(img));
 
-    // Convert and process new cropped images if provided
+
+
+   // Convert and process new cropped images if provided
     const imageUrls = [];
     if (req.body.croppedImage1) {
-      imageUrls.push(
-        await uploadBase64ImageToCloudinary(req.body.croppedImage1)
-      );
+      imageUrls.push(req.body.croppedImage1); // Assuming these are valid URLs from Cloudinary or another source
     }
     if (req.body.croppedImage2) {
-      imageUrls.push(
-        await uploadBase64ImageToCloudinary(req.body.croppedImage2)
-      );
+      imageUrls.push(req.body.croppedImage2);
     }
     if (req.body.croppedImage3) {
-      imageUrls.push(
-        await uploadBase64ImageToCloudinary(req.body.croppedImage3)
-      );
+      imageUrls.push(req.body.croppedImage3);
     }
 
-    // Add new image URLs to the product (if there are any)
-    product.image = product.image.concat(imageUrls);
-
-    // Find the category based on the provided category name or ID
-    //const category_id = await category.findOne({ _id: categoryId });
+  //  Replace the old images with the new ones
+    product.image = imageUrls;
 
     // Update product fields
     product.product_name = product_name;
-    product.category = categoryId[0];
+    product.category = categoryObjectId;
     product.genre = genre;
     product.game_Play_hour = game_Play_hour;
     product.release_date = release_date;
@@ -290,7 +291,6 @@ export const editProductPut = async (req, res) => {
       .json({ error: "Server error, could not update product" });
   }
 };
-
 //---------------------------------Delete products-----------------------------------
 
 export const deleteProduct = async (req, res) => {
