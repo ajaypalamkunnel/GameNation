@@ -81,3 +81,28 @@ export const addCouponPost = async (req, res) => {
         });
     }
 };
+
+
+export const removeCoupon =  async(req,res)=>{
+    try {
+
+        const {couponId} = req.params;
+
+        const coupon = await Coupon.findById(couponId)
+
+        if(!coupon){
+            return res.status(404).json({status:'error',message:'Coupon not found'})
+        }
+
+        coupon.isActive = !coupon.isActive;
+        await coupon.save();
+        res.status(200).json({
+            status:'success',
+            message: "Coupon updated"
+        })
+        
+    } catch (error) {
+        console.log('Error in product removing: ',error);
+        res.status(500).json({status:'error',message:`Server error ,${error}`})
+    }
+}

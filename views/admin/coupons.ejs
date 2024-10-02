@@ -44,9 +44,16 @@
                               <% } %>
                             </td>
                             <td>
-                              <!-- Actions (e.g., Edit/Delete) -->
-                              <a href="/admin/editCoupon/<%= coupon._id %>" class="text-blue-500">Edit</a> | 
-                              <a href="/admin/deleteCoupon/<%= coupon._id %>" class="text-red-500">Delete</a>
+                              <div class="flex gap-2">
+                                <!-- Actions (e.g., Edit/Delete) -->
+                                <a href="/admin/editCoupon/<%= coupon._id %>" class="text-blue-500">Edit</a> | 
+                                <button
+                                class="h-8 px-5 py-2 rounded-lg text-white text-sm tracking-wider font-medium border border-current outline-none <%= coupon.isActive ? 'bg-red-600 hover:bg-red-700' :'bg-green-600 hover:bg-green-700'  %>"
+                                onclick="couponToggle('<%= coupon._id %>',' <%= coupon.isActive %>')">
+                                <%= coupon.isActive ? 'Delete' : 'Add' %>
+                              </button>
+
+                              </div>
                             </td>
                           </tr>
                         <% }) %>
@@ -65,4 +72,48 @@
         $(document).ready(function() {
           $('#couponsTable').DataTable();
         });
+
+
+
+
+        function couponToggle(couponId,status){
+
+          fetch(`/admin/removeCoupon/${couponId}`,{
+            method:'PATCH',
+            headers:{
+              'Content-Type':'application/json'
+            },
+            body:JSON.stringify({
+              couponId:couponId
+            })
+
+          })
+          .then(response=>response.json())
+          .then(response=>{
+            if(response.status == 'success'){
+              Swal.fire({
+                icon:'success',
+                title:'Updated',
+                text:response.message|| 'coupon updated successfully'
+              }).then(()=>{
+                window.location.reload()
+              })
+            }else{
+              Swal.fire({
+                icon:'error',
+                title:'Updation Failed',
+                text:response.message||'coupon updation failed'
+              })
+            }
+          }).catch(error=>{
+            console.error('server error',error)
+            Swal.fire({
+                icon:'error',
+                title:'Server error',
+                text:error
+              })
+          })
+          
+
+        }
     </script>
