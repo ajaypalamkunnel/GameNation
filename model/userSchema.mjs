@@ -1,6 +1,20 @@
 import mongoose from "mongoose";
 import addressSchema from './addressSchema.mjs'
 
+
+const couponUsageSchema = mongoose.Schema({
+    couponId:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref: 'Coupon',
+        required:true
+    },
+    usageCount:{
+        type:Number,
+        default:0
+    }
+},{_id:false})
+
+
 const userSchema = mongoose.Schema(
     {
         username:{
@@ -31,6 +45,10 @@ const userSchema = mongoose.Schema(
         },
         googleID: {
             type: String
+        },
+        couponUsed:{
+            type : [couponUsageSchema],
+            default:[]
         }
     },
     { timestamps: true } 

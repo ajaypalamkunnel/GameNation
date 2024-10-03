@@ -1,6 +1,8 @@
+
 import addressSchema from "../../model/addressSchema.mjs";
 import Cart from "../../model/cartSchema.mjs";
 import category from "../../model/categoryScehema.mjs";
+import Coupon from "../../model/couponSchema.mjs";
 import OrderSchema from "../../model/orderSchema.mjs";
 import Product from "../../model/productSchema.mjs";
 import User from "../../model/userSchema.mjs";
@@ -31,8 +33,23 @@ export const checkout = async(req,res)=>{
                     console.log("Product is not Available , Remove product From cart");
                     
                 }
+            });
+
+            //coupon;
+
+            const availableCoupons = await Coupon.find({
+                isActive:true,
+                endDate:{$gte: new Date()},
+                minimumOrderAmount:{$lte: cartDetails.totalPrice}
             })
             
+            const eligibleCoupons = availableCoupons.filter((coupon)=>{
+                const couponUsage = user.couponUsed.find((c)=>c.couponId.equals(coupon._id))
+                if(couponUsage){
+                    return couponUsage.usageCount < coupon.usageCount
+                }
+                return true;
+            })
 
 
             const categories = await category.find({ isActive: true });
@@ -44,7 +61,8 @@ export const checkout = async(req,res)=>{
                 user:req.session.user,
                 addresses:user.address,
                 cartTotal:cartDetails.totalPrice,
-                payableAmount:cartDetails.payableAmount
+                payableAmount:cartDetails.payableAmount,
+                eligibleCoupons
             })
 
 
@@ -60,6 +78,101 @@ export const checkout = async(req,res)=>{
         
     }
 }
+
+
+export const applyCoupon = async (req, res) => {
+
+    try {
+        
+        const { couponCode } = req.body;
+        const user = await User.findOne({ email: req.session.user });
+      
+        if (!user) {
+          return res.redirect("/login");
+        }
+      
+        const coupon = await Coupon.findById(couponCode);
+      
+        if (!coupon) {
+          return res.status(400).json({
+            status: "error",
+            message: "Coupon not found",
+          });
+        }
+      
+        if (!coupon.isActive) {
+          return res.status(400).json({
+            status: "error",
+            message: "Coupon not not active",
+          });
+        }
+        if (!coupon.isActive || coupon.endDate > new Date()) {
+          return res.status(400).json({
+            status: "error",
+            message: "Coupon expired",
+          });
+        }
+      
+        const couponUsage = user.couponUsed.find((usage) => {
+          usage.couponId.toString() === coupon._id.toString();
+        });
+      
+        if (couponUsage && couponUsage.usageCount >= coupon.usageCount) {
+          return res
+            .status(400)
+            .json({
+              status: error,
+              message: "You have reached the maximum coupon usage limit",
+            });
+        }
+      
+        const cart = await Cart.findOne(user._id);
+      
+        if (!cart) {
+          return res.status(404).json({ status: "error", message: "cart not found" });
+        }
+        const total = cart.payableAmount;
+        let discountedTotal = total;
+      
+        if (total < coupon.minimumOrderAmount) {
+          return res
+            .status(409)
+            .json({
+              status: "error",
+              message:
+                "Minimum purchase limit not reached. Please add more items to your cart.",
+            });
+        }
+      
+        let couponDiscount = coupon.discountValue;
+      
+        if (coupon.discountType === "Fixed") {
+          discountedTotal = total - couponDiscount;
+        } else if (coupon.discountType === "Percentage") {
+          const discountAmount = (couponDiscount / 100) * total;
+          discountedTotal = total - discountAmount;
+        }
+      
+        cart.payableAmount = discountedTotal;
+      
+        await cart.save();
+
+        return res.status(200).json({})
+    } catch (error) {
+        
+    }
+
+  console.log(couponCode);
+};
+
+
+
+
+
+
+
+
+
 
 
 function orderIdGenerator(){
