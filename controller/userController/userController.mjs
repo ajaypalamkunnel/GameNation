@@ -4,6 +4,8 @@ import Product from "../../model/productSchema.mjs";
 import User from "../../model/userSchema.mjs";
 import WishList from "../../model/wishListSchema.mjs";
 
+import Wallet from "../../model/walletSchema.mjs";
+
 //---------------------------- user Home rendering -------------------------------------
 
 export const home = async (req, res) => {
@@ -419,11 +421,49 @@ export const removeWishList = async(req,res)=>{
     
   }
 
-
-  
-  
-
 }
 
 
+export const wallet = async(req,res)=>{
+  try {
+    const categories = await category.find({isActive:true});
+    const user = await User.findOne({email:req.session.user})
+    let userWallet = await Wallet.findOne({userId:user._id})
+
+    if(!userWallet){
+
+      const newWallet = new Wallet({
+        userId:user._id,
+        balance:0,
+        transactions:[]
+
+      })
+
+      await newWallet.save();
+
+      return res.render('user/wallet',{
+        title:'Wallet',
+        categories,
+        user:req.session.user,
+        wallet:newWallet
+      })
+
+    }
+
+    
+    return res.render('user/wallet',{
+      title:'Wallet',
+      categories,
+      user:req.session.user,
+      wallet:userWallet
+
+    })
+
+    
+    
+  } catch (error) {
+    console.log("error while rendering wallet",error);
+    
+  }
+}
 

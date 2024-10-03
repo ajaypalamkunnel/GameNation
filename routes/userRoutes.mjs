@@ -6,7 +6,7 @@ import {getSignUp,signupPost, verifyOtp,getLogin,loginPost,googleAuth,googleAuth
 import { productView,allProducts,cart,addToCart,updateCartQuantity,searchProducts,removeProductFromCart, allProductsSort  } from '../controller/adminController/productController.mjs';
 // import {} '../services/auth.mjs'
 import { checkout, placeOrder } from '../controller/userController/checkoutController.mjs';
-import { home,userProfile,addressView,addNewAddress,addNewAddressPost,editAddress,editAddressPut,deleteAddress, filterDataFetch, wishList, addWisList, removeWishList} from '../controller/userController/userController.mjs'; 
+import { home,userProfile,addressView,addNewAddress,addNewAddressPost,editAddress,editAddressPut,deleteAddress, filterDataFetch, wishList, addWisList, removeWishList, wallet} from '../controller/userController/userController.mjs'; 
 import passport from 'passport';
 import { cancelOrder, orders, orderSummary, orderView, returnOrder } from '../controller/userController/orderController.mjs';
 
@@ -112,6 +112,9 @@ userRouter.post('/addWishList',isUser,addWisList)
 userRouter.delete('/removeWishListItem',isUser,removeWishList)
 
 
+//---------------------------- wallet --------------
+
+userRouter.get('/wallet',isUser,wallet)
 
 
 
