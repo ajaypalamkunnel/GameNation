@@ -5,12 +5,13 @@ const userRouter = express.Router()
 import {getSignUp,signupPost, verifyOtp,getLogin,loginPost,googleAuth,googleAuthCallback,userLogout,resendOtp, passwordChangeGet, passwordChange, updateMobile, forgotPassword, forgotPasswordPost, forgotPasswordMail, forgotOtpMail, validateForgotOtp} from '../controller/userController/userAuth.mjs'
 import { productView,allProducts,cart,addToCart,updateCartQuantity,searchProducts,removeProductFromCart, allProductsSort  } from '../controller/adminController/productController.mjs';
 // import {} '../services/auth.mjs'
-import { checkout, placeOrder } from '../controller/userController/checkoutController.mjs';
+//import { checkout, placeOrder,applyCoupon,removeCoupon } from '../controller/userController/checkoutController.mjs';
 import { home,userProfile,addressView,addNewAddress,addNewAddressPost,editAddress,editAddressPut,deleteAddress, filterDataFetch, wishList, addWisList, removeWishList, wallet} from '../controller/userController/userController.mjs'; 
 import { applyCoupon, checkout, placeOrder, removeCoupon } from '../controller/userController/checkoutController.mjs';
-import { home,userProfile,addressView,addNewAddress,addNewAddressPost,editAddress,editAddressPut,deleteAddress, filterDataFetch, wishList, addWisList, removeWishList} from '../controller/userController/userController.mjs'; 
+//import { home,userProfile,addressView,addNewAddress,addNewAddressPost,editAddress,editAddressPut,deleteAddress, filterDataFetch, wishList, addWisList, removeWishList} from '../controller/userController/userController.mjs'; 
 import passport from 'passport';
 import { cancelOrder, orders, orderSummary, orderView, returnOrder } from '../controller/userController/orderController.mjs';
+import { userCoupons } from '../controller/userController/couponController.mjs';
 
 //----------------------------- login -------------------------------
 
@@ -36,11 +37,6 @@ userRouter.post('/resend-otp',resendOtp)
 
 
 
-
-
-
-
-
 //----------------------------- Google authentication -------------------------------
 
 
@@ -49,12 +45,7 @@ userRouter.get('/auth/google/callback', googleAuthCallback);
 
 
         
-        
-        
-        
-        
-        
-        
+       
 //----------------------------- Home -------------------------------
         
 userRouter.get('/home',home)
@@ -121,6 +112,7 @@ userRouter.get('/wallet',isUser,wallet)
 
 userRouter.post('/applyCoupon',isUser,applyCoupon)
 userRouter.post('/removeCoupon',isUser,removeCoupon)
+userRouter.get('/coupons',isUser,userCoupons)
 
 
 export default userRouter

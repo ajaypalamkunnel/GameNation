@@ -106,3 +106,30 @@ export const removeCoupon =  async(req,res)=>{
         res.status(500).json({status:'error',message:`Server error ,${error}`})
     }
 }
+
+export const userCoupons = async(req,res)=>{
+    try {
+
+        if(req.session.user){
+            
+            const categories = await category.find({ isActive: true });
+            const coupons = await Coupon.find({isActive:true})
+    
+            res.render('user/coupons',{
+                categories,
+                user:req.session.user,
+                title:'Coupons',
+                coupons
+            })
+        }else{
+            res.redirect('/login')
+        }
+
+
+        
+        
+    } catch (error) {
+        console.log('Error while rendering the  coupon page', error);
+        
+    }
+}
