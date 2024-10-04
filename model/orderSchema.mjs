@@ -42,6 +42,12 @@ const orderSchema = mongoose.Schema({
     totalPrice:{
         type:Number
     },
+    priceAfterCouponDiscount:{
+        type:Number,
+        default:0
+
+
+    },
     address: {
         contactName: String,
         building: String,

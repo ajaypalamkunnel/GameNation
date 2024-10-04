@@ -135,7 +135,7 @@
     <!-- Total Price for the Order -->
     <div class="text-right mt-6">
       <p class="text-white font-bold text-xl">
-        Total: ₹<%= order.totalPrice.toFixed(2) %>
+        Total: ₹ <%= order.totalPrice.toFixed(2) - order.couponDiscount.toFixed(2) %>
       </p>
     </div>
   </div>
