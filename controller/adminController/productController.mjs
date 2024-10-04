@@ -416,7 +416,7 @@ export const allProducts = async (req, res) => {
           sortStage = { product_name: -1 }; // Alphabetical Z-A
           break;
         default:
-          sortStage = { _id: -1 }; // Default: Newest first
+          sortStage = { createdAt: -1 }; // Default: Newest first
       }
       pipeline.push({ $sort: sortStage });
     } else {
@@ -561,6 +561,17 @@ export const addToCart = async (req, res) => {
 
       let cart = await Cart.findOne({ userId: user._id });
 
+      // console.log("///////",user._id);
+      // console.log("///////",cart);
+      if (!cart) {
+        cart = new Cart({
+          userId: user._id,
+          items: [],
+          totalPrice: 0,
+          payableAmount: 0,
+        });
+      }
+      
       if(cart.items.length > 4){
         return res.status(400).json({message: "Your cart is full"})
       }
@@ -584,14 +595,7 @@ export const addToCart = async (req, res) => {
       const discountedPrice = product.price * (1 - discountPercentage / 100);
 
 
-      if (!cart) {
-        cart = new Cart({
-          userId: user._id,
-          items: [],
-          totalPrice: 0,
-          payableAmount: 0,
-        });
-      }
+      
 
       const existingItemIndex = cart.items.findIndex(
         (item) => item.productId.toString() === productId

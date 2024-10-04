@@ -30,6 +30,18 @@ const cartSchema = mongoose.Schema({
     totalPrice:{
         type:Number,
         default:0
+    },
+    couponId:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Coupon'
+    },
+    couponDiscount:{
+        type:Number,
+        default:0
+    },
+    isCouponApplied:{
+        type:Boolean,
+        default:false
     }
 },{_id:true,timestamps:true})
 

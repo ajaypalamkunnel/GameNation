@@ -84,11 +84,11 @@
         <div class="grid grid-cols-2">
           <p class="font-semibold">Subtotal:</p>
           <p class="text-right">₹ <%= order.totalPrice.toFixed(2) %></p>
-          <p class="font-semibold">Shipping:</p>
-          <p class="text-right">₹ 0.00</p>
+          <p class="font-semibold">Coupon Discount:</p>
+          <p class="text-right">₹ -<%= order.couponDiscount.toFixed(2) %></p>
         </div>
         <div class="flex justify-end mt-4">
-          <p class="font-semibold text-xl">Total: ₹ <%= order.totalPrice.toFixed(2) %></p>
+          <p class="font-semibold text-xl">Total: ₹ <%= order.totalPrice.toFixed(2) - order.couponDiscount.toFixed(2) %></p>
         </div>
       </div>
   

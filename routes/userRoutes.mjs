@@ -7,6 +7,8 @@ import { productView,allProducts,cart,addToCart,updateCartQuantity,searchProduct
 // import {} '../services/auth.mjs'
 import { checkout, placeOrder } from '../controller/userController/checkoutController.mjs';
 import { home,userProfile,addressView,addNewAddress,addNewAddressPost,editAddress,editAddressPut,deleteAddress, filterDataFetch, wishList, addWisList, removeWishList, wallet} from '../controller/userController/userController.mjs'; 
+import { applyCoupon, checkout, placeOrder, removeCoupon } from '../controller/userController/checkoutController.mjs';
+import { home,userProfile,addressView,addNewAddress,addNewAddressPost,editAddress,editAddressPut,deleteAddress, filterDataFetch, wishList, addWisList, removeWishList} from '../controller/userController/userController.mjs'; 
 import passport from 'passport';
 import { cancelOrder, orders, orderSummary, orderView, returnOrder } from '../controller/userController/orderController.mjs';
 
@@ -115,7 +117,10 @@ userRouter.delete('/removeWishListItem',isUser,removeWishList)
 //---------------------------- wallet --------------
 
 userRouter.get('/wallet',isUser,wallet)
+//----------------------------- coupon apply --------------
 
+userRouter.post('/applyCoupon',isUser,applyCoupon)
+userRouter.post('/removeCoupon',isUser,removeCoupon)
 
 
 export default userRouter
