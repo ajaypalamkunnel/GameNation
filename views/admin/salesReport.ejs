@@ -57,7 +57,7 @@
             <td class="px-4 py-4 text-sm text-gray-400">₹ <%= data.couponDiscount.toFixed(2) %></td>
             <td class="px-4 py-4 text-sm <%= data.paymentStatus === 'Paid' ? 'text-green-500' : 'text-yellow-500' %>"><%= data.paymentStatus %></td>
             <td class="px-4 py-4 text-sm text-gray-400"><%= data.paymentMethod %></td>
-            <td class="px-4 py-4 text-sm text-gray-400"><a href="#" class="text-blue-400 hover:underline">View</a></td>
+            <td class="px-4 py-4 text-sm text-gray-400"><a href="/admin/salesReoprtView?orderId=<%= data._id %>" class="text-blue-400 hover:underline">View</a></td>
           </tr>
           <% }) %>
         </tbody>

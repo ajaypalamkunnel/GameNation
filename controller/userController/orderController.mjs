@@ -133,6 +133,33 @@ export const orderView = async (req, res) => {
   }
 };
 
+
+
+export const salesReoprtView = async (req, res) => {
+  console.log("I am in orderview");
+
+  try {
+    const { orderId } = req.query;
+    
+
+    const order = await OrderSchema.findOne({ _id: orderId }).populate({
+      path: "products.product_id",
+      select: "product_name category price discount stock image",
+      model: Product,
+      options: { strictPopulate: false },
+    });
+
+    
+
+    res.render("admin/saleReportView", {
+      title: "Order Details",
+      order: order,
+    });
+  } catch (error) {
+    console.log("error in orderview ", error);
+  }
+};
+
 export const cancelOrder = async (req, res) => {
   console.log("hiiiii cancelOrder");
 
