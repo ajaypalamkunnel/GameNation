@@ -7,7 +7,7 @@ import { addProduct, addProductPost,viewProducts,editProduct,editProductPut,dele
 import {upload} from '../uploads/cloudinary.mjs'
 import { orderStatus, salesReoprtView } from '../controller/userController/orderController.mjs';
 import { addCoupon, addCouponPost, coupons, removeCoupon } from '../controller/userController/couponController.mjs';
-import { sales } from '../controller/adminController/salesData.mjs';
+import { exportReport, sales } from '../controller/adminController/salesData.mjs';
 
 //------------------------------------  Login  ------------------------------------------------
 
@@ -71,5 +71,6 @@ adminRouter.patch('/removeCoupon/:couponId',isAdmin,removeCoupon)
 
 adminRouter.get('/salesReport',isAdmin,sales)
 adminRouter.get('/salesReoprtView',isAdmin,salesReoprtView)
+adminRouter.get('/exportReport',isAdmin,exportReport)
 
 export default adminRouter

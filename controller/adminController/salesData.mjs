@@ -1,4 +1,6 @@
 import OrderSchema from "../../model/orderSchema.mjs";
+import xlsx from 'xlsx';
+import PDFDocument from "pdfkit";
 
 const applyDateFilter = (filter) => {
   const now = new Date();
@@ -90,3 +92,81 @@ export const sales = async (req, res) => {
     }
   }
 };
+
+
+
+
+
+export const exportReport = async(req,res)=>{
+
+    try {
+
+        const filter = req.query.filter || '';
+        const format = req.query.format;
+
+
+        let queryCondition = {}
+
+        if(filter){
+            const dateFilter = applyDateFilter(filter);
+            queryCondition = {...queryCondition,...dateFilter}
+        }
+
+        const salesData = await OrderSchema.find(queryCondition).sort({createdAt:-1})
+
+        if(format === 'excel'){
+
+            const worksheetData = salesData.map(data => ({
+                OrderID: data.order_id,
+                UserID: data.customer_id,
+                OrderDate: new Date(data.createdAt).toLocaleDateString('en-GB'),
+                OrderAmount: `₹${data.priceAfterCouponDiscount.toFixed(2)}`,
+                CouponDeduction: `₹${data.couponDiscount.toFixed(2)}`,
+                PaymentStatus: data.paymentStatus,
+                PaymentMethod: data.paymentMethod,
+              }));
+
+              const worksheet = xlsx.utils.json_to_sheet(worksheetData);
+              const workbook = xlsx.utils.book_new();
+              xlsx.utils.book_append_sheet(workbook,worksheet,'Sales Report');
+
+
+              const excelBuffer = xlsx.write(workbook,{type:'buffer',bookType:'xlsx'})
+              res.setHeader('Content-Disposition', 'attachment; filename="sales_report.xlsx"');
+              res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+              return res.send(excelBuffer);
+            
+          
+        }
+
+
+        if(format === 'pdf'){
+
+            const doc = new PDFDocument();
+            res.setHeader('Content-Disposition', 'attachment; filename="sales_report.pdf"')
+            res.setHeader('Content-Type', 'application/pdf');
+            doc.pipe(res);
+
+
+            salesData.forEach(data => {
+                doc.fontSize(12).text(`Order ID: ${data.order_id}`);
+                doc.text(`User ID: ${data.customer_id}`);
+                doc.text(`Order Date: ${new Date(data.createdAt).toLocaleDateString('en-GB')}`);
+                doc.text(`Order Amount: ₹${data.priceAfterCouponDiscount.toFixed(2)}`);
+                doc.text(`Coupon Deduction: ₹${data.couponDiscount.toFixed(2)}`);
+                doc.text(`Payment Status: ${data.paymentStatus}`);
+                doc.text(`Payment Method: ${data.paymentMethod}`);
+                doc.moveDown();
+              });
+
+              doc.end()
+
+
+        }
+       
+    } catch (error) {
+
+        console.error('Error generating report:', error);
+        res.status(500).json({ message: 'Server Error', error: error.message });
+  }
+}

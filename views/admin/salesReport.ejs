@@ -167,4 +167,62 @@ let totalPages = parseInt(document.getElementById('totalPages').innerHTML);
       fetchSalesReport(currentPage + 1);
     }
   });
+
+
+  
+//--------------Report generation -------------------
+
+document.getElementById('export').addEventListener('change',function(event){
+    const selectedExport = event.target.value;
+
+    if(selectedExport){
+        const filterOption = document.getElementById('filterOption').value;
+
+       exportReport(selectedExport,filterOption)
+        
+
+    }
+})
+
+
+function exportReport(format,filterOption){
+
+
+    const URL = `/admin/exportReport?format=${format}&filter=${filterOption}`
+
+    fetch(URL,{
+        headers:{
+            'Accept':'application/json'
+        }
+    })
+    .then(response=>response.blob())
+    .then(blob=>{
+
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url
+
+        //file name
+
+        a.download = `sales_report.${format === 'excel' ? 'xlsx' : 'pdf'}`;
+
+        document.body.appendChild(a)
+        a.click();
+        a.remove()
+
+    })
+    .catch(error=  console.error('Error exporting report:', error))
+
+
+}
+
+
+
+
+
+
+
+
+
+
 </script>
