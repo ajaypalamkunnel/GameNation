@@ -17,13 +17,13 @@
                           <!-- Min Amount -->
                           <div>
                             <label class="block text-sm text-gray-300">Min Amount</label>
-                            <input id="minAmount" type="number" class="w-full mt-1 p-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring focus:border-orange-500" placeholder="Minimum amount" />
+                            <input id="minAmount" type="number" class="w-full mt-1 p-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring focus:border-orange-500" placeholder="Enter the amount"  />
                             <p id="minAmountError" class="text-red-500 text-sm hidden"></p>
                           </div>
                           <!-- Discount -->
                           <div>
                             <label class="block text-sm text-gray-300">Discount</label>
-                            <input id="discount" type="number" class="w-full mt-1 p-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring focus:border-orange-500" placeholder="Discount amount" />
+                            <input id="discount" type="number" class="w-full mt-1 p-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring focus:border-orange-500"  />
                             <p id="discountValueError" class="text-red-500 text-sm hidden"></p>
                           </div>
                           <!-- Discount Type -->
@@ -75,6 +75,15 @@
 
 <script>
 
+document.getElementById('discountType').addEventListener('change', function() {
+  let discountInput = document.getElementById('discount');
+  if (this.value === 'Percentage') {
+    discountInput.placeholder = 'Enter the percentage';
+  } else {
+    discountInput.placeholder = 'Enter the amount';
+  }
+});
+
 function submitForm(event){
 
   event.preventDefault();
@@ -98,7 +107,7 @@ function submitForm(event){
     document.querySelectorAll('.text-red-500').forEach(el => el.classList.add('hidden'));
 
 
-
+   
     // Validate coupon code: must be uppercase and numbers only
     const couponCodeRegex = /^[A-Z0-9]+$/;
     if (!couponCodeRegex.test(couponCode)) {
@@ -146,6 +155,17 @@ function submitForm(event){
         document.getElementById('discountValueError').classList.remove('hidden');
         isValid = false;
       }
+    }
+
+    if(discountType=='Percentage'){
+
+      if(discountValue>100){{
+        document.getElementById('discountValueError').innerHTML = 'Discount percentage should not greater than 100'
+        document.getElementById('discountValueError').classList.remove('hidden');
+        isValid = false;
+
+      }}
+
     }
 
 

@@ -298,12 +298,20 @@ export const placeOrder = async(req,res)=>{
     try {
         if(req.session.user){
 
-            const { addressId, paymentMethod, cartItems, totalPrice,couponDiscountValue } = req.body;
+            const { addressId, paymentMethod, cartItems, totalPrice,couponDiscountValue,razorpay_payment_id,razorpay_order_id,razorpay_signature } = req.body;
+
+            let paymentStatus 
+            if(razorpay_payment_id === undefined){
+              paymentStatus = 'Pending'
+
+            }else{
+              paymentStatus ='Paid'
+            }
+            
             const order_id = orderIdGenerator()
             const user = await User.findOne({email:req.session.user});
 
-            console.log("--------",cartItems);
-            
+           
             let orderTotal = cartItems.reduce((sum,item)=>{
                 return sum = sum + item.productPrice
             },0)
@@ -317,7 +325,7 @@ export const placeOrder = async(req,res)=>{
             if (!selectedAddress) {
                 return res.status(400).json({ message: "Address not found" });
               }
-              console.log("selected address",selectedAddress);
+             
 
 
 
@@ -364,7 +372,7 @@ export const placeOrder = async(req,res)=>{
                   priceAfterCouponDiscount:priceAfterCouponDiscount,
                   couponDiscount:couponDiscountValue,
                   paymentMethod:paymentMethod,
-                  paymentStatus: "Pending",
+                  paymentStatus: paymentStatus,
                   orderStatus:"Pending"
 
               })

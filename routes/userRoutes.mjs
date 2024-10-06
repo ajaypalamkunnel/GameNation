@@ -10,7 +10,7 @@ import { home,userProfile,addressView,addNewAddress,addNewAddressPost,editAddres
 import { applyCoupon, checkout, placeOrder, removeCoupon } from '../controller/userController/checkoutController.mjs';
 //import { home,userProfile,addressView,addNewAddress,addNewAddressPost,editAddress,editAddressPut,deleteAddress, filterDataFetch, wishList, addWisList, removeWishList} from '../controller/userController/userController.mjs'; 
 import passport from 'passport';
-import { cancelOrder, orders, orderSummary, orderView, returnOrder } from '../controller/userController/orderController.mjs';
+import { cancelOrder, orders, orderSummary, orderView, paymentRender, returnOrder } from '../controller/userController/orderController.mjs';
 import { userCoupons } from '../controller/userController/couponController.mjs';
 
 //----------------------------- login -------------------------------
@@ -79,7 +79,7 @@ userRouter.post('/cart/remove-item',isUser,removeProductFromCart)
 userRouter.get('/search',searchProducts);
 userRouter.get('/allProducts/sort',allProductsSort);
 userRouter.get('/allproducts/filter-modal',filterDataFetch);
-userRouter.get('/allproducts/filter',)
+userRouter.get('/allproducts/filter',isUser,)
 
 
 //---------------------------- checkout management --------------
@@ -90,6 +90,7 @@ userRouter.get('/orders',isUser,orders)
 userRouter.get('/orderView',isUser,orderView)
 userRouter.post('/cancelOrder',isUser,cancelOrder);
 userRouter.post('/returnOrder',isUser,returnOrder);
+userRouter.post('/paymentRender/:amount',isUser,paymentRender)
 
 //---------------------------- checkout management --------------
 
@@ -113,6 +114,8 @@ userRouter.get('/wallet',isUser,wallet)
 userRouter.post('/applyCoupon',isUser,applyCoupon)
 userRouter.post('/removeCoupon',isUser,removeCoupon)
 userRouter.get('/coupons',isUser,userCoupons)
+
+
 
 
 export default userRouter

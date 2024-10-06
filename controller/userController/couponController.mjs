@@ -114,12 +114,15 @@ export const userCoupons = async(req,res)=>{
             
             const categories = await category.find({ isActive: true });
             const coupons = await Coupon.find({isActive:true})
+
+            console.log(coupons);
+            
     
             res.render('user/coupons',{
                 categories,
                 user:req.session.user,
                 title:'Coupons',
-                coupons
+                coupons:coupons
             })
         }else{
             res.redirect('/login')

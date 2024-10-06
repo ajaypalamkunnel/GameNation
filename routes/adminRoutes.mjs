@@ -7,6 +7,7 @@ import { addProduct, addProductPost,viewProducts,editProduct,editProductPut,dele
 import {upload} from '../uploads/cloudinary.mjs'
 import { orderStatus } from '../controller/userController/orderController.mjs';
 import { addCoupon, addCouponPost, coupons, removeCoupon } from '../controller/userController/couponController.mjs';
+import { sales } from '../controller/adminController/salesData.mjs';
 
 //------------------------------------  Login  ------------------------------------------------
 
@@ -62,6 +63,14 @@ adminRouter.get('/coupons',isAdmin,coupons);
 adminRouter.get('/addCoupon',isAdmin,addCoupon);
 adminRouter.post('/addCouponPost',isAdmin,addCouponPost);
 adminRouter.patch('/removeCoupon/:couponId',isAdmin,removeCoupon)
+
+
+
+
+//-------------------- sales report ---------------------------------
+
+adminRouter.get('/salesReport',isAdmin,sales)
+
 
 
 export default adminRouter
