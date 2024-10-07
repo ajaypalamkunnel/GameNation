@@ -54,22 +54,30 @@
             <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">Offer Name</th>
             <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">Percentage (%)</th>
             <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">Is Active</th>
+            <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">Action</th>
           </tr>
         </thead>
         <tbody id="offerList" class="bg-gray-800 divide-y divide-gray-700">
-          <!-- Sample offers - these will be dynamically populated -->
+          <% if(offers.length > 0){ %>
+            <% offers.forEach(offer=>{ %>
           <tr>
-            <td class="px-4 py-4 text-sm text-gray-400">Electronics</td>
-            <td class="px-4 py-4 text-sm text-gray-400">New Year Offer</td>
-            <td class="px-4 py-4 text-sm text-gray-400">20%</td>
-            <td class="px-4 py-4 text-sm text-green-500">Active</td>
+            <td class="px-4 py-4 text-sm text-gray-400"><%= offer.offerCategory.collectionName %></td>
+            <td class="px-4 py-4 text-sm text-gray-400"><%= offer.offerName %></td>
+            <td class="px-4 py-4 text-sm text-gray-400"><%= offer.discountPercentage %></td>
+            <td class="px-4 py-4 text-sm text-green-500"><%= offer.isActive %></td>
+            <td class="px-4 py-4">
+              <button
+                class="h-8 px-5 py-2 rounded-lg text-white text-sm tracking-wider font-medium border border-current outline-none <%= offer.isActive ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700' %>"
+                onclick="toggleDelete('<%= offer._id %>')">
+                <%= offer.isActive ? 'Delete' : 'Add' %>
+              </button>
+            </td>
           </tr>
-          <tr>
-            <td class="px-4 py-4 text-sm text-gray-400">Fashion</td>
-            <td class="px-4 py-4 text-sm text-gray-400">Summer Sale</td>
-            <td class="px-4 py-4 text-sm text-gray-400">15%</td>
-            <td class="px-4 py-4 text-sm text-green-500">Active</td>
-          </tr>
+          <% }) %>
+          <% }else{ %>
+            <h2 class="text-xl font-bold mb-4">No offers available</h2>
+          <% } %>
+          
         </tbody>
       </table>
     </div>
@@ -83,10 +91,74 @@
 
 <script>
 
-document.getElementById('offerForm').addEventListener('submit', function(event) {
+
+
+
+
+function toggleDelete(offerId){
+  Swal.fire({
+    title: 'Are you sure?',
+      text: "Do you want to remove this offer?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!'
+  }).then((result)=>{
+    if(result.isConfirmed){
+      fetch('/admin/removeOffer',{
+        method:'POST',
+        headers:{
+          'Content-Type': 'application/json'
+        },
+        body:JSON.stringify({offerId})
+      })
+      .then(response=>response.json())
+      .then(result=>{
+        if(result.status === 'success'){
+          Swal.fire({
+              title: 'Deleted!',
+              text: result.message,
+              icon: 'success',
+              confirmButtonText: 'OK'
+            }).then(()=>{
+              location.reload()
+            })
+        }else{
+          Swal.fire({
+              title: 'Failed!',
+              text: result.message || 'Failed to remove offer.',
+              icon: 'error',
+              confirmButtonText: 'OK'
+            });
+        }
+      })
+      .catch(error=>{
+        console.error('Error removing offer:', error);
+          Swal.fire({
+            title: 'Error!',
+            text: 'An error occurred while removing the offer.',
+            icon: 'error',
+            confirmButtonText: 'OK'
+          });
+      })
+    }
+  })
+}
+
+
+
+
+
+
+
+
+
+
+  document.getElementById('offerForm').addEventListener('submit', function (event) {
     event.preventDefault();
-    
-    const category = document.getElementById('offerCategory').value.trim()
+
+    const offerCategory = document.getElementById('offerCategory').value.trim()
     const name = document.getElementById('offerName').value.trim();
     const percentage = document.getElementById('offerPercentage').value.trim();
     const categoryValueError = document.getElementById('categoryValueError')
@@ -97,60 +169,83 @@ document.getElementById('offerForm').addEventListener('submit', function(event) 
     document.querySelectorAll('.text-red-500').forEach(el => el.classList.add('hidden'));
 
 
-    if(!category){
-        categoryValueError.innerHTML = "Please select a category";
-        categoryValueError.classList.remove('hidden');
-        isValid = false
+    if (!offerCategory) {
+      categoryValueError.innerHTML = "Please select a category";
+      categoryValueError.classList.remove('hidden');
+      isValid = false
     }
 
-    if(!name){
-        offerNameError.innerHTML = "please Enter a name"
-        offerNameError.classList.remove('hidden');
-        isValid = false
+    if (!name) {
+      offerNameError.innerHTML = "please Enter a name"
+      offerNameError.classList.remove('hidden');
+      isValid = false
 
     }
 
-    if(!percentage){
-        offerPercentageError.innerHTML = "Please enter a percentage";
-        offerPercentageError.classList.remove('hidden')
-        isValid = false
+    if (!percentage) {
+      offerPercentageError.innerHTML = "Please enter a percentage";
+      offerPercentageError.classList.remove('hidden')
+      isValid = false
     }
 
-    if(percentage<0 || percentage >100){
-        offerPercentageError.innerHTML = 'Percentage must be between 1 to 100';
-        offerPercentageError.classList.remove('hidden');
-        isValid = false
+    if (percentage < 0 || percentage > 100) {
+      offerPercentageError.innerHTML = 'Percentage must be between 1 to 100';
+      offerPercentageError.classList.remove('hidden');
+      isValid = false
     }
 
-    if(isValid){
-        let formDate ={
-            category,
-            name,
-            percentage
-        }
+    if (isValid) {
+      let formDate = {
+        offerCategory,
+        name,
+        percentage
+      }
 
 
-        fetch('/admin/addOffer',{
-            method:'POST',
-            headers:{
-                'Content-Type': 'application/json'
-            },
-            body:JSON.stringify(formDate)
+      fetch('/admin/addOffer', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formDate)
 
+      })  
+
+      .then(response => response.json())
+        .then((result) => {
+          console.log("---------",result);
+          
+          if (result.message === 'Offer created successfully!') {
+            Swal.fire({
+              icon: 'success',
+              title: 'Offer Created',
+              text: result.message,
+              showConfirmButton: false,
+              timer: 1500
+            }).then(() => {
+
+              window.location.reload();
+            });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Failed to Create Offer',
+              text: result.message || 'Something went wrong!'
+            });
+          }
+        })
+        .catch((error) => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'An error occurred while processing your request.'
+          });
         })
 
-        then(response=>response.json())
-        .then((result)=>{
-            
-        })
     }
 
-   
-    
-    
+  })
 
-
-})
 
 
 </script>

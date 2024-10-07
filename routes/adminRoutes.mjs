@@ -1,7 +1,7 @@
 import express from 'express';
 import { isAdmin } from '../middleware/adminSession.mjs';
 const adminRouter = express.Router();
-import { getAdminLogin,loginPost,dashboard,addCategory,addCategoryPost,categoryView,updateCategory,customers,toggleVerification, ordersList, orderViewAdmin, searchCustomer, offers, addOfferPost } from '../controller/adminController/adminController.mjs';
+import { getAdminLogin,loginPost,dashboard,addCategory,addCategoryPost,categoryView,updateCategory,customers,toggleVerification, ordersList, orderViewAdmin, searchCustomer, offers, addOfferPost, removeOffer } from '../controller/adminController/adminController.mjs';
 import { addProduct, addProductPost,viewProducts,editProduct,editProductPut,deleteProduct} from '../controller/adminController/productController.mjs';
 //import cloudinary from '../uploads/cloudinary.mjs';
 import {upload} from '../uploads/cloudinary.mjs'
@@ -79,5 +79,6 @@ adminRouter.get('/exportReport',isAdmin,exportReport)
 
 adminRouter.get('/offers',isAdmin,offers)
 adminRouter.post('/addOffer',isAdmin,addOfferPost)
+adminRouter.post('/removeOffer',isAdmin,removeOffer)
 
 export default adminRouter

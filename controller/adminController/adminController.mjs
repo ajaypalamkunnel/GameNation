@@ -4,6 +4,7 @@ import OrderSchema from "../../model/orderSchema.mjs";
 import Product from "../../model/productSchema.mjs";
 import User from "../../model/userSchema.mjs";
 import mongoose from "mongoose";
+import Offer from "../../model/offerSchema.mjs";
 //---------------------- admin login get request ---------------------- 
 export const getAdminLogin = (req,res)=>{
 
@@ -350,10 +351,13 @@ export const offers = async(req,res)=>{
     try {
 
         const categories = await category.find({ isActive: true });
+        const offers = await Offer.find({ isActive: true }).populate('offerCategory', 'collectionName');
+
 
         res.render('admin/offers',{
             categories,
-            title:'offers'
+            title:'offers',
+            offers
         })
         
     } catch (error) {
@@ -367,12 +371,101 @@ export const offers = async(req,res)=>{
 export const addOfferPost = async(req,res)=>{
     try {
 
-        const {category,name,percentage} = req.body
-
+        const {offerCategory,name,percentage} = req.body;
 
         
+        console.log(offerCategory,"---",name,"----",percentage);
+        if(!offerCategory||!name||!percentage){
+            return res.status(400).json({status:error,message:'All fields are required.'})
+        }
+
+        const isCategory = await category.findById(offerCategory)
+
+        if (!isCategory) {
+            return res.status(404).json({ message: 'Category not found.' });
+        }
+
+        const products = await Product.find({ category: offerCategory });
+
+        if (products.length === 0) {
+          return res
+            .status(404)
+            .json({ message: "No products found in this category." });
+        }
+
+        const newOffer = Offer({
+            offerCategory: offerCategory,
+            offerName:name,
+            discountPercentage:parseInt(percentage),
+            isActive:true
+        })
+
+        const updatePromises = products.map((product) => {
+            product.discount += parseInt(percentage); 
+            return product.save(); 
+          });
+          
+          await Promise.all(updatePromises);
+          await newOffer.save()
+          
+        console.log(products);
+
+        res.status(200).json({
+            status:'success',
+            message:'Offer created successfully!'
+        }) 
+
         
     } catch (error) {
-        console.log('Error while adding offers : ',error);
+        console.error('Error while creating offer:', error);
+        res.status(500).json({
+            message: 'An error occurred while creating the offer.',
+            error: error.message
+        });;
+    }
+}
+
+
+
+export const removeOffer = async(req,res)=>{
+    try {
+
+        const {offerId} = req.body;
+
+        if(!offerId){
+            return res.status(400).json({ message: 'Offer ID is required.' })
+        }
+
+
+        const offer = await Offer.findById(offerId);
+        if(!offer){
+            return res.status(404).json({ message: 'Offer not found.' });
+        }
+
+    
+        offer.isActive = false;
+        await offer.save();
+
+        const products = await Product.find({category:offer.offerCategory});
+
+        const updatePromises = products.map((product) => {
+            product.discount -= offer.discountPercentage; // Decrease the discount
+            if (product.discount < 0) product.discount = 0; // Ensure discount doesn't go negative
+            return product.save();
+          });
+      
+          await Promise.all(updatePromises);
+
+          return res.status(200).json({
+            status: 'success',
+            message: 'Offer removed and products updated successfully!',
+          })
+        
+    } catch (error) {
+        console.error('Error while removing offer:', error);
+        return res.status(500).json({
+            status: 'error',
+            message: 'Failed to remove offer. Please try again later.',
+        })
     }
 }

@@ -12,9 +12,18 @@ const applyDateFilter = (filter) => {
       $lt: new Date(now.setHours(23, 59, 59, 999)),
     };
   } else if (filter === 'week') {
-    const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
+    const startOfWeek = new Date(now);
+    const dayOfWeek = now.getDay(); 
+    const distanceToMonday = (dayOfWeek === 0 ? 6 : dayOfWeek - 1); 
+   
+    startOfWeek.setDate(now.getDate() - distanceToMonday);
+    startOfWeek.setHours(0, 0, 0, 0);
+
+    // Set end of the week 
     const endOfWeek = new Date(startOfWeek);
-    endOfWeek.setDate(endOfWeek.getDate() + 6);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    endOfWeek.setHours(23, 59, 59, 999);
+
     dateFilter.createdAt = { $gte: startOfWeek, $lt: endOfWeek };
   } else if (filter === 'month') {
     dateFilter.createdAt = {
@@ -33,7 +42,7 @@ const applyDateFilter = (filter) => {
 
 export const sales = async (req, res) => {
   try {
-    const filter = req.query.filter || ''; // 'day', 'week', 'month', 'year'
+    const filter = req.query.filter || ''; 
     const page = parseInt(req.query.page, 10) || 1;
     const limit = parseInt(req.query.limit, 10) || 10;
     const skip = (page - 1) * limit;

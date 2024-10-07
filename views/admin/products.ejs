@@ -35,6 +35,7 @@
               <th class="p-4 text-left text-sm font-semibold text-black">Price</th>
               <th class="p-4 text-left text-sm font-semibold text-black">In stock</th>
               <th class="p-4 text-left text-sm font-semibold text-black">Publisher</th>
+              <th class="p-4 text-left text-sm font-semibold text-black">Discount <br> percentage</th>
               <th class="p-4 text-left text-sm font-semibold text-black">Category</th>
               <th class="p-4 text-left text-sm font-semibold text-black">Action</th>
             </tr>
@@ -67,6 +68,9 @@
               </td>
               <td class="p-4 text-sm">
                 <%= product.publisher %>
+              </td>
+              <td class="p-4 text-sm">
+                <%= product.discount %> %
               </td>
               <td class="p-4 text-sm">
                 <%= product.category  ? product.category.collectionName : 'N/A' %>

@@ -21,6 +21,6 @@ const offerSchema = mongoose.Schema({
 },{timestamps: true})
 
 
-const Offer =  mongoose.model('Offer',Schema)
+const Offer =  mongoose.model('Offer',offerSchema)
 
 export default Offer
