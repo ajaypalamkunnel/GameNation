@@ -54,15 +54,31 @@ export const sales = async (req, res) => {
       .skip(skip)
       .limit(limit);
 
-    console.log("sales data length = ",salesData.length);
-    
-
+      
+      
+      
+      
     const totalRecords = await OrderSchema.countDocuments(queryCondition);
 
     console.log("Total recodrd = ",totalRecords);
     console.log("sales recodrd = ",salesData);
 
     console.log("totalPages = ",Math.ceil(totalRecords / limit));
+
+    const totSalesData = await OrderSchema.find(queryCondition)
+
+    let orderAmount = totSalesData.reduce((tot,val)=>{
+       return  tot += val.priceAfterCouponDiscount
+    },0)
+    let totalCouponDiscount = totSalesData.reduce((tot,val)=>{
+       return  tot += val.couponDiscount
+    },0)
+    
+    let totalSalesCount = totSalesData.length;
+
+    console.log("Toal sales count : ",totalSalesCount);
+    console.log("order amount : ",orderAmount);
+    
     
     
 
@@ -72,6 +88,9 @@ export const sales = async (req, res) => {
         currentPage: page,
         totalPages: Math.ceil(totalRecords / limit),
         totalRecordsCount: totalRecords,
+        overallSalesCount:totalSalesCount,
+        overallOrderAmount:orderAmount,
+        totalCouponDiscount:totalCouponDiscount
       });
     } else {
       res.render('admin/salesReport', {
@@ -80,6 +99,10 @@ export const sales = async (req, res) => {
         totalPages: Math.ceil(totalRecords / limit),
         totalRecordsCount: totalRecords,
         title: 'Sales Report',
+        overallSalesCount:totalSalesCount,
+        overallOrderAmount:orderAmount,
+        totalCouponDiscount:totalCouponDiscount
+
       });
     }
   } catch (error) {

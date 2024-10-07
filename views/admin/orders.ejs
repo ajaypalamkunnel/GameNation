@@ -15,7 +15,7 @@
 </style>
 
 
-<div style="display: flex; height: 100vh">
+<div style="display: flex; min-height: 100vh">
   
     <%- include('sidebar') %>
 
@@ -51,7 +51,7 @@
                 <!-- Submit Filter Button -->
                 <button type="submit" class="bg-green-500 text-white p-2 rounded-lg hover:bg-green-600">Filter</button>
             </form>
-              <input type="text" placeholder="Search" class="pl-10 pr-4 py-2 rounded-full bg-gray-700 text-gray-300 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+              
               
             </div>
           </div>
@@ -173,13 +173,13 @@
           <!-- Pagination -->
 <div class="mt-6 flex justify-between items-center">
     <% if (currentPage > 1) { %>
-      <a href="?page=<%= currentPage - 1 %>&limit=<%= limit %>&status=<%= filters.status %>&paymentMethod=<%= filters.paymentMethod %>&startDate=<%= filters.startDate %>&endDate=<%= filters.endDate %>" class="bg-gray-600 text-white px-4 py-2 rounded-lg">Prev</a>
+      <a href="/admin/ordersList?page=<%= currentPage - 1 %>&limit=<%= limit %>&status=<%= filters.status %>&paymentMethod=<%= filters.paymentMethod %>&startDate=<%= filters.startDate %>&endDate=<%= filters.endDate %>" class="bg-gray-600 text-white px-4 py-2 rounded-lg">Prev</a>
     <% } else { %>
       <button disabled class="bg-gray-600 text-white px-4 py-2 rounded-lg opacity-50">Prev</button>
     <% } %>
     
     <% if (currentPage < totalPages) { %>
-      <a href="?page=<%= currentPage + 1 %>&limit=<%= limit %>&status=<%= filters.status %>&paymentMethod=<%= filters.paymentMethod %>&startDate=<%= filters.startDate %>&endDate=<%= filters.endDate %>" class="bg-gray-600 text-white px-4 py-2 rounded-lg">Next</a>
+      <a href="/admin/ordersList?page=<%= currentPage + 1 %>&limit=<%= limit %>&status=<%= filters.status %>&paymentMethod=<%= filters.paymentMethod %>&startDate=<%= filters.startDate %>&endDate=<%= filters.endDate %>" class="bg-gray-600 text-white px-4 py-2 rounded-lg">Next</a>
     <% } else { %>
       <button disabled class="bg-gray-600 text-white px-4 py-2 rounded-lg opacity-50">Next</button>
     <% } %>

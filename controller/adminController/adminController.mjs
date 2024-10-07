@@ -342,3 +342,37 @@ export const orderViewAdmin = async(req,res)=>{
 export const searchCustomer = async(req,res)=>{
 
 }
+
+
+
+
+export const offers = async(req,res)=>{
+    try {
+
+        const categories = await category.find({ isActive: true });
+
+        res.render('admin/offers',{
+            categories,
+            title:'offers'
+        })
+        
+    } catch (error) {
+        console.log('Error while rendering offers : ',error);
+        
+    }
+}
+
+
+
+export const addOfferPost = async(req,res)=>{
+    try {
+
+        const {category,name,percentage} = req.body
+
+
+        
+        
+    } catch (error) {
+        console.log('Error while adding offers : ',error);
+    }
+}

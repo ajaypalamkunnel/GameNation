@@ -1,0 +1,157 @@
+<%- include('adminHeader') %>
+<div style="display: flex; min-height: 100vh">
+    <%- include('sidebar') %>
+    <div class="min-h-screen w-full bg-gray-900 text-white p-8 overflow-auto">
+
+        
+<div class="min-h-screen bg-gray-900 p-8 text-white">
+  <!-- Add Offer Form -->
+  <div class="bg-gray-800 p-6 rounded-lg shadow-lg mb-8">
+    <h2 class="text-xl font-bold mb-4">Add New Offer</h2>
+    <form id="offerForm" class="space-y-4">
+      <!-- Offer Category -->
+      <div>
+        <label for="offerCategory" class="block text-sm font-medium mb-1">Offer Category</label>
+        <select id="offerCategory" name="offerCategory" class="w-full px-4 py-2 rounded-md bg-gray-700 text-white focus:ring-2 focus:ring-blue-400">
+          <option value="">Select Category</option>
+          <% categories.forEach(category=>{ %>
+          <option value="<%= category._id %>"><%= category.collectionName %></option>
+          <% }) %>
+          
+        </select>
+        <p id="categoryValueError" class="text-red-500 text-sm hidden"></p>
+      </div>
+
+      <!-- Offer Name -->
+      <div>
+        <label for="offerName" class="block text-sm font-medium mb-1">Offer Name</label>
+        <input type="text" id="offerName" name="offerName" class="w-full px-4 py-2 rounded-md bg-gray-700 text-white focus:ring-2 focus:ring-blue-400" placeholder="Enter offer name">
+        <p id="offerNameError" class="text-red-500 text-sm hidden"></p>
+      </div>
+
+      <!-- Offer Percentage -->
+      <div>
+        <label for="offerPercentage" class="block text-sm font-medium mb-1">Offer Percentage (%)</label>
+        <input type="number" id="offerPercentage" name="offerPercentage" class="w-full px-4 py-2 rounded-md bg-gray-700 text-white focus:ring-2 focus:ring-blue-400" placeholder="Enter offer percentage">
+        <p id="offerPercentageError" class="text-red-500 text-sm hidden"></p>
+      </div>
+
+      <!-- Add Offer Button -->
+      <div>
+        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white py-2 rounded-md font-semibold transition duration-300">Add Offer</button>
+      </div>
+    </fo rm>
+  </div>
+
+  <!-- Offer Listing -->
+  <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+    <h2 class="text-xl font-bold mb-4">Offer List</h2>
+    <div class="overflow-x-auto">
+      <table class="min-w-full table-auto divide-y divide-gray-700">
+        <thead class="bg-gray-700">
+          <tr>
+            <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">Category</th>
+            <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">Offer Name</th>
+            <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">Percentage (%)</th>
+            <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">Is Active</th>
+          </tr>
+        </thead>
+        <tbody id="offerList" class="bg-gray-800 divide-y divide-gray-700">
+          <!-- Sample offers - these will be dynamically populated -->
+          <tr>
+            <td class="px-4 py-4 text-sm text-gray-400">Electronics</td>
+            <td class="px-4 py-4 text-sm text-gray-400">New Year Offer</td>
+            <td class="px-4 py-4 text-sm text-gray-400">20%</td>
+            <td class="px-4 py-4 text-sm text-green-500">Active</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-4 text-sm text-gray-400">Fashion</td>
+            <td class="px-4 py-4 text-sm text-gray-400">Summer Sale</td>
+            <td class="px-4 py-4 text-sm text-gray-400">15%</td>
+            <td class="px-4 py-4 text-sm text-green-500">Active</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+    </div>
+</div>
+
+
+<script>
+
+document.getElementById('offerForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    
+    const category = document.getElementById('offerCategory').value.trim()
+    const name = document.getElementById('offerName').value.trim();
+    const percentage = document.getElementById('offerPercentage').value.trim();
+    const categoryValueError = document.getElementById('categoryValueError')
+    const offerNameError = document.getElementById('offerNameError')
+    const offerPercentageError = document.getElementById('offerPercentageError')
+    let isValid = true
+
+    document.querySelectorAll('.text-red-500').forEach(el => el.classList.add('hidden'));
+
+
+    if(!category){
+        categoryValueError.innerHTML = "Please select a category";
+        categoryValueError.classList.remove('hidden');
+        isValid = false
+    }
+
+    if(!name){
+        offerNameError.innerHTML = "please Enter a name"
+        offerNameError.classList.remove('hidden');
+        isValid = false
+
+    }
+
+    if(!percentage){
+        offerPercentageError.innerHTML = "Please enter a percentage";
+        offerPercentageError.classList.remove('hidden')
+        isValid = false
+    }
+
+    if(percentage<0 || percentage >100){
+        offerPercentageError.innerHTML = 'Percentage must be between 1 to 100';
+        offerPercentageError.classList.remove('hidden');
+        isValid = false
+    }
+
+    if(isValid){
+        let formDate ={
+            category,
+            name,
+            percentage
+        }
+
+
+        fetch('/admin/addOffer',{
+            method:'POST',
+            headers:{
+                'Content-Type': 'application/json'
+            },
+            body:JSON.stringify(formDate)
+
+        })
+
+        then(response=>response.json())
+        .then((result)=>{
+            
+        })
+    }
+
+   
+    
+    
+
+
+})
+
+
+</script>
+  

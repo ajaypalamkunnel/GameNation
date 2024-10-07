@@ -4,6 +4,8 @@ import User from "../../model/userSchema.mjs";
 import Product from "../../model/productSchema.mjs";
 import { razorpayInstance } from "../../services/razorpay.mjs";
 import { loginPost } from "./userAuth.mjs";
+import Wallet from "../../model/walletSchema.mjs";
+import { wallet } from "./userController.mjs";
 
 export const orderSummary = async (req, res) => {
   if (req.session.user) {
@@ -221,6 +223,35 @@ export const returnOrder = async (req, res) => {
     order.orderStatus = "Returned";
     order.isCancelled = true;
 
+    const refundAmount = order.priceAfterCouponDiscount
+    const customer_id = order.customer_id
+
+    let userWallet = await Wallet.findOne({userId:customer_id})
+
+    console.log("customer Id : ",customer_id);
+    console.log("wallet id : ",userWallet.userId);
+    
+
+    if(!userWallet){
+
+      userWallet = new Wallet({
+        userId:customer_id,
+        balance:4000,
+        transactions:[]
+      })
+
+    }
+
+    userWallet.balance += refundAmount;
+    userWallet.transactions.push({
+      walletAmount:refundAmount,
+      orderId:orderId,
+      transactionType:'Credited',
+      transactionDate: new Date()
+      
+    })
+
+    await userWallet.save()
     await order.save();
 
     for (let product of order.products) {
