@@ -360,8 +360,10 @@ export const allProducts = async (req, res) => {
     let matchStage = { isDelete: false };
 
     // Add search query if present
+    let returnQuery
     if (req.query.query) {
       const searchQuery = req.query.query.trim();
+      returnQuery = searchQuery
       matchStage.product_name = { $regex: searchQuery, $options: "i" }; // Case-insensitive regex search
     }
 
@@ -467,6 +469,7 @@ export const allProducts = async (req, res) => {
       user: req.session.user,
       currentPage: page,
       totalPages,
+      returnQuery,
       category: req.query.category || "",
       minPrice: req.query.minPrice || "",
       maxPrice: req.query.maxPrice || "",
