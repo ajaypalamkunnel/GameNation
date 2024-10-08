@@ -521,7 +521,14 @@
     const maxFiles = 3;
 
     if (files.length + fileCount > maxFiles) {
-      alert("You can upload a maximum of 3 files.");
+
+      Swal.fire({
+        icon:'warning',
+        title:'warning',
+        text: "You can upload a maximum of 3 files.",
+        confirmButtonText: 'OK'
+      })
+      
       return;
     }
 
@@ -558,7 +565,13 @@
     fileCount += 1;
 
     if (fileCount === 3) {
-      alert("Maximum number of images cropped.");
+      Swal.fire({
+        icon:'succes',
+        title:'Uploaded',
+        text:'Maximum number of images cropped.',
+        timer:1000
+      })
+     
     }
   });
 
@@ -650,7 +663,11 @@
       })
       .catch((error) => {
         console.error("Error editing product:", error);
-        alert("An error occurred while editing the product.");
+        Swal.fire({
+          icon:'error',
+          title:'Edit error',
+          text:error||'An error occurred while editing the product.'
+        })
       });
   });
 

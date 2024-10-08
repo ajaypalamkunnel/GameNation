@@ -187,10 +187,22 @@
       .then(response => response.json())
       .then(data => {
         if (data.success) {
-          alert('Address updated successfully!');
-          window.location.href = '/address';
+          Swal.fire({
+            icon: 'success',              
+            title: 'Success!',            
+            text: 'Address updated successfully!',  
+            showConfirmButton: false,    
+            timer: 1500,                 
+      }).then(() => {
+            window.location.href = '/address';   // Redirect after the alert closes
+      });
         } else {
-          alert('Failed to update address');
+          Swal.fire({
+            icon: 'error',                
+            title: 'Error!',              
+            text: 'Failed to update address',  
+            confirmButtonText: 'OK',      
+          });
         }
       })
       .catch(err => console.error('Error updating address:', err));

@@ -204,10 +204,22 @@
             const OriginalPrice = document.querySelector('#Original-price');
             OriginalPrice.textContent = `₹${data.totalPayable.toFixed(2)}`;
           } else {
-            alert(data.message);
+            Swal.fire({
+                icon: 'warning',               
+                title: 'Warning!',           
+                text: data.message,            
+                confirmButtonText: 'OK', 
+            });
           }
         } catch (error) {
           console.error('Error updating cart:', error);
+
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'An error occurred while updating the cart.',
+            confirmButtonText: 'OK',
+          });
         }
       }
 
@@ -253,10 +265,6 @@
           
         }
       }
-
-
-
-
 
     });
   </script>

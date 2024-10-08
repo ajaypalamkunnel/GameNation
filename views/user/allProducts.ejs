@@ -481,10 +481,22 @@ const addToCart = async (productId)=>{
         
         
       }else{
-        alert(data.message)
+        Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: data.message || 'Failed to add item to cart',
+        confirmButtonText: 'OK',
+      });
       }
     } catch (error) {
       console.error('Error adding to cart:', error);
+
+      Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'An error occurred while adding the item to the cart.',
+      confirmButtonText: 'OK',
+    });
       
     }
   }

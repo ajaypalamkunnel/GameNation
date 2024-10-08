@@ -35,8 +35,12 @@
         <div>
           <p><strong>Order ID:</strong> <%= order.order_id %></p>
           <p><strong>Ordered date:</strong> <%= new Date(order.createdAt).toLocaleDateString('en-GB') %></p>
-          <% if(order.orderStatus !== 'Delivered'){ %>
-            <p><strong>Delivered date:</strong> Not deliverd yet</p>
+          <% if(order.orderStatus === 'Returned'){ %>
+            <p class="<%= order.orderStatus === 'Returned' ? 'text-red-500' : 'text-yellow-500' %>">
+              <strong>Delivered date:</strong> Return
+          </p>
+            <% }else if(order.orderStatus !== 'Delivered'){ %>              
+              <p><strong>Delivered date:</strong> Not deliverd yet</p>
           <% }else{ %>
           <p><strong>Delivered date:</strong><%= new Date(order.deliveredDate).toLocaleDateString('en-GB') %></p>
           <% } %>

@@ -457,8 +457,13 @@
     const maxFiles = 3;
 
     if (files.length > maxFiles) {
-      alert("You can upload a maximum of 3 files.");
-      return;
+      Swal.fire({
+        icon: 'warning',
+        title: 'Too Many Files',
+        text: 'You can upload a maximum of 3 files.',
+        confirmButtonText: 'OK'
+      });
+  return;
     }
 
     Array.from(files).forEach((file) => {
@@ -542,7 +547,12 @@
 
   // Check if the maximum file count has been reached
   if (fileCount === 3) {
-    alert("All images cropped");
+    Swal.fire({
+  icon: 'success',
+  title: 'All Images Cropped',
+  text: 'All images have been successfully cropped.',
+  confirmButtonText: 'OK'
+});
   }
   });
 

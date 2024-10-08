@@ -180,19 +180,75 @@ export const exportReport = async(req,res)=>{
             doc.pipe(res);
 
 
-            salesData.forEach(data => {
-                doc.fontSize(12).text(`Order ID: ${data.order_id}`);
-                doc.text(`User ID: ${data.customer_id}`);
-                doc.text(`Order Date: ${new Date(data.createdAt).toLocaleDateString('en-GB')}`);
-                doc.text(`Order Amount: ₹${data.priceAfterCouponDiscount.toFixed(2)}`);
-                doc.text(`Coupon Deduction: ₹${data.couponDiscount.toFixed(2)}`);
-                doc.text(`Payment Status: ${data.paymentStatus}`);
-                doc.text(`Payment Method: ${data.paymentMethod}`);
-                doc.moveDown();
-              });
+           // Document title
+    doc.fontSize(20).font('Helvetica-Bold').text('GameNation Sales Report', { align: 'center' });
+    doc.moveDown(2); // Move down for spacing after title
 
-              doc.end()
+    // Table configuration
+    const tableTop = 150; // Starting Y position for the table
+    const startX = 30; // Starting X position for the table
+    const rowHeight = 30; // Height of each row
+    const cellPadding = 5; // Padding inside each cell
+    const tableWidth = 650; // Total width of the table to accommodate all columns
 
+    // Define columns and their widths
+    const columns = [
+        { label: 'Order ID', width: 60 },
+        { label: 'User ID', width: 90 },
+        { label: 'Order Date', width: 80 },
+        { label: 'Order Amount', width: 100 },
+        { label: 'Coupon Deduction', width: 70 },
+        { label: 'Payment Status', width: 70 },
+        { label: 'Payment Method', width: 100 }
+    ];
+
+    // Function to draw table borders for each cell
+    function drawTableBorders(x, y, width, height) {
+        doc.rect(x, y, width, height).stroke();
+    }
+
+    // Draw the table headers
+    let x = startX;
+    let y = tableTop;
+
+    // Draw header row
+    doc.fontSize(12).font('Helvetica-Bold');
+    columns.forEach(column => {
+        doc.text(column.label, x + cellPadding, y + cellPadding, { width: column.width - 2 * cellPadding, align: 'left' });
+        drawTableBorders(x, y, column.width, rowHeight); // Draw borders for the header cell
+        x += column.width; // Move x to next column
+    });
+
+    // Draw the data rows
+    y += rowHeight; // Move y to the next row (below headers)
+    doc.font('Helvetica').fontSize(10); // Set font for table data
+
+    salesData.forEach((data) => {
+        x = startX; // Reset x position for each row
+        const truncatedUserId = `${data.customer_id.substring(0, 6)}....${data.customer_id.substring(data.customer_id.length - 6)}`;
+
+        // Draw each column cell for the current row
+        const rowData = [
+            data.order_id,
+            truncatedUserId,
+            new Date(data.createdAt).toLocaleDateString('en-GB'),
+            `₹${data.priceAfterCouponDiscount.toFixed(2)}`,
+            `₹${data.couponDiscount.toFixed(2)}`,
+            data.paymentStatus,
+            data.paymentMethod
+        ];
+
+        rowData.forEach((text, i) => {
+            doc.text(text, x + cellPadding, y + cellPadding, { width: columns[i].width - 2 * cellPadding, align: 'left' });
+            drawTableBorders(x, y, columns[i].width, rowHeight); // Draw borders for each cell
+            x += columns[i].width; // Move x to next column
+        });
+
+        y += rowHeight; // Move y to the next row for subsequent data
+    });
+
+    // Finalize the document
+    doc.end();
 
         }
        

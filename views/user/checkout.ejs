@@ -160,6 +160,10 @@
                     <label for="paypal-2" class="font-medium leading-none text-gray-900 dark:text-white">wallet </label>
                     <p id="paypal-text" class="mt-1 text-xs font-normal text-gray-500 dark:text-gray-400">Connect to your account</p>
                   </div>
+
+                </div>
+                <div class="mt-4 flex items-center gap-2">
+                  <button class="inline-flex items-center justify-center px-4 py-2 bg-green-600 text-white font-medium text-sm rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2" id="rzp-button1">Pay with wallet</button>
                 </div>
   
                
@@ -206,7 +210,7 @@
   
               <dl class="flex items-center justify-between gap-4 py-3">
                 <dt class="text-base font-normal text-gray-500 dark:text-gray-400">Coupon Discount</dt>
-                <dd id="couponDiscountAmount" class="text-base font-medium text-green-500">- <%= cartDetails.couponDiscount %></dd>
+                <dd id="couponDiscountAmount" class="text-base font-medium text-green-500">- <%= cartDetails.couponDiscount.toFixed(2) %></dd>
               </dl>
   
               <dl class="flex items-center justify-between gap-4 py-3">
@@ -227,8 +231,7 @@
           </div>
   
           <div class="space-y-3">
-            <a href="/checkout" class="bg-primary-700 hover:bg-primary-800 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 flex w-full items-center justify-center rounded-lg px-5 py-2.5 text-sm font-medium text-white focus:outline-none focus:ring-4">Proceed to Payment</a>
-  
+            
             <p class="text-sm font-normal text-gray-500 dark:text-gray-400">One or more items in your cart require an account. <a href="#" title="" class="text-primary-700 dark:text-primary-500 font-medium underline hover:no-underline">Sign in or create an account now.</a>.</p>
           </div>
         </div>
@@ -253,7 +256,12 @@
     const positiveDiscountValue = Math.abs(numericDiscountValue);
 
     if (!selectedAddress) {
-      alert("Please select a delivery address.");
+      Swal.fire({
+        icon: 'warning',               // Use 'warning' icon to indicate attention
+        title: 'No Delivery Address',   // Title of the alert
+        text: 'Please select a delivery address to proceed.',  // Description message
+        confirmButtonText: 'OK',        // Text for the button
+      });
       return;
     }
 
@@ -490,7 +498,12 @@ function openRazorpayPayment(){
     const positiveDiscountValue = Math.abs(numericDiscountValue);
 
     if (!selectedAddress) {
-      alert("Please select a delivery address.");
+      Swal.fire({
+        icon: 'warning',               // Use 'warning' icon to indicate attention
+        title: 'No Delivery Address',   // Title of the alert
+        text: 'Please select a delivery address to proceed.',  // Description message
+        confirmButtonText: 'OK',        // Text for the button
+      });
       return;
     }
 
@@ -511,13 +524,15 @@ function openRazorpayPayment(){
         productQuantity: parseInt(productQuantity),
         productPrice: parseFloat(productPrice)
       })
+      console.log("cart data---",cartData);
+      
 
     })
 
     // Calculate total price from the cart items
-    const totalAmount = cartData.reduce((sum, item) => sum + (item.productQuantity * item.productPrice), 0);
+    const totalAmount = cartData.reduce((sum, item) => sum + (item.productPrice), 0);
     const finalAmount = Math.round(totalAmount - positiveDiscountValue)
-    console.log("====", finalAmount);
+    console.log("========", finalAmount);
     
 
     const orderData = {
