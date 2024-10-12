@@ -5,6 +5,7 @@ import Product from "../../model/productSchema.mjs";
 import User from "../../model/userSchema.mjs";
 import mongoose from "mongoose";
 import Offer from "../../model/offerSchema.mjs";
+import { orderStatus } from "../userController/orderController.mjs";
 //---------------------- admin login get request ---------------------- 
 export const getAdminLogin = (req,res)=>{
 
@@ -44,17 +45,241 @@ export const loginPost = (req,res)=>{
 
 //---------------------- admin dashboard ---------------------- 
 
-export const dashboard = (req,res)=>{
+export const dashboard = async (req, res) => {
     try {
-        if(req.session.admin){
-            res.render('admin/dashboardAdmin',{title:"AdminHome"})
-        }else{
-            res.redirect('/admin/login')
+      if (req.session.admin) {
+
+
+        //----------------------- Daily data---------------------
+
+        const startOfDay = new Date();
+        startOfDay.setHours(0,0,0,0);
+
+        const endOfDay = new Date();
+        endOfDay.setHours(23,59,59,999)
+
+        const totalCustomers = await User.find();
+        const totalUsers = totalCustomers.length
+        
+
+
+        const dailyMetrics = await OrderSchema.aggregate([
+          {
+            // Match orders with specific statuses and not cancelled
+            $match: {
+              orderStatus: { $in: ['Delivered', 'Pending', 'Shipped'] },
+              isCancelled: false,
+              createdAt:{$gte:startOfDay,$lt:endOfDay}
+            },
+          },
+          {
+            // Group by year, month, and day to get daily metrics
+            $group: {
+              _id: {
+                year: { $year: "$createdAt" },
+                month: { $month: "$createdAt" },
+                day: { $dayOfMonth: "$createdAt" },
+              },
+              totalDailyOrders: { $sum: 1 }, // Count of orders
+              totalSales: { $sum: "$priceAfterCouponDiscount" }, // Total sales of the day
+              totalDailyProfit: { $sum: { $multiply: ["$priceAfterCouponDiscount", 0.1] } }, // 10% of total sales
+            },
+          },
+          {
+            // Project fields for readability and format date field
+            $project: {
+              _id: 0,
+              date: {
+                $dateFromParts: {
+                  year: "$_id.year",
+                  month: "$_id.month",
+                  day: "$_id.day",
+                },
+              },
+              totalDailyOrders: 1,
+              totalSales: 1,
+              totalDailyProfit: 1,
+            },
+          },
+          {
+            // Sort by date in descending order
+            $sort: { date: -1 },
+          },
+        ]);
+  
+        console.log("Daily data:", dailyMetrics);
+
+
+
+        //--------------- weekly dashboard data -----------------------
+
+        const startOfWeek = new Date();
+        startOfWeek.setDate(startOfWeek.getDate())
+        startOfWeek.setHours(0,0,0,0)
+
+        const endOfWeek = new Date();
+        endOfWeek.setDate(startOfWeek.getDate() + 6); // Set to the end of the week (Saturday)
+        endOfWeek.setHours(23, 59, 59, 999);
+
+        const weeklyMetrics = await OrderSchema.aggregate([
+          {  $match:{
+            orderStatus: { $in: ['Delivered', 'Pending', 'Shipped'] },
+            isCancelled: false,
+            createdAt: { $gte: startOfWeek, $lt: endOfWeek }
+            }
+        },
+        {
+            $group: {
+                _id: { $dayOfMonth: "$createdAt" }, // Group by day of the month for weekly data
+                totalDailySales: { $sum: "$totalPrice" }, // Sum of total sales
+                totalDailyProfit: { $sum: { $multiply: ["$totalPrice", 0.1] } }, // Assume profit is 10% of total sales
+            }
+        },
+        {
+            $sort:{_id:1}
         }
+        ])
+
+
+        console.log("Weekly data : ",weeklyMetrics)
+
+
+        const categories = weeklyMetrics.map((metric) => `Day ${metric._id}`);
+        const totalSalesData = weeklyMetrics.map((metric) => metric.totalDailySales);
+        const totalProfitData = weeklyMetrics.map((metric) => metric.totalDailyProfit);
+
+
+
+
+
+
+  
+        // Pass the data to the view
+        res.render('admin/dashboardAdmin', {
+            title: "AdminHome",
+             dailyMetrics,totalUsers,
+             categories: JSON.stringify(categories), // Send categories as JSON string
+            totalSalesData: JSON.stringify(totalSalesData), // Send total sales data as JSON string
+            totalProfitData: JSON.stringify(totalProfitData), // Send total profit data as JSON string
+             });
+      } else {
+        res.redirect('/admin/login');
+      }
     } catch (error) {
+      console.error("Error in admin dashboard:", error);
+      res.status(500).send("Internal Server Error");
+    }
+  };
+  
+
+
+
+
+export const dashboardFilter = async(req,res)=>{
+
+    try {
+
+        
+       //--------------- graph filtered data------------------
+
+
+
+       const filter = req.query.filter;
+       let matchCondition = {orderStatus:{$in:['Delivered', 'Pending', 'Shipped']},isCancelled:false}
+       let startDate, endDate;
+
+       switch (filter) {
+           case 'yesterday':
+               startDate = new Date();
+               startDate.setDate(startDate.getDate()-1);
+               startDate.setHours(0,0,0,0);
+               endDate = new Date()
+               endDate.setDate(endDate.getDate()-1);
+               endDate.setHours(23,59,59,999);
+               break;
+           
+           case'today':
+               startDate = new Date();
+               startDate.setHours(0, 0, 0, 0);
+               endDate = new Date();
+               endDate.setHours(23, 59, 59, 999);
+               break;
+
+           case 'thisWeek':
+               startDate = new Date()
+               startDate.setDate(startDate.getDate() - startDate.getDay()); // Start of the week
+               startDate.setHours(0, 0, 0, 0);
+               endDate = new Date();
+               endDate.setHours(23, 59, 59, 999);
+               break;
+           case 'thisMonth':
+               startDate = new Date();
+               startDate.setDate(1); // First day of the month
+               startDate.setHours(0, 0, 0, 0);
+               endDate = new Date();
+               endDate.setHours(23, 59, 59, 999);
+               break;
+           case 'thisYear':
+               startDate = new Date(new Date().getFullYear(), 0, 1); // First day of the year
+               startDate.setHours(0, 0, 0, 0);
+               endDate = new Date();
+               endDate.setHours(23, 59, 59, 999);
+               break;
+
+           default:
+               // Default case can be today 
+               startDate = new Date();
+               startDate.setHours(0, 0, 0, 0);
+               endDate = new Date();
+               endDate.setHours(23, 59, 59, 999);
+
+       }
+
+       matchCondition.createdAt = {$gte:startDate,$lt:endDate}
+
+       const metrics = await OrderSchema.aggregate([
+           {$match:matchCondition},
+           {
+               $group:{
+                   _id:null,
+                   totalSales : {$sum: "$priceAfterCouponDiscount"},
+                   totalProfit: {$sum:{$multiply:["$priceAfterCouponDiscount",0.1]}}
+               }
+           }
+       ])
+
+
+
+       res.json({
+
+        totalSales:metrics[0]?.totalSales||0,
+        totalProfit:metrics[0]?.totalProfit||0
+
+       })
+        
+    } catch (error) {
+        console.error("Error in admin dashboard:", error);
+        res.status(500).send("Internal Server Error");
         
     }
+
+
+
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -163,7 +163,7 @@
 
                 </div>
                 <div class="mt-4 flex items-center gap-2">
-                  <button class="inline-flex items-center justify-center px-4 py-2 bg-green-600 text-white font-medium text-sm rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2" id="rzp-button1">Pay with wallet</button>
+                  <button id="wallet" class="inline-flex items-center justify-center px-4 py-2 bg-green-600 text-white font-medium text-sm rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2" >Pay with wallet</button>
                 </div>
   
                
@@ -297,6 +297,19 @@
     }
 
 
+    if(totalAmount>1000){
+      Swal.fire({
+        position:'center',
+        icon:'warning',
+        title:'Not allowed',
+        text:'cash on delivery not allowed for order above 1000'
+        
+      })
+
+      return;
+    }
+
+
 //------------------place order ---------------------------------------
     try {
 
@@ -315,7 +328,7 @@
         Swal.fire({
           position: "center",
           icon: "success",
-          title: "Order Place",
+          title: "Order Placed",
           showConfirmButton: false,
           time: 1500
         })
@@ -637,17 +650,268 @@ function openRazorpayPayment(){
 }
 
 
-document.getElementById("rzp-button1").onclick = function (e) {
+  document.getElementById("rzp-button1").onclick = function (e) {
+
+    e.preventDefault()
+
+    openRazorpayPayment()
+  }
+
+
+//---------------- wallet payment ----------------------
+
+
+
+
+  function walletPayment() {
+    console.log("----------wallet-------");
+
+
+    const selectedAddress = document.querySelector("input[name='delivery-method']:checked");
+    const couponDiscountElement = document.getElementById('couponDiscountAmount');
+    const couponDiscountValue = couponDiscountElement.innerText || 0;
+    const numericDiscountValue = parseFloat(couponDiscountValue.replace(/[^0-9.-]+/g, ''));
+    const positiveDiscountValue = Math.abs(numericDiscountValue);
+
+    if (!selectedAddress) {
+      Swal.fire({
+        icon: 'warning',               // Use 'warning' icon to indicate attention
+        title: 'No Delivery Address',   // Title of the alert
+        text: 'Please select a delivery address to proceed.',  // Description message
+        confirmButtonText: 'OK',        // Text for the button
+      });
+      return;
+    }
+
+    const addressId = selectedAddress.value;
+    const paymentMethod = "Wallet";
+    const cartItemsElements = document.querySelectorAll('.cart-item')
+    const cartData = []
+
+    cartItemsElements.forEach(itemElement => {
+      const productId = itemElement.getAttribute('data-product-id');
+      const productName = itemElement.getAttribute('data-product-name');
+      const productQuantity = itemElement.getAttribute('data-product-quantity');
+      const productPrice = itemElement.getAttribute('data-product-price');
+
+      cartData.push({
+        productId: productId,
+        productName: productName,
+        productQuantity: parseInt(productQuantity),
+        productPrice: parseFloat(productPrice)
+      })
+      console.log("cart data---", cartData);
+
+
+    })
+
+    // Calculate total price from the cart items
+    const totalAmount = cartData.reduce((sum, item) => sum + (item.productPrice), 0);
+    const finalAmount = Math.round(totalAmount - positiveDiscountValue)
+    console.log("========", finalAmount);
+    let remainingAmountToPay;
+
+
+    const orderData = {
+      addressId: addressId,
+      paymentMethod: paymentMethod,
+      cartItems: cartData,
+      totalPrice: totalAmount,
+      couponDiscountValue: positiveDiscountValue
+    }
+
+
+    const URL = `/walletPayment`;
+
+    fetch(URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': "application/json"
+      },
+      body: JSON.stringify({ finalAmount })
+    })
+      .then(response => response.json())
+      .then(result => {
+        if (result.status === 'success') {
+          Swal.fire({
+            icon: 'success',
+            title: 'Order Processing',
+            text: result.message || 'You have enough balance in wallet order processing',
+            timer: 1500
+          })
+            .then(() => {
+
+              fetch('/place-order', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': "application/json"
+                },
+                body: JSON.stringify(orderData)
+              })
+                .then(response => response.json())
+
+
+                .then(result => {
+                  console.log("result: ", result);
+
+                  if (result.message === 'Order placed succesfully') {
+                    Swal.fire({
+                      icon: 'success',
+                      title: 'Order Placed',
+                      text: result.message || 'Order placed successfully'
+                    })
+                    setTimeout(() => {
+                      window.location.href = `/orderSummary?orderId=${result.orderId}`
+                    }, 2000)
+                  } else {
+                    Swal.fire({
+                      icon: 'error',
+                      title: 'error in order placeing',
+                      message: result.message || 'error in order placeing'
+                    })
+                  }
+                }).catch(error => {
+                  console.log("server error in order placeing");
+                  Swal.fire({
+                    icon: 'error',
+                    title: 'Server Error',
+                    text: "An error occurred while placing the order. Please try again."
+                  })
+
+                })
+
+
+
+            })
+        } else if (result.status === 'partial_payment_needed') {
+
+          Swal.fire({
+            icon: 'info',
+            title: 'Partial Payment Required',
+            text: result.message
+          }).then(() => {
+            remainingAmountToPay = result.remainingAmount
+            const URL = `/paymentRender/${result.remainingAmount}`;
+
+            fetch(URL, {
+              method: 'POST',
+              headers: {
+                "Content-Type": "application/json"
+              }
+            })
+              .then(res => {
+                if (!res.ok) {
+                  throw new Error("Cannot render the payment page")
+                }
+                return res.json()
+              })
+              .then(data => {
+                console.log(data.orderId);
+
+                if (data.orderId) {
+                  const options = {
+                    key: "rzp_test_OZVJGxiPWQgDaM",
+                    amount: remainingAmountToPay * 100,
+                    currency: "INR",
+                    name: "GameNation",
+                    order_id: data.orderId,
+                    handler: function (response) {
+                      const finalOrderData = {
+                        ...orderData,
+                        razorpay_payment_id: response.razorpay_payment_id,
+                        razorpay_order_id: response.razorpay_order_id,
+                        razorpay_signature: response.razorpay_signature,
+                      }
+                      console.log(finalOrderData);
+
+                      fetch('/place-order', {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': "application/json"
+                        },
+                        body: JSON.stringify(finalOrderData)
+                      })
+                        .then(async (response) => {
+                          console.log("///////", response);
+
+                          if (response) {
+                            Swal.fire({
+                              position: "center",
+                              icon: "success",
+                              title: "Order Placed",
+                              text: "Your order has been placed successfully!",
+                              showConfirmButton: false,
+                              timer: 2000,
+                            })
+                            const result = await response.json()
+                            console.log(result);
+
+                            setTimeout(() => {
+                              window.location.href = `/orderSummary?orderId=${result.orderId}`
+                            }, 2000)
+                          } else {
+                            alert(data.message)
+                          }
+
+                        }).catch(error => {
+                          console.error("Erro while placing order", error)
+                          alert("Something went wrong while placing your order. Please try again.");
+                        })
+                    },
+                    prefill: {
+                      name: "Your Name",
+                      email: "your.email@example.com",
+                      contact: "9999999999",
+                    },
+                    notes: {
+                      address: "Razorpay Corporate Office"
+                    },
+                    theme: {
+                      color: "#3399cc"
+                    }
+                  }
+
+                  const rzp1 = new Razorpay(options)
+                  rzp1.open()
+                }
+
+              })
+          })
+
+
+        }
+        else {
+          Swal.fire({
+            icon: 'error',
+            title: `can't process order`,
+            text: result.message || 'order processing is not possible try another payment method'
+          })
+        }
+      }).catch(error => {
+        console.log('error while wallet transaction');
+        Swal.fire({
+          icon: 'error',
+          title: 'error occured',
+          text: "server Error in wallet payment try another payment method"
+        })
+
+      })
+
+
+  }
+
+
+
+document.getElementById('wallet').onclick = function(e){
+
+  //console.log("----------wallet-------");
+  
 
   e.preventDefault()
-  
-  openRazorpayPayment()
-  
+
+  walletPayment()
 
 }
-
-
-
 
 
 

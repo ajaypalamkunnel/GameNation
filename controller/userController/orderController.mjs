@@ -236,7 +236,7 @@ export const returnOrder = async (req, res) => {
 
       userWallet = new Wallet({
         userId:customer_id,
-        balance:4000,
+        balance:0,
         transactions:[]
       })
 

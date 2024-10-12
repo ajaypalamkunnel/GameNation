@@ -1,12 +1,12 @@
 import express from 'express';
 import { isAdmin } from '../middleware/adminSession.mjs';
 const adminRouter = express.Router();
-import { getAdminLogin,loginPost,dashboard,addCategory,addCategoryPost,categoryView,updateCategory,customers,toggleVerification, ordersList, orderViewAdmin, searchCustomer, offers, addOfferPost, removeOffer } from '../controller/adminController/adminController.mjs';
+import { getAdminLogin,loginPost,dashboard,addCategory,addCategoryPost,categoryView,updateCategory,customers,toggleVerification, ordersList, orderViewAdmin, searchCustomer, offers, addOfferPost, removeOffer, dashboardFilter } from '../controller/adminController/adminController.mjs';
 import { addProduct, addProductPost,viewProducts,editProduct,editProductPut,deleteProduct} from '../controller/adminController/productController.mjs';
 //import cloudinary from '../uploads/cloudinary.mjs';
 import {upload} from '../uploads/cloudinary.mjs'
 import { orderStatus, salesReoprtView } from '../controller/userController/orderController.mjs';
-import { addCoupon, addCouponPost, coupons, removeCoupon } from '../controller/userController/couponController.mjs';
+import { addCoupon, addCouponPost, coupons, editCoupon, editCouponPost, removeCoupon } from '../controller/userController/couponController.mjs';
 import { exportReport, sales } from '../controller/adminController/salesData.mjs';
 
 //------------------------------------  Login  ------------------------------------------------
@@ -21,6 +21,7 @@ adminRouter.post('/login',loginPost)
 
 
 adminRouter.get('/dashboard',isAdmin,dashboard)
+adminRouter.get('/dashboardFilter',dashboardFilter)
 
 
 //------------------------------------  add category ------------------------------------------------
@@ -63,7 +64,8 @@ adminRouter.get('/coupons',isAdmin,coupons);
 adminRouter.get('/addCoupon',isAdmin,addCoupon);
 adminRouter.post('/addCouponPost',isAdmin,addCouponPost);
 adminRouter.patch('/removeCoupon/:couponId',isAdmin,removeCoupon)
-
+adminRouter.get('/editCoupon',isAdmin,editCoupon)
+adminRouter.post('/editProductPost',isAdmin,editCouponPost)
 
 
 

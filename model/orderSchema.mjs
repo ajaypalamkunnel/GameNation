@@ -4,7 +4,8 @@ import mongoose from "mongoose";
 const orderSchema = mongoose.Schema({
 
     customer_id:{
-        type: String
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'User'
     },
     order_id:{
         type: Number

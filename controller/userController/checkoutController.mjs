@@ -7,9 +7,10 @@ import Coupon from "../../model/couponSchema.mjs";
 import OrderSchema from "../../model/orderSchema.mjs";
 import Product from "../../model/productSchema.mjs";
 import User from "../../model/userSchema.mjs";
+import Wallet from "../../model/walletSchema.mjs";
 
 export const checkout = async(req,res)=>{
-    console.log("hiiiiiiiiiiiiiiiii");
+    
     
 
     try {
@@ -19,7 +20,7 @@ export const checkout = async(req,res)=>{
             const email = req.session.user;
             const user = await User.findOne({email});
 
-            console.log("i am user--",user );
+            
 
             const cartDetails = await Cart.findOne({userId:user._id}).populate('items.productId')
             
@@ -298,7 +299,7 @@ export const placeOrder = async(req,res)=>{
     try {
         if(req.session.user){
 
-            const { addressId, paymentMethod, cartItems, totalPrice,couponDiscountValue,razorpay_payment_id,razorpay_order_id,razorpay_signature } = req.body;
+            const { addressId, paymentMethod, cartItems, totalPrice,couponDiscountValue,razorpay_payment_id } = req.body;
 
             let paymentStatus 
             if(razorpay_payment_id === undefined){
@@ -377,6 +378,9 @@ export const placeOrder = async(req,res)=>{
 
               })
 
+              console.log("'''''''",newOrder);
+              
+
               await newOrder.save();
 
 
@@ -413,3 +417,71 @@ export const placeOrder = async(req,res)=>{
     }
 
 }
+
+
+
+
+export const walletPayment = async (req, res) => {
+  console.log("hi wallet");
+
+  try {
+    if (req.session.user) {
+      const user = await User.findOne({ email: req.session.user });
+      const wallet = await Wallet.findOne({ userId: user._id });
+
+      const { finalAmount } = req.body;
+
+      if (!wallet) {
+        return res
+          .status(404)
+          .json({ status: "error", message: "User has no wallet" });
+      }
+
+      if (finalAmount <= wallet.balance) {
+        wallet.balance -= finalAmount;
+        wallet.transactions.push({
+          walletAmount: finalAmount,
+          transactionType: "Debited",
+          transactionDate: new Date(),
+        });
+        await wallet.save();
+
+        return res
+          .status(200)
+          .json({
+            status: "success",
+            message: "You have enough balance to place order",
+          });
+      } else {
+      let remainingAmount = (finalAmount - wallet.balance);
+
+        let usedWalletBalance = wallet.balance;
+        wallet.balance = 0;
+
+        wallet.transactions.push({
+          walletAmount: usedWalletBalance,
+          transactionType: "Debited",
+          transactionDate: new Date(),
+        });
+        await wallet.save();
+        return res
+          .status(200)
+          .json({
+            status: "partial_payment_needed",
+            message: "Wallet balance is not enough. Proceed to pay the remaining amount.",
+            remainingAmount:remainingAmount
+          });
+      }
+    } else {
+      res.redirect("/login");
+    }
+  } catch (error) {
+    console.error("Error while wallet payment", error);
+    res
+      .status(500)
+      .json({
+        status: "error",
+        message: "An error occurred while wallet payment ",
+      });
+  }
+};

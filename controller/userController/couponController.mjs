@@ -136,3 +136,63 @@ export const userCoupons = async(req,res)=>{
         
     }
 }
+
+
+export const editCoupon = async(req,res)=>{
+    try {
+        
+        const couponId = req.query.id;
+        console.log(couponId);
+    
+        const coupon = await Coupon.findById(couponId)
+    
+        if(!coupon){
+            return res.status(404).json({status:'error',message:'Coupon not found'})
+        }
+    
+        res.render('admin/editCoupon',{
+            coupon,
+            title:'Edit coupon'
+        })
+    } catch (error) {
+        console.error('error while rendering edit coupon',error);
+        return res.status(500).json({status:'error',message:'server error'})
+    }
+    
+}
+
+export const editCouponPost = async(req,res)=>{
+    console.log("edit ");
+    try {
+        const { couponCode, minAmount, discountValue, discountType, startDate, expiryDate, usageCount,coupon_id } = req.body;
+    
+        console.log(couponCode, minAmount, discountValue, discountType, startDate, expiryDate, usageCount);
+    
+        const couponEdit = await Coupon.findById(coupon_id);
+    
+        if(!couponEdit){
+            return res.status(404).json({status:'error',message:'coupon not found'})
+        }
+
+        couponEdit.couponCode = couponCode;
+        couponEdit.discountType= discountType;
+        couponEdit.discountValue = discountValue;
+        couponEdit.minimumOrderAmount=minAmount;
+        couponEdit.startDate=startDate;
+        couponEdit.endDate=expiryDate;
+        couponEdit.usageCount=usageCount
+
+        await couponEdit.save()
+
+        return res.status(200).json({status:"success",message:'Coupon updated successfuly'})
+
+        
+    } catch (error) {
+        console.error('error while edit coupon',error);
+        return res.status(500).json({status:'error',message:'server error coupon edit'})
+    }
+    
+
+
+    
+}

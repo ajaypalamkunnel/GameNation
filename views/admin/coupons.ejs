@@ -46,7 +46,7 @@
                             <td>
                               <div class="flex gap-2">
                                 <!-- Actions (e.g., Edit/Delete) -->
-                                <a href="/admin/editCoupon/<%= coupon._id %>" class="text-blue-500">Edit</a> | 
+                                <a href="/admin/editCoupon/?id=<%= coupon._id %>" class="text-blue-500">Edit</a> | 
                                 <button
                                 class="h-8 px-5 py-2 rounded-lg text-white text-sm tracking-wider font-medium border border-current outline-none <%= coupon.isActive ? 'bg-red-600 hover:bg-red-700' :'bg-green-600 hover:bg-green-700'  %>"
                                 onclick="couponToggle('<%= coupon._id %>',' <%= coupon.isActive %>')">

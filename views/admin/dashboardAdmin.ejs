@@ -1,13 +1,344 @@
 <!-- views/admin/dashboardAdmin.ejs -->
 <%- include('adminHeader') %>
 
-<div style="display: flex; height: 100vh;">
+<div style="display: flex; min-height: 100vh;">
     <!-- Sidebar -->
     <%- include('sidebar') %>
 
     <!-- Main Content -->
-    <div style="flex-grow: 1; padding: 20px; background-color: #1C1C1C; color: #FFFFFF;">
-        <h1>Admin Home</h1>
-        <!-- Other content goes here -->
+    <div style="flex-grow: 1; background-color: #1C1C1C; color: #FFFFFF;">
+
+
+        <!-- Top section -->
+        
+
+        <div class="grid grid-cols-4 gap-4 p-4 bg-gray-900 dark:bg-gray-900">
+            <!-- Total Views Card -->
+            <div class="p-6 bg-gray-800 shadow rounded-lg text-gray-300 dark:text-gray-300">
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-2xl font-bold">₹ <%= (dailyMetrics[0] && dailyMetrics[0].totalDailyProfit ? dailyMetrics[0].totalDailyProfit.toFixed(2) : "0.00") %></span>
+                <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A12.096 12.096 0 0112 3.5c-2.043 0-3.972.402-5.553 1.124L11 9M4.38 14H20m0 0l-5.932 2.898a12.096 12.096 0 01-4.068.602 12.096 12.096 0 01-4.068-.602L4 14"></path></svg>
+              </div>
+              <p class="text-sm">Total Daily Profit</p>
+              <p class="text-sm text-green-400">0.43% &#8593;</p>
+            </div>
+          
+            <!-- Total Profit Card -->
+            <div class="p-6 bg-gray-800 shadow rounded-lg text-gray-300 dark:text-gray-300">
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-2xl font-bold">₹ <%= (dailyMetrics[0] && dailyMetrics[0].totalSales ? dailyMetrics[0].totalSales.toFixed() : "0.00") %></span>
+                <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 11h14M12 5v14"></path></svg>
+              </div>
+              <p class="text-sm">Total Daily Sales</p>
+              <p class="text-sm text-green-400">4.35% &#8593;</p>
+            </div>
+          
+            <!-- Total Products Card -->
+            <div class="p-6 bg-gray-800 shadow rounded-lg text-gray-300 dark:text-gray-300">
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-2xl font-bold"><%= (dailyMetrics[0] && dailyMetrics[0].totalDailyOrders ? dailyMetrics[0].totalDailyOrders : "0") %></span>
+                <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 11h14M12 5v14"></path></svg>
+              </div>
+              <p class="text-sm">Total Daily Orders</p>
+              <p class="text-sm text-green-400">2.59% &#8593;</p>
+            </div>
+          
+            <!-- Total Users Card -->
+            <div class="p-6 bg-gray-800 shadow rounded-lg text-gray-300 dark:text-gray-300">
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-2xl font-bold"><%= totalUsers %></span>
+                <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v14M5 11h14"></path></svg>
+              </div>
+              <p class="text-sm">Total Customers</p>
+              <p class="text-sm text-red-400">0.95% &#8595;</p>
+            </div>
+          </div>
+
+          
+
+
+          <!----------------------------------------- Top section -------------------------------------------------->
+
+
+        <!-------------------------------------- graph =------------------------------------------------>
+
+        <div id="graph-data" class="grid grid-cols-4 mx-2 gap-2">
+            <!-- First Chart - 3/4 of the width -->
+            <div class="col-span-3 max-w-full w-full bg-white rounded-lg shadow dark:bg-gray-800 p-4 md:p-6">
+                <div class="flex justify-between mb-5">
+                    <div>
+                        <h5 class="leading-none text-3xl font-bold text-gray-900 dark:text-white pb-2">$12,423</h5>
+                        <p class="text-base font-normal text-gray-500 dark:text-gray-400">Sales this week</p>
+                    </div>
+                    <div class="flex items-center px-2.5 py-0.5 text-base font-semibold text-green-500 dark:text-green-500 text-center">
+                        23%
+                        <svg class="w-3 h-3 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13V1m0 0L1 5m4-4 4 4" />
+                        </svg>
+                    </div>
+                </div>
+                <div id="data-labels-chart"></div>
+                <div class="grid grid-cols-1 items-center border-gray-200 border-t dark:border-gray-700 justify-between mt-5">
+                    <div class="flex justify-between items-center pt-5">
+                        <!-- Dropdown menu -->
+                        <select id="lastDaysDropdown" class="block px-4 py-2 rounded-lg shadow w-44 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700">
+                            <option value="yesterday">Yesterday</option>
+                            <option value="today">Today</option>
+                            <option value="thisWeek">This week</option>
+                            <option value="thisMonth">This Month</option>
+                            <option value="thisYear">This year</option>
+                        </select>
+                        <a href="#" class="uppercase text-sm font-semibold inline-flex items-center rounded-lg text-blue-600 hover:text-blue-700 dark:hover:text-blue-500 hover:bg-gray-100 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700 px-3 py-2">
+                            Sales Report
+                            <svg class="w-2.5 h-2.5 ms-1.5 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        
+            <!-- Second Chart - 1/4 of the width -->
+            <div class="col-span-1 max-w-full w-full bg-white rounded-lg shadow dark:bg-gray-800 p-4 md:p-6">
+                <div class="flex justify-between mb-3">
+                    <div class="flex justify-center items-center">
+                        <h5 class="text-xl font-bold leading-none text-gray-900 dark:text-white pe-1">Category Performance</h5>
+                        <svg data-popover-target="chart-info" data-popover-placement="bottom" class="w-3.5 h-3.5 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white cursor-pointer ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm0 16a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3Zm1-5.034V12a1 1 0 0 1-2 0v-1.418a1 1 0 0 1 1.038-.999 1.436 1.436 0 0 0 1.488-1.441 1.501 1.501 0 1 0-3-.116.986.986 0 0 1-1.037.961 1 1 0 0 1-.96-1.037A3.5 3.5 0 1 1 11 11.466Z" />
+                        </svg>
+                        <div data-popover id="chart-info" role="tooltip" class="absolute z-10 invisible inline-block text-sm text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 w-72 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400">
+                            <div class="p-3 space-y-2">
+                                <h3 class="font-semibold text-gray-900 dark:text-white">Activity growth - Incremental</h3>
+                                <p>Report helps navigate cumulative growth of community activities. Ideally, the chart should have a growing trend, as stagnating chart signifies a significant decrease of community activity.</p>
+                                <h3 class="font-semibold text-gray-900 dark:text-white">Calculation</h3>
+                                <p>For each date bucket, the all-time volume of activities is calculated. This means that activities in period n contain all activities up to period n, plus the activities generated by your community in period.</p>
+                                <a href="#" class="flex items-center font-medium text-blue-600 dark:text-blue-500 dark:hover:text-blue-600 hover:text-blue-700 hover:underline">Read more
+                                    <svg class="w-2 h-2 ms-1.5 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4" />
+                                    </svg></a>
+                            </div>
+                            <div data-popper-arrow></div>
+                        </div>
+                    </div>
+                    <div>
+                        <button type="button" data-tooltip-target="data-tooltip" data-tooltip-placement="bottom" class="hidden sm:inline-flex items-center justify-center text-gray-500 w-8 h-8 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm">
+                            <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 18">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 1v11m0 0 4-4m-4 4L4 8m11 4v3a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-3" />
+                            </svg>
+                            <span class="sr-only">Download data</span>
+                        </button>
+                        <div id="data-tooltip" role="tooltip" class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700">
+                            Download CSV
+                            <div class="tooltip-arrow" data-popper-arrow></div>
+                        </div>
+                    </div>
+                </div>
+        
+                <!-- Donut Chart -->
+                <div class="py-6" id="donut-chart"></div>
+        
+                <div class="grid grid-cols-1 items-center border-gray-200 border-t dark:border-gray-700 justify-between">
+                    <div class="flex justify-between items-center pt-5">
+                        <!-- Dropdown menu -->
+                        <select id="lastDaysDropdown" class="block px-4 py-2 rounded-lg shadow w-44 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700">
+                            <option value="yesterday">Yesterday</option>
+                            <option value="today">Today</option>
+                            <option value="last7days">Last 7 days</option>
+                            <option value="last30days">Last 30 days</option>
+                            <option value="last90days">Last 90 days</option>
+                        </select>
+                        <a href="#" class="uppercase text-sm font-semibold inline-flex items-center rounded-lg text-blue-600 hover:text-blue-700 dark:hover:text-blue-500 hover:bg-gray-100 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700 px-3 py-2">
+                            Traffic analysis
+                            <svg class="w-2.5 h-2.5 ms-1.5 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+                <!-- graph -->     
     </div>
 </div>
+
+<!-- Chart Container -->
+
+<!-- Add ApexCharts CDN in the head of your HTML -->
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+<script>
+
+
+const categories = <%- categories %>;
+const totalSalesData = <%- totalSalesData %>; // Sales data for the chart
+const totalProfitData = <%- totalProfitData %>; // Profit data for the chart 
+
+
+
+
+
+// -------------------------------------------- Graph section --------------------------------------
+  // Load ApexCharts CDN dynamically
+  const apexScript = document.createElement('script');
+  apexScript.src = "https://cdn.jsdelivr.net/npm/apexcharts";
+  document.head.appendChild(apexScript);
+
+  apexScript.onload = function() {
+    // Once the ApexCharts library is loaded, initialize the chart
+    const options = {
+      dataLabels: {
+        enabled: true,
+        style: {
+          cssClass: 'text-xs text-white font-medium'
+        },
+      },
+      grid: {
+        show: false,
+        strokeDashArray: 4,
+        padding: {
+          left: 16,
+          right: 16,
+          top: -26
+        },
+      },
+      series: [
+        {
+          name: "Total Sales",
+          data: totalSalesData,
+          color: "#1A56DB",
+        },
+        {
+          name: "Total Profit",
+          data: totalProfitData,
+          color: "#7E3BF2",
+        },
+      ],
+      chart: {
+        height: "100%",
+        maxWidth: "100%",
+        type: "area",
+        fontFamily: "Inter, sans-serif",
+        dropShadow: {
+          enabled: false,
+        },
+        toolbar: {
+          show: false,
+        },
+      },
+      tooltip: {
+        enabled: true,
+        x: {
+          show: false,
+        },
+      },
+      legend: {
+        show: true
+      },
+      fill: {
+        type: "gradient",
+        gradient: {
+          opacityFrom: 0.55,
+          opacityTo: 0,
+          shade: "#1C64F2",
+          gradientToColors: ["#1C64F2"],
+        },
+      },
+      stroke: {
+        width: 6,
+      },
+      xaxis: {
+        categories: categories,
+        labels: {
+          show: false,
+        },
+        axisBorder: {
+          show: false,
+        },
+        axisTicks: {
+          show: false,
+        },
+      },
+      yaxis: {
+        show: false,
+        labels: {
+          formatter: function (value) {
+            return '₹' + value.toFixed(2);
+          }
+        }
+      },
+    };
+
+    if (document.getElementById("data-labels-chart") && typeof ApexCharts !== 'undefined') {
+      const chart = new ApexCharts(document.getElementById("data-labels-chart"), options);
+      chart.render();
+    }
+  };
+
+// -------------------------------------------- Graph section --------------------------------------
+
+
+
+
+
+//--------------------------------------------- Pie chart ------------------------------------------
+
+const chartOptions = {
+  series: [52.8, 26.8, 20.4], // static data for Donut chart
+  chart: {
+    height: 320,
+    type: 'donut',
+  },
+  colors: ['#1C64F2', '#16BDCA', '#9061F9'],
+  labels: ['Direct', 'Organic search', 'Referrals'],
+  plotOptions: {
+    pie: {
+      donut: {
+        size: '65%',
+      }
+    }
+  },
+  dataLabels: {
+    enabled: true,
+    style: {
+      fontFamily: 'Inter, sans-serif',
+    },
+  },
+  legend: {
+    position: 'bottom',
+    fontFamily: 'Inter, sans-serif',
+  },
+};
+
+if (document.getElementById('donut-chart') && typeof ApexCharts !== 'undefined') {
+  const chart = new ApexCharts(document.getElementById('donut-chart'), chartOptions);
+  chart.render();
+}
+
+
+//--------------------------------------------- Pie chart -------------------------------------
+
+
+document.getElementById('lastDaysDropdown').addEventListener('change',function(){
+  const selectedOption = this.value;
+
+  console.log(selectedOption);
+  
+
+  fetch(`/admin/dashboardFilter?filter=${selectedOption}`)
+  .then(response=>response.json())
+  .then(data=>{
+    updateChart(data)
+  })
+  .catch(error=>console.error('Error featching data:',error))
+})
+
+function updateChart(data){
+
+}
+
+
+
+
+
+</script>
+
