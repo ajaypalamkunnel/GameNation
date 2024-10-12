@@ -549,13 +549,13 @@ export const cart = async (req, res) => {
 
 export const addToCart = async (req, res) => {
   try {
-    if (req.session.user) {
+   
       const email = req.session.user;
 
       const user = await User.findOne({ email: email });
 
       if (!user) {
-        return res.status(404).json({ message: "User not found" });
+        return res.status(404).json({ message: "User not found please login" });
       }
 
       const { productId, productCount } = req.body;
@@ -564,8 +564,7 @@ export const addToCart = async (req, res) => {
 
       let cart = await Cart.findOne({ userId: user._id });
 
-      // console.log("///////",user._id);
-      // console.log("///////",cart);
+     
       if (!cart) {
         cart = new Cart({
           userId: user._id,
@@ -643,10 +642,8 @@ export const addToCart = async (req, res) => {
       return res
         .status(200)
         .json({ message: "Product added to cart successfully", cart });
-    } else {
-      console.log("please login ajay");
-      res.redirect("/login");
-    }
+    
+    
   } catch (error) {
     console.error(error);
     return res.status(500).json({

@@ -212,40 +212,50 @@
     mainImage.src = imageUrl;
   }
 
-  const addToCart = async (productId)=>{
-    try {
-      const response = await fetch('/cart/add',{
-        method:'POST',
-        headers:{
-          'content-Type' : 'application/json'
-        },
-        body:JSON.stringify({
-          productId : productId,
-          productCount:1
-        })
-      })
+  const addToCart = async (productId) => {
+  try {
+    const response = await fetch('/cart/add', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        productId: productId,
+        productCount: 1, // default product count to 1
+      }),
+    });
 
-      const data = await response.json();
+    const data = await response.json(); // Parse response JSON
 
-      if(response.ok){
-        Swal.fire({
-          postion:"top-center",
-          icon:"success",
-          title:"Item added to cart",
-          showConfirmButton: false,
-          time:500
-
-        })
-        
-        
-      }else{
-        alert(data.message)
-      }
-    } catch (error) {
-      console.error('Error adding to cart:', error);
-      
+    if (response.ok) {
+      // Successful addition to cart
+      Swal.fire({
+        position: "top-center",
+        icon: "success",
+        title: "Item added to cart",
+        showConfirmButton: false,
+        timer: 1000,
+      });
+    } else {
+      // Error response from server (e.g., insufficient stock, product not found)
+      Swal.fire({
+        icon: "warning",
+        title: "Error adding to cart",
+        text: data.message || "Unable to add product to cart.",
+        confirmButtonText: "OK",
+      });
     }
+  } catch (error) {
+    // Network or unexpected error
+    Swal.fire({
+      icon: "error",
+      title: "Network Error",
+      text: "Something went wrong while adding the product to your cart. Please try again.",
+      confirmButtonText: "OK",
+    });
+    console.error('Error adding to cart:', error); // Log the error for debugging
   }
+};
 
 
   document.querySelectorAll('.add-to-cart-btn').forEach(button=>{

@@ -76,7 +76,10 @@
                       </div>
 
                       <% } %>
+
+
             </div>
+
 
             <% order.products.forEach(product=>{ %>
 
@@ -118,11 +121,28 @@
                 </div>
 
                 <!-- Total Price for the Order -->
-                <div class="text-right mt-6">
-                  <p class="text-white font-bold text-xl">
-                    Total: ₹ <%= order.totalPrice.toFixed(2) - order.couponDiscount.toFixed(2) %>
-                  </p>
+                <div class="bg-orange-70">
+
+
+
+
+                  <div class="text-right mt-6">
+                    <p class="text-white font-bold text-xl">
+                      Total: ₹ <%= order.totalPrice.toFixed(2) - order.couponDiscount.toFixed(2) %>
+                    </p>
+                  </div>
+
+                  <% if(order.paymentStatus==='Pending' && (order.paymentMethod==='razorpay'
+                    ||order.paymentMethod==='Wallet' )){%>
+                    <div>
+                      <a class="bg-green-500 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-green-600"
+                        onclick="payNow('<%= order.priceAfterCouponDiscount.toFixed() %>','<%= order.order_id %>')">Pay
+                        Now</a>
+                    </div>
+                    <%}%>
                 </div>
+
+
           </div>
 
           <% }) %>
@@ -216,6 +236,7 @@
   </div>
 
   <%- include('footer') %>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
     <script>
       function showCancelModal(orderId) {
@@ -364,4 +385,114 @@
               });
             });
         });
+
+
+
+
+
+
+
+      function payNow(totalAmount, orderId) {
+        console.log(totalAmount);
+
+        const URL = `/paymentRender/${totalAmount}`;
+
+        fetch(URL, {
+          method: 'POST',
+          headers: {
+            "Content-Type": "application/json"
+          }
+        })
+          .then(res => {
+            if (!res.ok) {
+              throw new Error("Cannot render the payment page");
+            }
+            return res.json();
+          })
+          .then(data => {
+            if (data.orderId) {
+              const options = {
+                key: "rzp_test_OZVJGxiPWQgDaM",  // Replace with your Razorpay key
+                amount: totalAmount * 100,  // Razorpay accepts amounts in paise
+                currency: "INR",
+                name: "GameNation",
+                order_id: data.orderId,  // Razorpay Order ID
+                handler: function (response) {
+                  // Successful payment handler
+                  fetch('/rePay', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': "application/json"
+                    },
+                    body: JSON.stringify({ orderId: orderId })  // Pass orderId as an object
+                  })
+                    .then(async (response) => {
+                      if (response.ok) {
+                        Swal.fire({
+                          position: "center",
+                          icon: "success",
+                          title: "Payment Success",
+                          text: "Your payment was successful!",
+                          showConfirmButton: false,
+                          timer: 2000,
+                        });
+                        const result = await response.json();
+
+                        setTimeout(() => {
+                          window.location.reload();  // Refresh the page
+                        }, 2000);
+                      } else {
+                        Swal.fire({
+                          position: "center",
+                          icon: "error",
+                          title: "Payment Failed",
+                          text: "Your payment failed. Please try again.",
+                          showConfirmButton: false,
+                          timer: 2000,
+                        });
+                      }
+                    })
+                    .catch(error => {
+                      console.error("Error while re-paying amount:", error);
+                      Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred while processing the payment.',
+                      });
+                    });
+                },
+                prefill: {
+                  name: "Your Name",
+                  email: "your.email@example.com",
+                  contact: "9999999999",
+                },
+                notes: {
+                  address: "Razorpay Corporate Office"
+                },
+                theme: {
+                  color: "#3399cc"
+                }
+              };
+              const rzp1 = new Razorpay(options);
+              rzp1.open();
+            }
+          })
+          .catch(error => {
+            console.error("Error during the payment render:", error);
+            Swal.fire({
+              icon: 'error',
+              title: 'Payment Error',
+              text: "Unable to process the payment. Please try again.",
+            });
+          });
+      }
+
+
+
+
+
+
+
+
+
     </script>

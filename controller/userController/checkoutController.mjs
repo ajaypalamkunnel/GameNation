@@ -305,7 +305,10 @@ export const placeOrder = async(req,res)=>{
             if(razorpay_payment_id === undefined){
               paymentStatus = 'Pending'
 
-            }else{
+            }else if(paymentMethod === 'Wallet'){
+              paymentStatus = 'Paid'
+            }
+            else{
               paymentStatus ='Paid'
             }
             
@@ -485,3 +488,33 @@ export const walletPayment = async (req, res) => {
       });
   }
 };
+
+export const rePay = async(req,res)=>{
+  try {
+
+    if (req.session.user) {
+      const {orderId} = req.body;
+      console.log(orderId);
+
+      let order = await OrderSchema.findOne({order_id:orderId});
+
+      if(!order){
+        return res.status(404).json({status:'error',message:'order not found'})
+      }
+
+      order.paymentStatus = 'Paid';
+
+      await order.save()
+
+      return res.status(200).json({status:'success',message:'payment status updated'});
+    }else{
+      res.redirect('/login')
+    }
+    
+  } catch (error) {
+    console.error('Error while repaying amount',error );
+    
+  }
+
+
+}

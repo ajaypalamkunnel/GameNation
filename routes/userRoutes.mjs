@@ -7,7 +7,7 @@ import { productView,allProducts,cart,addToCart,updateCartQuantity,searchProduct
 // import {} '../services/auth.mjs'
 //import { checkout, placeOrder,applyCoupon,removeCoupon } from '../controller/userController/checkoutController.mjs';
 import { home,userProfile,addressView,addNewAddress,addNewAddressPost,editAddress,editAddressPut,deleteAddress, filterDataFetch, wishList, addWisList, removeWishList, wallet} from '../controller/userController/userController.mjs'; 
-import { applyCoupon, checkout, placeOrder, removeCoupon, walletPayment } from '../controller/userController/checkoutController.mjs';
+import { applyCoupon, checkout, placeOrder, removeCoupon, rePay, walletPayment } from '../controller/userController/checkoutController.mjs';
 //import { home,userProfile,addressView,addNewAddress,addNewAddressPost,editAddress,editAddressPut,deleteAddress, filterDataFetch, wishList, addWisList, removeWishList} from '../controller/userController/userController.mjs'; 
 import passport from 'passport';
 import { cancelOrder, orders, orderSummary, orderView, paymentRender, returnOrder } from '../controller/userController/orderController.mjs';
@@ -92,6 +92,7 @@ userRouter.post('/cancelOrder',isUser,cancelOrder);
 userRouter.post('/returnOrder',isUser,returnOrder);
 userRouter.post('/paymentRender/:amount',isUser,paymentRender);
 userRouter.post('/walletPayment',isUser,walletPayment)
+userRouter.post('/rePay',isUser,rePay)
 
 //---------------------------- checkout management --------------
 
