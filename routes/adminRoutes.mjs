@@ -21,6 +21,7 @@ adminRouter.post('/login',loginPost)
 
 
 adminRouter.get('/dashboard',isAdmin,dashboard)
+adminRouter.post('/dashboard',isAdmin,dashboard)
 adminRouter.get('/dashboardFilter',dashboardFilter)
 
 

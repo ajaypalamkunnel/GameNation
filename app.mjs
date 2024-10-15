@@ -84,7 +84,7 @@ app.get('/',(req,res)=>{
   try {
     res.redirect('/home')
   } catch (error) {
-    console.log(`error from main route ${error}`) 
+    c 
   }
 })
 //------------------------------routes------------------

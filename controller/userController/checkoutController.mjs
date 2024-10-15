@@ -347,6 +347,15 @@ export const placeOrder = async(req,res)=>{
               }
 
               const priceAfterCouponDiscount = orderTotal - couponDiscountValue
+
+              //console.log("cart item = ",cartItems);
+
+              console.log(cartItems.map(item=>{
+                  console.log("+++++++++++++++++++++++",item.productId.category);
+                  
+              }));
+              
+              
               
 
               const newOrder = new OrderSchema({

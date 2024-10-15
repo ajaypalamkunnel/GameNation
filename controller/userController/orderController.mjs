@@ -165,9 +165,13 @@ export const salesReoprtView = async (req, res) => {
 export const cancelOrder = async (req, res) => {
   console.log("hiiiii cancelOrder");
 
+
   try {
-    const user = req.session.user;
+    const user = await User.findOne({email:req.session.user});
     const { orderId, cancelReason } = req.body;
+
+    console.log(orderId);
+    
 
     if (!orderId) {
       console.log(orderId);
@@ -181,9 +185,34 @@ export const cancelOrder = async (req, res) => {
     if (!order) {
       console.log("order");
       return res
-        .status(404)
-        .json({ message: "Order not found or access denied." });
+      .status(404)
+      .json({ message: "Order not found or access denied." });
     }
+    const orderdetails = await OrderSchema.findById(orderId)
+
+    if(orderdetails.paymentMethod === 'razorpay' || orderdetails.paymentMethod === 'Wallet'){
+
+      let wallet = await Wallet.findOne({userId:user._id})
+      if(!wallet){
+        return res.status(404).json({status:'error',message:'Wallet not avaliable'})
+      }
+
+      wallet.balance += orderdetails.priceAfterCouponDiscount;
+
+      wallet.transactions.push({
+        walletAmount:orderdetails.priceAfterCouponDiscount,
+        orderId:orderdetails.orderId,
+        transactionType:'Credited',
+        transactionDate: new Date()
+
+      })
+
+      await wallet.save()
+
+    }
+
+
+
     return res.status(200).json({ message: "order cancelled successfully" });
   } catch (error) {
     console.log("error while cancelling order ", error);

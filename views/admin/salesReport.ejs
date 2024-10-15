@@ -72,7 +72,7 @@
           <% data.forEach(data =>{ %>
           <tr>
             <td class="px-4 py-4 text-sm text-gray-400"><%= data.order_id %></td>
-            <td class="px-4 py-4 text-sm text-gray-400"><%= data.customer_id.substring(0, 4) + '...' + data.customer_id.slice(-5) %></td>
+            <td class="px-4 py-4 text-sm text-gray-400"><%= data.customer_id.toString().substring(0, 4) + '...' + data.customer_id.toString().slice(-5) %></td>
             <td class="px-4 py-4 text-sm text-gray-400"><%= new Date(data.createdAt).toLocaleDateString('en-GB') %></td>
             <td class="px-4 py-4 text-sm text-gray-400">₹ <%= data.priceAfterCouponDiscount.toFixed(2) %></td>
             <td class="px-4 py-4 text-sm text-gray-400">₹ <%= data.couponDiscount.toFixed(2) %></td>
