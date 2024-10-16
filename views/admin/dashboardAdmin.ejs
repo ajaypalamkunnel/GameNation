@@ -68,7 +68,7 @@
                 <div class="flex justify-between mb-5">
                     <div>
                         <h5 class="leading-none text-3xl font-bold text-gray-900 dark:text-white pb-2">$12,423</h5>
-                        <p class="text-base font-normal text-gray-500 dark:text-gray-400">Sales this week</p>
+                        <p class="text-base font-normal text-gray-500 dark:text-gray-400">Total Sales</p>
                     </div>
                     <div class="flex items-center px-2.5 py-0.5 text-base font-semibold text-green-500 dark:text-green-500 text-center">
                         23%
@@ -81,14 +81,13 @@
                 <div class="grid grid-cols-1 items-center border-gray-200 border-t dark:border-gray-700 justify-between mt-5">
                     <div class="flex justify-between items-center pt-5">
                         <!-- Dropdown menu -->
-                        <select id="lastDaysDropdown" class="block px-4 py-2 rounded-lg shadow w-44 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700">
-                            <option value="yesterday">Yesterday</option>
-                            <option value="today">Today</option>
-                            <option value="thisWeek">This week</option>
-                            <option value="thisMonth">This Month</option>
-                            <option value="thisYear">This year</option>
+                        <select id="mainGraphData" class="block px-4 py-2 rounded-lg shadow w-44 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700">
+                          <option value="day">Day</option>
+                          <option value="week">Week</option>
+                          <option value="month">Month</option>
+                          <option value="year">Year</option>
                         </select>
-                        <a href="#" class="uppercase text-sm font-semibold inline-flex items-center rounded-lg text-blue-600 hover:text-blue-700 dark:hover:text-blue-500 hover:bg-gray-100 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700 px-3 py-2">
+                        <a href="/admin/salesReport" class="uppercase text-sm font-semibold inline-flex items-center rounded-lg text-blue-600 hover:text-blue-700 dark:hover:text-blue-500 hover:bg-gray-100 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700 px-3 py-2">
                             Sales Report
                             <svg class="w-2.5 h-2.5 ms-1.5 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4" />
@@ -97,6 +96,12 @@
                     </div>
                 </div>
             </div>
+
+
+
+
+             <!-------------------------------------- graph end=------------------------------------------------>
+
         
             <!-- Second Chart - 1/4 of the width -->
             <div class="col-span-1 max-w-full  w-full bg-white rounded-lg shadow dark:bg-gray-800 py-5 md:p-6">
@@ -115,12 +120,12 @@
                   </div>
                 </div>
                 <!-- Download Data Button -->
-                <button id="download-data" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:ring-4 rounded-lg text-sm w-8 h-8 flex items-center justify-center">
+                <!-- <button id="download-data" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:ring-4 rounded-lg text-sm w-8 h-8 flex items-center justify-center">
                   <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 18">
                     <path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M8 1v11m0 0 4-4m-4 4L4 8m11 4v3a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-3"/>
                   </svg>
                   <span class="sr-only">Download CSV</span>
-                </button>
+                </button> -->
               </div>
             
               <!-- Donut Chart -->
@@ -135,7 +140,7 @@
                   <option value="year">Year</option>
                 </select>
                 <a href="#" class="uppercase text-sm font-semibold text-blue-600 hover:text-blue-700 dark:hover:text-blue-500 hover:bg-gray-100 dark:hover:bg-gray-700 px-3 py-2 rounded-lg">
-                  Traffic Analysis
+                  Filter
                 </a>
               </div>
             </div>
@@ -231,101 +236,129 @@ const totalProfitData = <%- totalProfitData %>; // Profit data for the chart
 
 // -------------------------------------------- Graph section --------------------------------------
   // Load ApexCharts CDN dynamically
-  const apexScript = document.createElement('script');
-  apexScript.src = "https://cdn.jsdelivr.net/npm/apexcharts";
-  document.head.appendChild(apexScript);
+  let chartMain; // Declare the chart globally
 
-  apexScript.onload = function() {
-    // Once the ApexCharts library is loaded, initialize the chart
-    const options = {
-      dataLabels: {
-        enabled: true,
+// Function to render the chart
+function renderGraph(categories, salesData, profitData) {
+  const options = {
+    dataLabels: {
+      enabled: true,
+      style: {
+        cssClass: 'text-xs text-white font-medium',
+      },
+    },
+    grid: {
+      show: false,
+      strokeDashArray: 4,
+      padding: {
+        left: 16,
+        right: 16,
+        top: -26,
+      },
+    },
+    series: [
+      {
+        name: "Total Sales",
+        data: salesData,
+        color: "#1A56DB",
+      },
+      {
+        name: "Total Profit",
+        data: profitData,
+        color: "#7E3BF2",
+      },
+    ],
+    chart: {
+      height: "100%",
+      type: "area",
+      fontFamily: "Inter, sans-serif",
+      dropShadow: {
+        enabled: false,
+      },
+      toolbar: {
+        show: false,
+      },
+    },
+    tooltip: {
+      enabled: true,
+      x: {
+        show: false,
+      },
+      theme:"dark",
+      style:{
+        fontSize:'12px',
+        color:'#FFFFFF'
+      },
+      fillSeriesColor: false, // Use custom color instead of series color
+      background: {
+      color: "#333333", // Customize tooltip background color
+    },
+    },
+    legend: {
+      show: true,
+    },
+    fill: {
+      type: "gradient",
+      gradient: {
+        opacityFrom: 0.55,
+        opacityTo: 0,
+        shade: "#1C64F2",
+        gradientToColors: ["#1C64F2"],
+      },
+    },
+    stroke: {
+      width: 6,
+    },
+    xaxis: {
+      categories: categories,
+      labels: {
+        show: true,
         style: {
-          cssClass: 'text-xs text-white font-medium'
+          fontSize: '12px',
+          colors: '#A0AEC0',
         },
       },
-      grid: {
-        show: false,
-        strokeDashArray: 4,
-        padding: {
-          left: 16,
-          right: 16,
-          top: -26
+      axisTicks: { show: false },
+    },
+    yaxis: {
+      labels: {
+        formatter: (value) => `₹${value.toFixed(2)}`,
+        style: {
+          fontSize: '12px',
+          colors: '#A0AEC0',
         },
       },
-      series: [
-        {
-          name: "Total Sales",
-          data: totalSalesData,
-          color: "#1A56DB",
-        },
-        {
-          name: "Total Profit",
-          data: totalProfitData,
-          color: "#7E3BF2",
-        },
-      ],
-      chart: {
-        height: "100%",
-        maxWidth: "100%",
-        type: "area",
-        fontFamily: "Inter, sans-serif",
-        dropShadow: {
-          enabled: false,
-        },
-        toolbar: {
-          show: false,
-        },
-      },
-      tooltip: {
-        enabled: true,
-        x: {
-          show: false,
-        },
-      },
-      legend: {
-        show: true
-      },
-      fill: {
-        type: "gradient",
-        gradient: {
-          opacityFrom: 0.55,
-          opacityTo: 0,
-          shade: "#1C64F2",
-          gradientToColors: ["#1C64F2"],
-        },
-      },
-      stroke: {
-        width: 6,
-      },
-      xaxis: {
-        categories: categories,
-        labels: {
-          show: false,
-        },
-        axisBorder: {
-          show: false,
-        },
-        axisTicks: {
-          show: false,
-        },
-      },
-      yaxis: {
-        show: false,
-        labels: {
-          formatter: function (value) {
-            return '₹' + value.toFixed(2);
-          }
-        }
-      },
-    };
-
-    if (document.getElementById("data-labels-chart") && typeof ApexCharts !== 'undefined') {
-      const chart = new ApexCharts(document.getElementById("data-labels-chart"), options);
-      chart.render();
-    }
+    },
   };
 
+  if (chartMain) {
+    chartMain.destroy();
+  }
+  
+  // Create a new chart instance
+  chartMain = new ApexCharts(document.getElementById("data-labels-chart"), options);
+  chartMain.render();
+}
+
+// Initial chart rendering
+renderGraph(categories, totalSalesData, totalProfitData);
+
+
+  document.getElementById('mainGraphData').addEventListener('change', function () {
+    const selectedFilter = this.value;
+  fetch(`/admin/dashboard?filter=${selectedFilter}`,{
+    method:"POST",
+    headers:{
+      'Content-Type': 'application/json',
+    }
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      // Update the chart with new data
+      renderGraph(data.categories, data.totalSalesData, data.totalProfitData);
+    })
+    .catch((error) => console.error('Error fetching filtered data:', error));
+  })
 // -------------------------------------------- Graph section --------------------------------------
 
 
@@ -384,6 +417,7 @@ function renderChart(labels, data) {
 
 
 
+  
 
 document.getElementById('categoryDropdown').addEventListener('change', function() {
   const selectedFilter = this.value;
@@ -411,22 +445,25 @@ document.getElementById('categoryDropdown').addEventListener('change', function(
 
 
 
+
+
+
 //--------------------------------------------- Pie chart -------------------------------------
 
 
-document.getElementById('lastDaysDropdown').addEventListener('change',function(){
-  const selectedOption = this.value;
+// document.getElementById('lastDaysDropdown').addEventListener('change',function(){
+//   const selectedOption = this.value;
 
-  console.log(selectedOption);
+//   console.log(selectedOption);
   
 
-  fetch(`/admin/dashboardFilter?filter=${selectedOption}`)
-  .then(response=>response.json())
-  .then(data=>{
-    updateChart(data)
-  })
-  .catch(error=>console.error('Error featching data:',error))
-})
+//   fetch(`/admin/dashboardFilter?filter=${selectedOption}`)
+//   .then(response=>response.json())
+//   .then(data=>{
+//     updateChart(data)
+//   })
+//   .catch(error=>console.error('Error featching data:',error))
+// })
 
 function updateChart(data){
 
@@ -490,6 +527,13 @@ function updateTable(products) {
     `;
   }
 }
+
+
+
+
+
+
+
 
 
 </script>

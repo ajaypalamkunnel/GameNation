@@ -149,6 +149,9 @@ export const dashboard = async (req, res) => {
 
       console.log("Daily data:", dailyMetrics);
 
+
+      //----------------------- Daily data  end ---------------------
+
       //----------------------- Top selling products---------------------
 
       const filter = req.query.filter || "day";
@@ -196,10 +199,11 @@ export const dashboard = async (req, res) => {
 
       console.log("----------", productData);
 
-      //----------------------- pie chart ---------------------
+      //----------------------- Top selling products end---------------------
+
+      //----------------------- pie chart categgory perfomance  ---------------------
 
       const categoryFilter = req.query.filter || "day";
-
       const CategoryDateFilter = applyDateFilter(categoryFilter);
 
       const categoryPerfomance = await OrderSchema.aggregate([
@@ -266,10 +270,17 @@ export const dashboard = async (req, res) => {
       const categoryData = categoryPerfomance.map(
         (item) => item.totalQuantitySold
       );
-
       console.log(categoryLabels, "[][]][][[]", categoryData);
 
+
+
+      //----------------------- pie chart categgory perfomance  end ---------------------
+
       //--------------- weekly dashboard data -----------------------
+
+      const filterMain = req.query.filter || "week";
+
+      const dateFilterMain = applyDateFilter(filterMain)
 
       const startOfWeek = new Date();
       startOfWeek.setDate(startOfWeek.getDate());
@@ -279,17 +290,17 @@ export const dashboard = async (req, res) => {
       endOfWeek.setDate(startOfWeek.getDate() + 6); // Set to the end of the week (Saturday)
       endOfWeek.setHours(23, 59, 59, 999);
 
-      const weeklyMetrics = await OrderSchema.aggregate([
+      const metrics = await OrderSchema.aggregate([
         {
           $match: {
             orderStatus: { $in: ["Delivered", "Pending", "Shipped"] },
             isCancelled: false,
-            createdAt: { $gte: startOfWeek, $lt: endOfWeek },
+            createdAt: dateFilter.createdAt, // Apply the filtered date range
           },
         },
         {
           $group: {
-            _id: { $dayOfMonth: "$createdAt" }, // Group by day of the month for weekly data
+            _id: { $dayOfMonth: "$createdAt" }, // Group by day of the month for weekly data (modify based on filter)
             totalDailySales: { $sum: "$totalPrice" }, // Sum of total sales
             totalDailyProfit: { $sum: { $multiply: ["$totalPrice", 0.1] } }, // Assume profit is 10% of total sales
           },
@@ -298,19 +309,14 @@ export const dashboard = async (req, res) => {
           $sort: { _id: 1 },
         },
       ]);
+     
 
-      console.log("Weekly data : ", weeklyMetrics);
+      const categories = metrics.map((metric) => `Day ${metric._id}`);
+      const totalSalesData = metrics.map((metric) => metric.totalDailySales);
+      const totalProfitData = metrics.map((metric) => metric.totalDailyProfit);
 
-      const categories = weeklyMetrics.map((metric) => `Day ${metric._id}`);
-      const totalSalesData = weeklyMetrics.map(
-        (metric) => metric.totalDailySales
-      );
-      const totalProfitData = weeklyMetrics.map(
-        (metric) => metric.totalDailyProfit
-      );
 
       if (
-
         req.xhr ||
         req.headers["content-type"] === "application/json" ||
         req.headers.accept.indexOf("json") > -1
@@ -321,6 +327,10 @@ export const dashboard = async (req, res) => {
           topSellingProducts: productData,
           categoryLabels,
           categoryData,
+          //main cart
+          categories,
+          totalSalesData,
+          totalProfitData,
         });
       }
       // Pass the data to the view
@@ -425,6 +435,8 @@ export const dashboardFilter = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
+
+
 
 //---------------------------- add category page -------------------------------------
 

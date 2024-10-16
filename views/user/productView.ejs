@@ -54,7 +54,7 @@
           <!-- Product Name and Price -->
            <div class="flex justify-between">
              <h1 class="text-3xl font-bold"><%= product.product_name%></h1>
-             <button id="heartButton" class="focus:outline-none items-end" onclick="addToWishList('<%= product._id %>')">
+             <!-- <button id="heartButton" class="focus:outline-none items-end" onclick="addToWishList('<%= product._id %>')">
               <svg
                 id="heartIcon"
                 xmlns="http://www.w3.org/2000/svg"
@@ -69,7 +69,7 @@
                   d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
                 />
               </svg>
-            </button>
+            </button> -->
 
            </div>
           <p class="text-gray-400"><%= product.publisher%></p>
@@ -103,12 +103,16 @@
           <div class="mt-6 flex gap-4">
             <% if (product.stock > 0) { %>
               <!-- Enable buttons when in stock -->
+              <button onclick="addToWishList('<%= product._id %>')" class="bg-pink-500 text-white font-semibold py-2 px-6 rounded-lg hover:bg-pink-400 transition flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                </svg>
+                Add to Wishlist
+              </button>
               <button class="add-to-cart-btn bg-yellow-500 text-gray-900 font-semibold py-2 px-6 rounded-lg hover:bg-yellow-400 transition" data-product-id="<%= product._id %>">
                 Add to cart
               </button>
-              <button class="bg-green-500 text-white font-semibold py-2 px-6 rounded-lg hover:bg-green-400 transition">
-                Buy Now
-              </button>
+              
             <% } else { %>
               <!-- Disable buttons and change style when out of stock -->
               <button class=" bg-gray-500 text-gray-400 font-semibold py-2 px-6 rounded-lg cursor-not-allowed" disabled>

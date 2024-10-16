@@ -225,7 +225,8 @@ export const exportReport = async(req,res)=>{
 
     salesData.forEach((data) => {
         x = startX; // Reset x position for each row
-        const truncatedUserId = `${data.customer_id.substring(0, 6)}....${data.customer_id.substring(data.customer_id.length - 6)}`;
+        const truncatedUserId = `${data.customer_id.toString().substring(0, 6)}....${data.customer_id.toString().substring(data.customer_id.toString().length - 6)}`;
+
 
         // Draw each column cell for the current row
         const rowData = [
