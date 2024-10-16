@@ -308,7 +308,8 @@ export const validateForgotOtp = async(req,res)=>{
 //----------------------------------- google auth  ----------------------------
 
 export const googleAuth = passport.authenticate('google', {
-    scope: ['email', 'profile']
+    scope: ['email', 'profile'],
+    prompt: 'select_account'
   });
   
 //----------------------------------- google auth callback  ----------------------------
@@ -335,7 +336,11 @@ export const googleAuthCallback = (req, res, next) => {
         }
   
         // Store user in the session
-        req.session.user = user;
+        req.session.user = user.email;
+        console.log("********** session",req.session.user);
+        
+        console.log("Successfully logged in with Google!");
+        
         req.flash('success_msg', 'Successfully logged in with Google!');
         return res.redirect('/home');
       });

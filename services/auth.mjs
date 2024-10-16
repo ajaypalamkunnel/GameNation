@@ -8,7 +8,8 @@ passport.use(
     new GoogleStrategy({
         clientID:process.env.GOOGLE_CLIENT_ID,
         clientSecret:process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL:'/auth/google/callback'
+        callbackURL:'/auth/google/callback',
+        state:true
     },
 
 
@@ -18,24 +19,47 @@ passport.use(
              //----------- Extract email from profile -------------------
 
              const email = profile.emails[0].value;
+             
+             console.log("Google email:", email);
+             
 
              //------------ Check if the user already exists ------------
 
             let user = await User.findOne({ email })
 
+            console.log("I am user----",user);
 
-            if(!user){
-                user = new User({
-                    name:profile.displayName,
-                    email : profile.emails[0].value,
-                    googleID: profile.id
-                })
-                await user.save()
+            if(user){
+              if(!user.isVerified){
+                console.log("User is blocked:", email);
+                return done(null,false,{message:"Your account is blocked." })
+              }
+            
+            
+            // Update Google ID if it's missing or has changed
+            if(!user.googleID||user.googleID!==profile.id){
+              user.googleID = profile.id;
+              user.isVerified = true;
+              await user.save()
             }
-            done(null,user)
+            return done(null,user)
+          }else{
+            const newUser = new User({
+              username:profile.displayName,
+              email:email,
+              googleID:profile.id,
+              isVerified:true
+
+            })
+            await newUser.save()
+            return done(null,newUser)
+
+          }
+            
             
         } catch (error) {
-            done(error,null)
+          console.error("Error during Google authentication:", error);
+          done(error,null)
             
         }
     }
