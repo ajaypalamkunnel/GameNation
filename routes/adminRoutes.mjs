@@ -1,7 +1,7 @@
 import express from 'express';
 import { isAdmin } from '../middleware/adminSession.mjs';
 const adminRouter = express.Router();
-import { getAdminLogin,loginPost,dashboard,addCategory,addCategoryPost,categoryView,updateCategory,customers,toggleVerification, ordersList, orderViewAdmin, searchCustomer, offers, addOfferPost, removeOffer, dashboardFilter } from '../controller/adminController/adminController.mjs';
+import { getAdminLogin,loginPost,dashboard,addCategory,addCategoryPost,categoryView,updateCategory,customers,toggleVerification, ordersList, orderViewAdmin, searchCustomer, offers, addOfferPost, removeOffer, dashboardFilter, adminLogout } from '../controller/adminController/adminController.mjs';
 import { addProduct, addProductPost,viewProducts,editProduct,editProductPut,deleteProduct} from '../controller/adminController/productController.mjs';
 //import cloudinary from '../uploads/cloudinary.mjs';
 import {upload} from '../uploads/cloudinary.mjs'
@@ -14,6 +14,8 @@ import { exportReport, sales } from '../controller/adminController/salesData.mjs
 adminRouter.get('/login',getAdminLogin)
 
 adminRouter.post('/login',loginPost)
+
+adminRouter.get('/adminLogout',adminLogout)
 
 
 

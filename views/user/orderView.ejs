@@ -45,6 +45,7 @@
           <p><strong>Delivered date:</strong><%= new Date(order.deliveredDate).toLocaleDateString('en-GB') %></p>
           <% } %>
           <p><strong>Order status:</strong> <span class=" <%= order.orderStatus === 'Delivered' ? 'text-green-500' : order.orderStatus === 'Cancelled' ? 'text-red-500' : 'text-yellow-500' %> "><%= order.orderStatus %></span> </p>
+          <p><strong>Payment Status:</strong> <%= order.paymentStatus %></p>
         </div>
       </div>
   
@@ -101,10 +102,11 @@
     </div>
     
   </div>
-  
+  <% if(order.orderStatus === 'Delivered'){ %>
   <div class="bg-gray-900 py-8 p-2 text-center">
     <a href="#" id="downloadInvoice" class="bg-green-500 hover:bg-green-600 text-white font-semibold px-6 py-4  rounded-lg">Download Invoice</a>
   </div>
+  <% } %>
 
   <script>
     document.getElementById('downloadInvoice').addEventListener('click', function(event) {

@@ -45,6 +45,27 @@ export const loginPost = (req, res) => {
   }
 };
 
+export const adminLogout = (req,res)=>{
+  try {
+
+    req.session.destroy((err)=>{
+      if(err){
+        console.error('Error destroying session:', err);
+        return res.status(500).send('Error logging out');
+      }
+
+      res.redirect('/login')
+    })
+    
+  } catch (error) {
+    console.log("Error while admin Logout",error);
+    
+  }
+}
+
+
+
+
 const applyDateFilter = (filter) => {
   console.log("filter");
 
@@ -152,6 +173,21 @@ export const dashboard = async (req, res) => {
 
       //----------------------- Daily data  end ---------------------
 
+      //----------------------- Total sale amount -------------------
+
+      const totalSaleAmount = await OrderSchema.aggregate([
+        {
+          $group:{
+            _id:null,
+            totalAmount:{$sum:"$priceAfterCouponDiscount"}
+          }
+        }
+      ])
+
+      const finalTotalSaleAmount = (totalSaleAmount.length > 0 ? totalSaleAmount[0].totalAmount : 0).toFixed(2)
+      console.log("amt : ",finalTotalSaleAmount);
+      
+
       //----------------------- Top selling products---------------------
 
       const filter = req.query.filter || "day";
@@ -197,7 +233,7 @@ export const dashboard = async (req, res) => {
         { path: "productCategory", model: "category" }
       );
 
-      console.log("----------", productData);
+      console.log("----------Product data: ", productData);
 
       //----------------------- Top selling products end---------------------
 
@@ -312,8 +348,15 @@ export const dashboard = async (req, res) => {
      
 
       const categories = metrics.map((metric) => `Day ${metric._id}`);
-      const totalSalesData = metrics.map((metric) => metric.totalDailySales);
-      const totalProfitData = metrics.map((metric) => metric.totalDailyProfit);
+      const totalSalesData = metrics.map((metric) => metric.totalDailySales.toFixed(2));
+      const totalProfitData = metrics.map((metric) => metric.totalDailyProfit.toFixed(2));
+
+      console.log("category : ",categories);
+      console.log("totalSalesData : ",totalSalesData);
+      console.log("totalProfitData: ", totalProfitData);
+      
+      
+      
 
 
       if (
@@ -331,6 +374,7 @@ export const dashboard = async (req, res) => {
           categories,
           totalSalesData,
           totalProfitData,
+          finalTotalSaleAmount
         });
       }
       // Pass the data to the view
@@ -339,11 +383,12 @@ export const dashboard = async (req, res) => {
         dailyMetrics,
         totalUsers,
         topSellingProducts: productData,
-        categories: JSON.stringify(categories), // Send categories as JSON string
-        totalSalesData: JSON.stringify(totalSalesData), // Send total sales data as JSON string
-        totalProfitData: JSON.stringify(totalProfitData), // Send total profit data as JSON string
-        categoryLabels: JSON.stringify(categoryLabels), // Send labels as JSON string
+        categories: JSON.stringify(categories), 
+        totalSalesData: JSON.stringify(totalSalesData), 
+        totalProfitData: JSON.stringify(totalProfitData),
+        categoryLabels: JSON.stringify(categoryLabels),
         categoryData: JSON.stringify(categoryData),
+        finalTotalSaleAmount
       });
     } else {
       res.redirect("/admin/login");

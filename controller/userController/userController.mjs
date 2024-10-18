@@ -6,6 +6,8 @@ import WishList from "../../model/wishListSchema.mjs";
 
 import Wallet from "../../model/walletSchema.mjs";
 
+
+
 //---------------------------- user Home rendering -------------------------------------
 
 export const home = async (req, res) => {
@@ -428,7 +430,7 @@ export const wallet = async(req,res)=>{
   try {
     const categories = await category.find({isActive:true});
     const user = await User.findOne({email:req.session.user})
-    let userWallet = await Wallet.findOne({userId:user._id})
+    let userWallet = await Wallet.findOne({userId:user._id}).sort({createdAt:-1})
 
     if(!userWallet){
 
@@ -467,3 +469,78 @@ export const wallet = async(req,res)=>{
   }
 }
 
+
+
+export const categoryView = async(req,res)=>{
+
+  try {
+
+    const categoryQuery = req.query.fetchCategory;
+    const searchQuery = req.query.search || '';
+    const sortBy = req.query.sort || '';
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = 8;
+
+    console.log(categoryQuery,"----",searchQuery,"----",sortBy,"---",page);
+    
+
+    let filter = {category:categoryQuery};
+    console.log("----------=========",filter);
+    
+
+    if(searchQuery){
+      filter.product_name = {$regex:searchQuery,$options:'i'}
+    }
+
+    let sortOption = {};
+
+    if(sortBy === 'lowToHigh'){
+      sortOption = { discountPrice: 1 }
+    }else if(sortBy === 'highToLow'){
+      sortOption = { discountPrice: -1 };
+    }else if (sortBy === 'aToZ'){
+      sortOption = { product_name: 1 };
+    }else if(sortBy === 'zToA'){
+      sortOption = { product_name: -1 };
+    }
+
+    const totalProducuts = await Product.countDocuments(filter);
+    const totalPages = Math.ceil(totalProducuts/pageSize);
+    const categoryWiseProducts = await Product.find(filter)
+    .sort(sortOption)
+    .skip((page-1)*pageSize)
+    .limit(pageSize)
+
+   // console.log(categoryWiseProducts);
+    
+    
+    
+
+    categoryWiseProducts.forEach((product) => {
+      const discountPrice = Math.ceil(
+        product.price - (product.price * product.discount) / 100
+      );
+      product.discountPrice = discountPrice; // Append discountPrice to product
+    });
+    
+
+
+    const categories = await category.find({isActive:true});
+
+    res.render('user/categoryView',{
+      user:req.session.user,
+      title:'categoryView',
+      products:categoryWiseProducts,
+      categories,
+      currentPage:page,
+      totalPages,
+      searchQuery,
+      sortBy
+    })
+    
+  } catch (error) {
+    console.log('error while rendering category view',error);
+    res.status(500).json({message:'Internal Server Error'})
+  }
+
+}

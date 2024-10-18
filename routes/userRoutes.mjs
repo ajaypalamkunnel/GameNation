@@ -6,7 +6,7 @@ import {getSignUp,signupPost, verifyOtp,getLogin,loginPost,googleAuth,googleAuth
 import { productView,allProducts,cart,addToCart,updateCartQuantity,searchProducts,removeProductFromCart, allProductsSort  } from '../controller/adminController/productController.mjs';
 // import {} '../services/auth.mjs'
 //import { checkout, placeOrder,applyCoupon,removeCoupon } from '../controller/userController/checkoutController.mjs';
-import { home,userProfile,addressView,addNewAddress,addNewAddressPost,editAddress,editAddressPut,deleteAddress, filterDataFetch, wishList, addWisList, removeWishList, wallet} from '../controller/userController/userController.mjs'; 
+import { home,userProfile,addressView,addNewAddress,addNewAddressPost,editAddress,editAddressPut,deleteAddress, filterDataFetch, wishList, addWisList, removeWishList, wallet, categoryView} from '../controller/userController/userController.mjs'; 
 import { applyCoupon, checkout, placeOrder, removeCoupon, rePay, walletPayment } from '../controller/userController/checkoutController.mjs';
 //import { home,userProfile,addressView,addNewAddress,addNewAddressPost,editAddress,editAddressPut,deleteAddress, filterDataFetch, wishList, addWisList, removeWishList} from '../controller/userController/userController.mjs'; 
 import passport from 'passport';
@@ -51,6 +51,7 @@ userRouter.get('/auth/google/callback', googleAuthCallback);
 userRouter.get('/home',home)
 userRouter.get('/productView/:id',productView)
 userRouter.get('/allProducts',allProducts)
+userRouter.get('/categoryView',categoryView)
 
 
 

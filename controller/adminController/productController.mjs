@@ -843,3 +843,8 @@ export const allProductsSort = async (req, res) => {
 };
 
 export const allProductsFilter = async (req, res) => {};
+
+
+
+
+

@@ -218,7 +218,7 @@
                 <option selected disabled value="">Select Coupon</option>
                 <% eligibleCoupons.forEach(coupon=>{ %>
                   <option value="<%= coupon._id %>">
-                    <%= coupon.couponCode %>
+                    <%= coupon.couponCode %> || <% if (coupon.discountType === 'Percentage'){  %> <%= coupon.discountValue %>%<% }else{ %>₹ <%= coupon.discountValue %><% } %> coupon discount
                   </option>
 
                   <% }) %>

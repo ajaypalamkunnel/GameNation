@@ -36,13 +36,14 @@
       
               <!-- Transaction rows -->
               <div class="space-y-2 mt-4">
+                <% wallet.transactions.reverse() %>
                 <% wallet.transactions.forEach(transaction => { %>
                   <div class="grid grid-cols-4 gap-4 bg-gray-100 p-3 rounded-md">
                     <div class="text-center"><%= new Date(transaction.transactionDate).toLocaleDateString() %></div>
                     <div class="text-center"><%= transaction.transactionType %></div>
                     <div class="text-center"><%= transaction.orderId || 'N/A' %></div>
                     <div class="text-center <%= transaction.transactionType === 'Credited' ? 'text-green-500' : 'text-red-500' %>">
-                      ₹ <%= transaction.walletAmount %>
+                      ₹ <%= transaction.walletAmount.toFixed(2) %>
                     </div>
                   </div>
                 <% }) %>

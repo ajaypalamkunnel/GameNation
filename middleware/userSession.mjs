@@ -9,7 +9,6 @@ export const isUser= async(req,res,next)=>{
 
 
             const user = await User.findOne({email:req.session.user})
-
             console.log("inside if ",user);
             
            
