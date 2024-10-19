@@ -12,7 +12,7 @@ import Cart from "../../model/cartSchema.mjs";
 
 export const addProduct = async (req, res) => {
   try {
-    if (req.session.admin) {
+    
       const categories = await category.find({ isActive: true });
       // Retrieve flash messages
       const successMessage = req.flash("success");
@@ -23,9 +23,7 @@ export const addProduct = async (req, res) => {
         failedMessage,
         categories,
       });
-    } else {
-      res.redirect("/admin/login");
-    }
+   
   } catch (error) {
     console.error("Error fetching categories: ", error);
     res.status(500).send("Internal Server Error");
@@ -486,7 +484,7 @@ export const allProducts = async (req, res) => {
 
 export const cart = async (req, res) => {
   try {
-    if (req.session.user) {
+    
       const email = req.session.user;
 
       const user = await User.findOne({ email });
@@ -537,9 +535,7 @@ export const cart = async (req, res) => {
         cartItems,
         totalPayable,
       });
-    } else {
-      res.redirect("/login");
-    }
+    
   } catch (error) {
     console.log(`error while rendering ${error}`);
   }
