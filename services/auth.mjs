@@ -7,7 +7,10 @@ import User from "../model/userSchema.mjs";
 passport.use(
     new GoogleStrategy({
         clientID:process.env.GOOGLE_CLIENT_ID,
-        clientSecret:process.env.GOOGLE_CLIENT_SECRET },
+        clientSecret:process.env.GOOGLE_CLIENT_SECRET,
+        callbackURL:'https://gamenation.online/auth/google/callback',
+        state:true
+    },
 
 
     async(accessToken, refreshToken, profile, done)=>{
