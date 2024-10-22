@@ -244,9 +244,10 @@
       // Error response from server (e.g., insufficient stock, product not found)
       Swal.fire({
         icon: "warning",
-        title: "Error adding to cart",
+        title: "Please login",
         text: data.message || "Unable to add product to cart.",
         confirmButtonText: "OK",
+        footer: '<a href="/login">Click here to login</a>'
       });
     }
   } catch (error) {

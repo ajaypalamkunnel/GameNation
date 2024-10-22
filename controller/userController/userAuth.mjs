@@ -14,8 +14,7 @@ export const getSignUp = (req,res)=>{
         res.redirect('/home')
     }else{
        
-        // console.log('Success message:', req.flash('success_msg'));
-        // console.log('Error message:', req.flash('error_msg'));
+       
 
         
         res.render('user/signup',{
@@ -274,30 +273,27 @@ export const forgotOtpMail = async(req,res)=>{
 }
 
 
-export const validateForgotOtp = async(req,res)=>{
-    try {
+//---------------------------- password forgot otp validator --------------------------------
 
-        
 
-        const {otp} = req.body;
+export const validateForgotOtp = async (req, res) => {
+  try {
+    const { otp } = req.body;
 
-        console.log(otp,"---",req.session.otp);
-        
+    console.log(otp, "---", req.session.otp);
 
-        if(otp == req.session.otp){
-            req.session.otp = null;
-            return res.status(200).json({status:'success',message:'OTP validated successfully'})
-        }
-
-        return res.status(400).json({status:'error',message:'Invalid OTP'})
-        
-    } catch (error) {
-
-        console.log('Error while validating OTP : ',error);
-        
-        
+    if (otp == req.session.otp) {
+      req.session.otp = null;
+      return res
+        .status(200)
+        .json({ status: "success", message: "OTP validated successfully" });
     }
-}
+
+    return res.status(400).json({ status: "error", message: "Invalid OTP" });
+  } catch (error) {
+    console.log("Error while validating OTP : ", error);
+  }
+};
 
 
 
@@ -348,20 +344,22 @@ export const googleAuthCallback = (req, res, next) => {
   };
 
 
+//---------------------------- forgot password changing form  --------------------------------
 
-  export const forgotPassword = async(req,res)=>{
+
+  export const forgotPassword = async (req, res) => {
     try {
-        res.render('user/forgotPassword',{
-            title:'Forgot Password'
-        })
-        
+      res.render("user/forgotPassword", {
+        title: "Forgot Password",
+      });
     } catch (error) {
-        console.log("error while loading ",error);
-        
+      console.log("error while loading ", error);
     }
+  };
 
 
-  }
+//---------------------------- forgot password mail enter form --------------------------------
+
   export const forgotPasswordMail = async(req,res)=>{
     try {
         res.render('user/forgotPasswordMail',{
@@ -376,65 +374,67 @@ export const googleAuthCallback = (req, res, next) => {
 
   }
 
-  export const forgotPasswordPost = async(req,res)=>{
+//---------------------------- forgot password post controller--------------------------------
 
+  export const forgotPasswordPost = async (req, res) => {
     try {
-        const {confirmPassword} = req.body;
+      const { confirmPassword } = req.body;
 
-        const user = await User.findOne({email:req.session.otpMail})
+      const user = await User.findOne({ email: req.session.otpMail });
 
-        if(!user){
-            return res.status(404).json({status:'notFound',message:'User not found'})
-        }
+      if (!user) {
+        return res
+          .status(404)
+          .json({ status: "notFound", message: "User not found" });
+      }
 
-        const hashedPassword = await bcrypt.hash(confirmPassword, 10);
+      const hashedPassword = await bcrypt.hash(confirmPassword, 10);
 
-        user.password =  hashedPassword;
+      user.password = hashedPassword;
 
-        await user.save();
-        req.session.otpMail = null;
+      await user.save();
+      req.session.otpMail = null;
 
-        return res.status(200).json({status:'success',message:'Password changed successfully'})
-        
+      return res
+        .status(200)
+        .json({ status: "success", message: "Password changed successfully" });
     } catch (error) {
-        console.log("error while changing password",error);
-        
+      console.log("error while changing password", error);
     }
-
-  }
-
+  };
 
 
 
-  export const userLogout = (req,res)=>{
-
-    req.session.destroy((err)=>{
-        if(err){
-            console.error('Error destroying session:', err);
-            return res.status(500).send('Error logging out');
-        }
-
-        res.redirect('/login');
-
-    })
-
-  }
+//---------------------------- user loguot--------------------------------
 
 
+  export const userLogout = (req, res) => {
+    req.session.destroy((err) => {
+      if (err) {
+        console.error("Error destroying session:", err);
+        return res.status(500).send("Error logging out");
+      }
 
-export const passwordChangeGet = async (req,res)=>{
-    const categories = await category.find({isActive:true});
-
-    res.render('user/passwordChange',{
-        title:'Password Change',
-        categories,
-        user:req.session.user
-
-    })
+      res.redirect("/login");
+    });
+  };
 
 
+//---------------------------- change password  from inside --------------------------------
 
-}
+
+export const passwordChangeGet = async (req, res) => {
+  const categories = await category.find({ isActive: true });
+
+  res.render("user/passwordChange", {
+    title: "Password Change",
+    categories,
+    user: req.session.user,
+  });
+};
+
+
+//---------------------------- password change post --------------------------------
 
 
 export const passwordChange = async(req,res)=>{
@@ -477,6 +477,10 @@ export const passwordChange = async(req,res)=>{
     }
 
 }
+
+
+
+//---------------------------- user profile mobile number updation --------------------------------
 
 export const updateMobile = async(req,res)=>{
     try {

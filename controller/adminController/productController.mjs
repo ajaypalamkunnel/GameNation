@@ -654,7 +654,7 @@ export const addToCart = async (req, res) => {
 export const removeProductFromCart = async (req, res) => {
   try {
     const { productId } = req.body;
-    if (req.session.user) {
+    
       
 
       const email = req.session.user;
@@ -679,9 +679,7 @@ export const removeProductFromCart = async (req, res) => {
         message: "Item remove successfully",
         totalPayable: userCart.totalPrice,
       });
-    } else {
-      res.redirect("/login");
-    }
+    
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error removing item from cart" });
@@ -690,7 +688,7 @@ export const removeProductFromCart = async (req, res) => {
 
 export const updateCartQuantity = async (req, res) => {
   try {
-    if (req.session.user) {
+    
       const { productId, action } = req.body;
       const email = req.session.user;
       const user = await User.findOne({ email });
@@ -761,9 +759,7 @@ export const updateCartQuantity = async (req, res) => {
         productPrice: cartItem.productPrice,
         totalPayable: cart.totalPrice,
       });
-    } else {
-      res.redirect("/login");
-    }
+    
   } catch (error) {
     console.error("Error updating cart:", error);
     res.status(500).json({ message: "Server error" });

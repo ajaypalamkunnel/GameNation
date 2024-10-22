@@ -2,6 +2,8 @@ import OrderSchema from "../../model/orderSchema.mjs";
 import xlsx from 'xlsx';
 import PDFDocument from "pdfkit";
 
+//----------------- date based filter applying function ------------------
+
 const applyDateFilter = (filter) => {
   const now = new Date();
   let dateFilter = {};
@@ -39,6 +41,8 @@ const applyDateFilter = (filter) => {
 
   return dateFilter;
 };
+
+//----------------------- sales data admin dashboard------------------------------
 
 export const sales = async (req, res) => {
   try {
@@ -126,7 +130,7 @@ export const sales = async (req, res) => {
 };
 
 
-
+//----------------- Report exporting controller-----------------
 
 
 export const exportReport = async(req,res)=>{

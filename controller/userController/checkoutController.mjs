@@ -9,79 +9,68 @@ import Product from "../../model/productSchema.mjs";
 import User from "../../model/userSchema.mjs";
 import Wallet from "../../model/walletSchema.mjs";
 
-export const checkout = async(req,res)=>{
-    
-    
 
-    try {
-        if(req.session.user){
+//------------------checkout controller-----------------------
 
+export const checkout = async (req, res) => {
+  try {
+    const email = req.session.user;
+    const user = await User.findOne({ email });
 
-            const email = req.session.user;
-            const user = await User.findOne({email});
+    const cartDetails = await Cart.findOne({ userId: user._id }).populate(
+      "items.productId"
+    );
 
-            
+    const items = cartDetails.items;
 
-            const cartDetails = await Cart.findOne({userId:user._id}).populate('items.productId')
-            
-            const items = cartDetails.items;
-
-            if(items.length === 0){
-                return res.redirect('/cart')
-            }
-
-            cartDetails.items.forEach((item)=>{
-                if(item.productId.isDelete === true){
-                    console.log("Product is not Available , Remove product From cart");
-                    
-                }
-            });
-
-            //coupon;
-
-            const availableCoupons = await Coupon.find({
-                isActive:true,
-                endDate:{$gte: new Date()},
-                minimumOrderAmount:{$lte: cartDetails.totalPrice}
-            })
-            
-            const eligibleCoupons = availableCoupons.filter((coupon)=>{
-                const couponUsage = user.couponUsed.find((c)=>c.couponId.equals(coupon._id))
-                if(couponUsage){
-                    return couponUsage.usageCount < coupon.usageCount
-                }
-                return true;
-            })
-
-
-            const categories = await category.find({ isActive: true });
-
-            res.render('user/checkout',{
-                title:'checkout',
-                categories,
-                items:cartDetails.items,
-                user:req.session.user,
-                addresses:user.address,
-                cartTotal:cartDetails.totalPrice,
-                payableAmount:cartDetails.payableAmount,
-                eligibleCoupons,
-                cartDetails
-            })
-
-
-
-        }else{
-            res.redirect('/login')
-        }
-    } catch (error) {
-
-        console.log("error while rendering check out ",error);
-        res.redirect('/cart');
-        
-        
+    if (items.length === 0) {
+      return res.redirect("/cart");
     }
-}
 
+    cartDetails.items.forEach((item) => {
+      if (item.productId.isDelete === true) {
+        console.log("Product is not Available , Remove product From cart");
+      }
+    });
+
+    //coupon;
+
+    const availableCoupons = await Coupon.find({
+      isActive: true,
+      endDate: { $gte: new Date() },
+      minimumOrderAmount: { $lte: cartDetails.totalPrice },
+    });
+
+    const eligibleCoupons = availableCoupons.filter((coupon) => {
+      const couponUsage = user.couponUsed.find((c) =>
+        c.couponId.equals(coupon._id)
+      );
+      if (couponUsage) {
+        return couponUsage.usageCount < coupon.usageCount;
+      }
+      return true;
+    });
+
+    const categories = await category.find({ isActive: true });
+
+    res.render("user/checkout", {
+      title: "checkout",
+      categories,
+      items: cartDetails.items,
+      user: req.session.user,
+      addresses: user.address,
+      cartTotal: cartDetails.totalPrice,
+      payableAmount: cartDetails.payableAmount,
+      eligibleCoupons,
+      cartDetails,
+    });
+  } catch (error) {
+    console.log("error while rendering check out ", error);
+    res.redirect("/cart");
+  }
+};
+
+//------------------- coupon appling controller -------------------------
 
 export const applyCoupon = async (req, res) => {
   try {
@@ -189,26 +178,24 @@ export const applyCoupon = async (req, res) => {
   
 };
 
+//----------------- coupon removing controller------------------------------
 
 export const removeCoupon = async (req, res) => {
   try {
-    
-    
     const user = await User.findOne({ email: req.session.user });
-    
+
     // Find the user's cart
     if (!user) {
       return res.redirect("/login");
     }
-    
+
     const cart = await Cart.findOne({ userId: user._id });
 
     if (!cart) {
-      return res.status(404).json({ status: "error", message: "Cart not found" });
+      return res
+        .status(404)
+        .json({ status: "error", message: "Cart not found" });
     }
-
-
-
 
     // Check if the coupon is applied to the cart
     if (!cart.isCouponApplied) {
@@ -236,7 +223,7 @@ export const removeCoupon = async (req, res) => {
     cart.payableAmount = total;
     cart.isCouponApplied = false; // Coupon no longer applied
     cart.couponDiscount = 0; // Reset the coupon discount
-    appliedCouponId=null;
+    appliedCouponId = null;
 
     // Save the cart and user
     await cart.save();

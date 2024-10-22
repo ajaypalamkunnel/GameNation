@@ -30,9 +30,11 @@ export const orderSummary = async (req, res) => {
   }
 };
 
+//---------------------------- order list user side --------------------------------
+
 export const orders = async (req, res) => {
   try {
-    if (req.session.user) {
+   
       const email = req.session.user;
 
       const user = await User.findOne({ email });
@@ -53,15 +55,13 @@ export const orders = async (req, res) => {
         categories,
         title: "Orders",
       });
-    } else {
-      res.redirect("/login");
-    }
+   
   } catch (error) {
     console.log("error while rendering orders ", error);
   }
 };
 
-// ---------------------------------- status change ------------------------------
+// ---------------------------------- order status changer ------------------------------
 
 export const orderStatus = async (req, res) => {
   try {
@@ -105,8 +105,11 @@ export const orderStatus = async (req, res) => {
   }
 };
 
+
+//----------------------------order view user side--------------------------------
+
+
 export const orderView = async (req, res) => {
-  console.log("I am in orderview");
 
   try {
     const { orderId } = req.query;
@@ -136,13 +139,12 @@ export const orderView = async (req, res) => {
 };
 
 
+//---------------------------- sales report view controller --------------------------------
+
 
 export const salesReoprtView = async (req, res) => {
-  console.log("I am in orderview");
-
   try {
     const { orderId } = req.query;
-    
 
     const order = await OrderSchema.findOne({ _id: orderId }).populate({
       path: "products.product_id",
@@ -150,8 +152,6 @@ export const salesReoprtView = async (req, res) => {
       model: Product,
       options: { strictPopulate: false },
     });
-
-    
 
     res.render("admin/saleReportView", {
       title: "Order Details",
@@ -162,16 +162,16 @@ export const salesReoprtView = async (req, res) => {
   }
 };
 
+
+
+//---------------------------- order cancel controller --------------------------------
+
 export const cancelOrder = async (req, res) => {
-  console.log("hiiiii cancelOrder");
-
-
   try {
-    const user = await User.findOne({email:req.session.user});
+    const user = await User.findOne({ email: req.session.user });
     const { orderId, cancelReason } = req.body;
 
     console.log(orderId);
-    
 
     if (!orderId) {
       console.log(orderId);
@@ -185,39 +185,41 @@ export const cancelOrder = async (req, res) => {
     if (!order) {
       console.log("order");
       return res
-      .status(404)
-      .json({ message: "Order not found or access denied." });
+        .status(404)
+        .json({ message: "Order not found or access denied." });
     }
-    const orderdetails = await OrderSchema.findById(orderId)
+    const orderdetails = await OrderSchema.findById(orderId);
 
-    if(orderdetails.paymentMethod === 'razorpay' || orderdetails.paymentMethod === 'Wallet'){
-
-      let wallet = await Wallet.findOne({userId:user._id})
-      if(!wallet){
-        return res.status(404).json({status:'error',message:'Wallet not avaliable'})
+    if (
+      orderdetails.paymentMethod === "razorpay" ||
+      orderdetails.paymentMethod === "Wallet"
+    ) {
+      let wallet = await Wallet.findOne({ userId: user._id });
+      if (!wallet) {
+        return res
+          .status(404)
+          .json({ status: "error", message: "Wallet not avaliable" });
       }
 
       wallet.balance += orderdetails.priceAfterCouponDiscount;
 
       wallet.transactions.push({
-        walletAmount:orderdetails.priceAfterCouponDiscount,
-        orderId:orderdetails.orderId,
-        transactionType:'Credited',
-        transactionDate: new Date()
+        walletAmount: orderdetails.priceAfterCouponDiscount,
+        orderId: orderdetails.orderId,
+        transactionType: "Credited",
+        transactionDate: new Date(),
+      });
 
-      })
-
-      await wallet.save()
-
+      await wallet.save();
     }
-
-
 
     return res.status(200).json({ message: "order cancelled successfully" });
   } catch (error) {
     console.log("error while cancelling order ", error);
   }
 };
+
+//------------ order return controller ----------------------
 
 export const returnOrder = async (req, res) => {
   console.log("hi return order");
@@ -305,14 +307,12 @@ export const returnOrder = async (req, res) => {
 
 
 
+//---------------------------- razorpay order creation --------------------------------
+
 export const paymentRender = async (req, res) => {
   try {
-   
-    
     const totalAmount = req.params.amount;
     const instance = razorpayInstance;
-
-    
 
     const options = {
       amount: totalAmount * 100,
@@ -328,7 +328,7 @@ export const paymentRender = async (req, res) => {
           .json({ error: `Failed to create oreder : ${error.message}` });
       }
       console.log(order.id);
-      
+
       return res.status(200).json({ orderId: order.id });
     });
   } catch (error) {

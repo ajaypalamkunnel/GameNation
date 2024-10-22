@@ -64,7 +64,7 @@ export const adminLogout = (req,res)=>{
 }
 
 
-
+//---------------------- function for Date Filter   ----------------------
 
 const applyDateFilter = (filter) => {
   console.log("filter");
@@ -110,7 +110,7 @@ const applyDateFilter = (filter) => {
 
 export const dashboard = async (req, res) => {
   try {
-    if (req.session.admin) {
+    
       //----------------------- Daily data---------------------
 
       const startOfDay = new Date();
@@ -390,9 +390,7 @@ export const dashboard = async (req, res) => {
         categoryData: JSON.stringify(categoryData),
         finalTotalSaleAmount
       });
-    } else {
-      res.redirect("/admin/login");
-    }
+    
   } catch (error) {
     console.error("Error in admin dashboard:", error);
     res.status(500).send("Internal Server Error");
@@ -487,16 +485,14 @@ export const dashboardFilter = async (req, res) => {
 
 export const addCategory = (req, res) => {
   try {
-    if (req.session.admin) {
+    
       res.render("admin/addCategory", {
         title: "Add category",
         admin: req.session.admin,
         successMessage: req.flash("success"),
         errorMessage: req.flash("error"),
       });
-    } else {
-      res.redirect("/admin/login");
-    }
+    
   } catch (error) {
     console.log(`error while rendering add category ${error} `);
   }
@@ -582,7 +578,7 @@ export const updateCategory = async (req, res) => {
 
 export const customers = async (req, res) => {
   try {
-    if (req.session.admin) {
+    
       const searchQuery = req.query.search || "";
 
       const page = parseInt(req.query.page) || 1;
@@ -611,9 +607,7 @@ export const customers = async (req, res) => {
         limit: limit,
         searchQuery,
       });
-    } else {
-      res.redirect("/admin/login");
-    }
+   
   } catch (error) {
     console.log(`error while rendering add customers ${error} `);
   }
@@ -640,7 +634,7 @@ export const toggleVerification = async (req, res) => {
 
 export const ordersList = async (req, res) => {
   try {
-    if (req.session.admin) {
+    
       const {
         status,
         paymentMethod,
@@ -701,9 +695,7 @@ export const ordersList = async (req, res) => {
         totalOrders,
         filters: { status, paymentMethod, startDate, endDate },
       });
-    } else {
-      res.redirect("/admin/login");
-    }
+    
   } catch (error) {
     console.log("error while rendring orders", error);
   }
@@ -731,6 +723,10 @@ export const orderViewAdmin = async (req, res) => {
 
 export const searchCustomer = async (req, res) => {};
 
+
+//---------------- offer lisitng controler -------------------
+
+
 export const offers = async (req, res) => {
   try {
     const categories = await category.find({ isActive: true });
@@ -748,6 +744,10 @@ export const offers = async (req, res) => {
     console.log("Error while rendering offers : ", error);
   }
 };
+
+
+//---------------------- offer adding post controller ----------------------
+
 
 export const addOfferPost = async (req, res) => {
   try {
@@ -803,6 +803,8 @@ export const addOfferPost = async (req, res) => {
     });
   }
 };
+
+//---------------------- Offer removing  ----------------------
 
 export const removeOffer = async (req, res) => {
   try {

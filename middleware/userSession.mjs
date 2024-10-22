@@ -2,8 +2,8 @@ import User from "../model/userSchema.mjs";
 
 export const isUser= async(req,res,next)=>{
     try {
-        console.log("================",req.session.user);
-        console.log("goooglei id:",req.session.user.isVerified);
+        //console.log("================",req.session.user);
+       // console.log("goooglei id:",req.session.user.isVerified);
         
         if(req.session.user){
 

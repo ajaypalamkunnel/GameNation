@@ -1,6 +1,8 @@
 import category from "../../model/categoryScehema.mjs";
 import Coupon from "../../model/couponSchema.mjs";
 
+//---------------- coupon listing controller--------------------------
+
 export const coupons = async(req,res)=>{
 
     try {
@@ -17,26 +19,24 @@ export const coupons = async(req,res)=>{
 
 }
 
-export const addCoupon = async(req,res)=>{
+//---------------------------- add coupon form --------------------------------
 
-    try {
+export const addCoupon = async (req, res) => {
+  try {
+    const categories = await category.find({ isActive: true });
 
-        const categories = await category.find({ isActive: true });
-        
-        
-        
-        res.render('admin/addCoupon',{
-            title:'Add Coupon',
-            categories
-        })
-    } catch (error) {
-        console.log('error while rendering the add coupon '),error;
-        
-        
-    }
+    res.render("admin/addCoupon", {
+      title: "Add Coupon",
+      categories,
+    });
+  } catch (error) {
+    console.log("error while rendering the add coupon "), error;
+  }
+};
 
 
-}
+
+//---------------------------- add coupon form post controller--------------------------------
 
 export const addCouponPost = async (req, res) => {
     try {
@@ -83,6 +83,8 @@ export const addCouponPost = async (req, res) => {
 };
 
 
+//---------------------------- remove coupon controller --------------------------------
+
 export const removeCoupon =  async(req,res)=>{
     try {
 
@@ -107,35 +109,31 @@ export const removeCoupon =  async(req,res)=>{
     }
 }
 
-export const userCoupons = async(req,res)=>{
-    try {
 
-        if(req.session.user){
-            
-            const categories = await category.find({ isActive: true });
-            const coupons = await Coupon.find({isActive:true})
-
-            console.log(coupons);
-            
-    
-            res.render('user/coupons',{
-                categories,
-                user:req.session.user,
-                title:'Coupons',
-                coupons:coupons
-            })
-        }else{
-            res.redirect('/login')
-        }
+//---------------------------- user side  coupon listing --------------------------------
 
 
-        
-        
-    } catch (error) {
-        console.log('Error while rendering the  coupon page', error);
-        
-    }
-}
+export const userCoupons = async (req, res) => {
+  try {
+    const categories = await category.find({ isActive: true });
+    const coupons = await Coupon.find({ isActive: true });
+
+    console.log(coupons);
+
+    res.render("user/coupons", {
+      categories,
+      user: req.session.user,
+      title: "Coupons",
+      coupons: coupons,
+    });
+  } catch (error) {
+    console.log("Error while rendering the  coupon page", error);
+  }
+};
+
+
+
+//---------------------------- edit coupon form --------------------------------
 
 
 export const editCoupon = async(req,res)=>{
@@ -161,8 +159,12 @@ export const editCoupon = async(req,res)=>{
     
 }
 
+
+//---------------------------- edit coupon post request --------------------------------
+
+
 export const editCouponPost = async(req,res)=>{
-    console.log("edit ");
+    
     try {
         const { couponCode, minAmount, discountValue, discountType, startDate, expiryDate, usageCount,coupon_id } = req.body;
     
@@ -191,8 +193,6 @@ export const editCouponPost = async(req,res)=>{
         console.error('error while edit coupon',error);
         return res.status(500).json({status:'error',message:'server error coupon edit'})
     }
-    
-
 
     
 }
