@@ -15,8 +15,6 @@ export const getSignUp = (req,res)=>{
     }else{
        
        
-
-        
         res.render('user/signup',{
             success_msg: req.flash('success_msg'),
             error_msg: req.flash('error_msg'),

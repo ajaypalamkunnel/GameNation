@@ -9,7 +9,7 @@
 
     <!-- Main Content Section (3/4 of the width) -->
     <div class="w-full bg-gray-700 md:w-3/4 flex-grow p-4">
-        <div class="bg-gray-800 max-w-4xl mx-auto rounded-lg shadow-lg p-8">
+        <div class="bg-gray-800 max-w-4xl mx-auto rounded-lg shadow-lg p-4 sm:p-8">
             <!-- Left Profile Section -->
             <div class="flex flex-col md:flex-row bg-gray-800 text-white rounded-lg">
                 <div class="md:w-1/3 flex flex-col items-center justify-center p-8">
@@ -21,12 +21,10 @@
                     <h2 class="text-xl font-bold"><%=userProfile.username%></h2>
                     <p class="text-sm mt-1"><%=userProfile.email%></p>
                     <p class="text-sm mt-1"><%=userProfile.phone === "" ? '--' : userProfile.phone%></p>
-
-                    
                 </div>
 
                 <!-- Right Form Section -->
-                <div class="md:w-2/3 bg-gray-100 p-8 rounded-b-lg md:rounded-r-lg md:rounded-bl-none">
+                <div class="md:w-2/3 bg-gray-100 p-4 sm:p-8 rounded-b-lg md:rounded-r-lg md:rounded-bl-none">
                     <!-- Form Heading -->
                     <h2 class="text-lg font-semibold text-gray-800 mb-6">Edit Your Profile</h2>
 
@@ -40,7 +38,7 @@
                             </div>
                             <div class="w-full mb-4">
                                 <label for="lastName" class="block text-gray-600 text-sm">Phone</label>
-                                <input type=tel"  id="phone" value="" class="w-full mt-1 p-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                                <input type="tel" id="phone" value="" class="w-full mt-1 p-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
                                 <p id="phoneError" class="text-red-500 text-sm mt-1 hidden">Please enter a valid 10 digit mobile number.</p>
                             </div>
                         </div>
@@ -51,12 +49,13 @@
                                 <label for="email" class="block text-gray-600 text-sm">Email</label>
                                 <input type="email" disabled id="email" value="<%=userProfile.email%>" class="w-full mt-1 p-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
                             </div>
-                            
                         </div>
+
                         <!-- Buttons -->
                         <div class="flex mt-6">
-                           
-                            <button type="submit" id="submitProfile" class="bg-green-500 text-white py-2 px-6 rounded-md hover:bg-green-600 focus:outline-none">Save Changes</button>
+                            <button type="submit" id="submitProfile" class="bg-green-500 text-white py-2 px-6 rounded-md hover:bg-green-600 focus:outline-none w-full sm:w-auto">
+                                Save Changes
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -65,65 +64,57 @@
     </div>
 </div>
 
-
 <script>
+    document.getElementById('profileUpdateForm').addEventListener('submit', (event) => {
+        const phoneError = document.getElementById('phoneError');
+        event.preventDefault();
+        const phone = document.getElementById('phone').value;
+        const phoneRegex = /^[6-9]\d{9}$/;
 
-   document.getElementById('profileUpdateForm').addEventListener('submit',(event)=>{
-
-    const phoneError = document.getElementById('phoneError')
-
-    event.preventDefault(   )
-    const phone = document.getElementById('phone').value;
-    const phoneRegex = /^[6-9]\d{9}$/;
-    
-    if(!phoneRegex.test(phone)){
-        phoneError.classList.remove('hidden');
-        return
-    }
-
-    const data = {
-        phone: phone
-    }
-
-    fetch('/updateMobile',{
-        method:'PATCH',
-        headers:{
-            'Content-Type': 'application/json'
-        },
-        body:JSON.stringify(data)
-
-    })
-    .then(response => response.json())
-    .then(result=>{
-        if(result.status === 'success'){
-            Swal.fire({
-                icon:"success",
-                title:"Phone Updated",
-                text: "Your phone number has been updated successfully."
-            })
-            .then(()=>{
-                window.location.reload()
-            })
-        }else{
-            Swal.fire({
-                icon:"error",
-                title:"update failed",
-                text: result.message || "Failed to update phone number."
-            })
+        if (!phoneRegex.test(phone)) {
+            phoneError.classList.remove('hidden');
+            return;
         }
-    })
-    .catch(error=>{
-        console.error("Error updating phone:", error);
-        Swal.fire({
-            icon:"error",
-            title:data,
-            text: "An error occurred while updating your phone number."
 
+        const data = {
+            phone: phone
+        };
+
+        fetch('/updateMobile', {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
         })
-    })
-
-
-    
-   })
-
+        .then(response => response.json())
+        .then(result => {
+            if (result.status === 'success') {
+                Swal.fire({
+                    icon: "success",
+                    title: "Phone Updated",
+                    text: "Your phone number has been updated successfully."
+                })
+                .then(() => {
+                    window.location.reload();
+                });
+            } else {
+                Swal.fire({
+                    icon: "error",
+                    title: "Update Failed",
+                    text: result.message || "Failed to update phone number."
+                });
+            }
+        })
+        .catch(error => {
+            console.error("Error updating phone:", error);
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "An error occurred while updating your phone number."
+            });
+        });
+    });
 </script>
+
+

@@ -117,7 +117,7 @@ userRouter.get('/wallet',isUser,wallet)
 userRouter.post('/applyCoupon',isUser,applyCoupon)
 userRouter.post('/removeCoupon',isUser,removeCoupon)
 userRouter.get('/coupons',isUser,userCoupons)
-
+userRouter.get('/*',home)
 
 
 
