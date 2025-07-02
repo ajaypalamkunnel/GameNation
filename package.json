@@ -8,7 +8,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node app.mjs",
     "dev": "nodemon app.mjs",
-    "build": "tailwindcss -i ./src/tailwind.css -o ./public/css/style.css"
+    "build": "npx tailwindcss -i ./src/tailwind.css -o ./public/css/style.css"
+   
   },
   "repository": {
     "type": "git",
