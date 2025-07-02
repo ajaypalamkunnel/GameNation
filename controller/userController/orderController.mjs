@@ -32,33 +32,70 @@ export const orderSummary = async (req, res) => {
 };
 
 //---------------------------- order list user side --------------------------------
-
 export const orders = async (req, res) => {
   try {
-   
-      const email = req.session.user;
+    const email = req.session.user;
+    const user = await User.findOne({ email });
+    
+    if (!user) {
+      return res.redirect('/login');
+    }
 
-      const user = await User.findOne({ email });
-      const categories = await category.find({ isActive: true });
+    const categories = await category.find({ isActive: true });
 
-      const orders = await OrderSchema.find({ customer_id: user._id })
-        .sort({ createdAt: -1 })
-        .populate({
-          path: "products.product_id",
-          select: "product_name category price stock image",
-          model: Product,
-          options: { strictPopulate: false },
-        });
+    // Pagination parameters
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
 
-      res.render("user/orders", {
-        orders: orders,
-        user: req.session.user,
-        categories,
-        title: "Orders",
+    // Get total count for pagination
+    const totalOrders = await OrderSchema.countDocuments({ customer_id: user._id });
+    
+    // Calculate pagination info
+    const totalPages = Math.ceil(totalOrders / limit);
+    const hasNextPage = page < totalPages;
+    const hasPrevPage = page > 1;
+
+    // Fetch orders with pagination
+    const orders = await OrderSchema.find({ customer_id: user._id })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate({
+        path: "products.product_id",
+        select: "product_name category price stock image",
+        model: Product,
+        options: { strictPopulate: false },
       });
-   
+
+    // Pagination data
+    const pagination = {
+      currentPage: page,
+      totalPages,
+      totalOrders,
+      hasNextPage,
+      hasPrevPage,
+      nextPage: hasNextPage ? page + 1 : null,
+      prevPage: hasPrevPage ? page - 1 : null,
+      limit,
+      startIndex: skip + 1,
+      endIndex: Math.min(skip + limit, totalOrders)
+    };
+
+    res.render("user/orders", {
+      orders: orders,
+      pagination: pagination,
+      user: req.session.user,
+      categories,
+      title: "My Orders",
+    });
+
   } catch (error) {
-    console.log("error while rendering orders ", error);
+    console.error("Error while rendering orders:", error);
+    res.status(500).render('error', { 
+      message: 'Something went wrong while loading your orders.',
+      error: error 
+    });
   }
 };
 

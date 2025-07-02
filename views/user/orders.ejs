@@ -1,483 +1,611 @@
 <%- include('header') %>
 
-  <div class="bg-gray-900 p-2">
-    <ul class="flex items-center ml-6   bg-gray-900 font-[sans-serif]  ">
-      <a class="text-white  text-base cursor-pointer" href="/">
-        <li></li>
-        Home
+<!-- Breadcrumb Navigation -->
+<div class="bg-gray-800 border-b border-gray-700">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <nav class="flex items-center py-3" aria-label="Breadcrumb">
+      <ol class="flex items-center space-x-2">
+        <li>
+          <a href="/" class="text-gray-300 hover:text-white transition-colors duration-200 flex items-center">
+            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
+            </svg>
+            Home
+          </a>
         </li>
-      </a>
-      <li>
-        <svg xmlns="http://www.w3.org/2000/svg" class="fill-gray-400 w-3.5 -rotate-90" viewBox="0 0 24 24">
-          <path fill-rule="evenodd"
-            d="M11.99997 18.1669a2.38 2.38 0 0 1-1.68266-.69733l-9.52-9.52a2.38 2.38 0 1 1 3.36532-3.36532l7.83734 7.83734 7.83734-7.83734a2.38 2.38 0 1 1 3.36532 3.36532l-9.52 9.52a2.38 2.38 0 0 1-1.68266.69734z"
-            clip-rule="evenodd" data-original="#000000"></path>
-        </svg>
-      </li>
-      <li class="text-gray-500 text-base cursor-pointer">
-        <a href="/orders">orders</a>
-      </li>
-      <li>
-        <svg xmlns="http://www.w3.org/2000/svg" class="fill-gray-400 w-3.5 -rotate-90" viewBox="0 0 24 24">
-          <path fill-rule="evenodd"
-            d="M11.99997 18.1669a2.38 2.38 0 0 1-1.68266-.69733l-9.52-9.52a2.38 2.38 0 1 1 3.36532-3.36532l7.83734 7.83734 7.83734-7.83734a2.38 2.38 0 1 1 3.36532 3.36532l-9.52 9.52a2.38 2.38 0 0 1-1.68266.69734z"
-            clip-rule="evenodd" data-original="#000000"></path>
-        </svg>
-      </li>
-    
-    </ul>
+        <li>
+          <svg class="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+          </svg>
+        </li>
+        <li>
+          <span class="text-gray-400 font-medium">Orders</span>
+        </li>
+      </ol>
+    </nav>
   </div>
+</div>
 
-
-  <div class="container mx-auto p-4 bg-gray-900">
-    <h1 class="text-3xl font-bold text-center text-white mb-8">My Orders</h1>
-
-    <% if(!orders || orders.length===0){ %>
-
-      <p class="text-white text-center">You have no orders yet.</p>
-
-      <% }else{ %>
-        <% orders.forEach(order=>{ %>
-          <!-- Order Card 1 -->
-          <div class="bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
-            <div class="flex justify-between items-center mb-4">
-              <div>
-                <p class="text-white text-lg font-semibold">
-                  Order ID: <%= order.order_id %>
-                </p>
-                <p class="text-gray-400 text-sm">
-                  Ordered date: <%= new Date(order.createdAt).toLocaleDateString('en-GB') %>
-                </p>
-                <p class="text-<%= order.orderStatus === 'Delivered' ? 'green-400' : 'yellow-400' %> font-medium">
-                  Order status: <%= order.orderStatus %>
-                </p>
-              </div>
-              <% if (order.orderStatus==='Confirmed' || order.orderStatus==='Pending' || order.orderStatus==='Shipped' )
-                { %>
-                <div>
-                  <a class="bg-red-500 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-red-600"
-                    onclick="showCancelModal('<%= order._id%>')">Cancel</a>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-900 min-h-screen">
+    <!-- Header Section -->
+    <div class="bg-gray-800 shadow-lg border-b border-gray-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <h1 class="text-2xl font-bold text-white">My Orders</h1>
+                <div class="text-sm text-gray-300">
+                    <% if (pagination && pagination.totalOrders > 0) { %>
+                        Showing <%= pagination.startIndex %>-<%= pagination.endIndex %> of <%= pagination.totalOrders %> orders
+                    <% } %>
                 </div>
-                <% }else if(order.orderStatus==='Delivered' ){ %>
-                  <div>
-                    <a class="bg-red-500 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-red-600"
-                      onclick="showReturnModal('<%= order._id%>')">Return</a>
-                  </div>
-                  <% }else if(order.orderStatus==='Cancelled' ){%>
-                    <div>
-                      <p class="text-yellow-300 text-center">Cancelled</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <% if (!orders || orders.length === 0) { %>
+            <!-- Empty State -->
+            <div class="text-center py-16">
+                <div class="mx-auto h-24 w-24 text-gray-600 mb-4">
+                    <i class="fas fa-shopping-bag text-6xl"></i>
+                </div>
+                <h3 class="text-lg font-medium text-white mb-2">No orders yet</h3>
+                <p class="text-gray-400 mb-6">When you place orders, they'll appear here.</p>
+                <a href="/shop" class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                    <i class="fas fa-shopping-cart mr-2"></i>
+                    Start Shopping
+                </a>
+            </div>
+        <% } else { %>
+            <!-- Orders List -->
+            <div class="space-y-6">
+                <% orders.forEach(order => { %>
+                    <div class="bg-gray-800 rounded-xl shadow-lg border border-gray-700 overflow-hidden hover:shadow-xl transition-all duration-200">
+                        <!-- Order Header -->
+                        <div class="bg-gray-700 px-6 py-4 border-b border-gray-600">
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                                <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+                                    <div>
+                                        <div class="flex items-center gap-2 mb-1">
+                                            <span class="text-sm font-medium text-gray-300">Order ID:</span>
+                                            <span class="text-sm font-mono text-white"><%= order.order_id %></span>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-sm text-gray-400">
+                                                <i class="far fa-calendar-alt mr-1"></i>
+                                                <%= new Date(order.createdAt).toLocaleDateString('en-GB', { 
+                                                    day: 'numeric', 
+                                                    month: 'short', 
+                                                    year: 'numeric' 
+                                                }) %>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium
+                                            <% if (order.orderStatus === 'Delivered') { %>
+                                                bg-green-900 text-green-300 border border-green-800
+                                            <% } else if (order.orderStatus === 'Cancelled') { %>
+                                                bg-red-900 text-red-300 border border-red-800
+                                            <% } else if (order.orderStatus === 'Returned') { %>
+                                                bg-yellow-900 text-yellow-300 border border-yellow-800
+                                            <% } else if (order.orderStatus === 'Shipped') { %>
+                                                bg-blue-900 text-blue-300 border border-blue-800
+                                            <% } else { %>
+                                                bg-gray-600 text-gray-300 border border-gray-500
+                                            <% } %>">
+                                            <i class="fas fa-circle text-xs mr-1"></i>
+                                            <%= order.orderStatus %>
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Action Buttons -->
+                                <div class="flex items-center gap-2">
+                                    <% if (['Confirmed', 'Pending', 'Shipped'].includes(order.orderStatus)) { %>
+                                        <button onclick="showCancelModal('<%= order._id %>')" 
+                                                class="inline-flex items-center px-3 py-2 text-xs font-medium text-red-300 bg-red-900 border border-red-800 rounded-lg hover:bg-red-800 transition-colors duration-200">
+                                            <i class="fas fa-times mr-1"></i>
+                                            Cancel
+                                        </button>
+                                    <% } else if (order.orderStatus === 'Delivered') { %>
+                                        <button onclick="showReturnModal('<%= order._id %>')" 
+                                                class="inline-flex items-center px-3 py-2 text-xs font-medium text-orange-300 bg-orange-900 border border-orange-800 rounded-lg hover:bg-orange-800 transition-colors duration-200">
+                                            <i class="fas fa-undo mr-1"></i>
+                                            Return
+                                        </button>
+                                    <% } %>
+                                    
+                                    <% if (order.paymentStatus === 'Pending' && ['razorpay', 'Wallet'].includes(order.paymentMethod)) { %>
+                                        <button onclick="payNow('<%= order.priceAfterCouponDiscount.toFixed() %>', '<%= order.order_id %>')" 
+                                                class="inline-flex items-center px-3 py-2 text-xs font-medium text-green-300 bg-green-900 border border-green-800 rounded-lg hover:bg-green-800 transition-colors duration-200">
+                                            <i class="fas fa-credit-card mr-1"></i>
+                                            Pay Now
+                                        </button>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Products List -->
+                        <div class="p-6">
+                            <div class="space-y-4">
+                                <% order.products.forEach(product => { %>
+                                    <div class="flex gap-4 p-4 bg-gray-700 rounded-lg border border-gray-600">
+                                        <!-- Product Image -->
+                                        <div class="flex-shrink-0">
+                                            <% if (product.product_id && product.product_id.image && product.product_id.image.length > 0) { %>
+                                                <img src="<%= product.product_id.image[0] %>" 
+                                                     alt="<%= product.product_name %>" 
+                                                     class="w-16 h-16 object-cover rounded-lg border border-gray-600">
+                                            <% } else { %>
+                                                <div class="w-16 h-16 bg-gray-600 rounded-lg flex items-center justify-center border border-gray-500">
+                                                    <i class="fas fa-image text-gray-400"></i>
+                                                </div>
+                                            <% } %>
+                                        </div>
+
+                                        <!-- Product Details -->
+                                        <div class="flex-1 min-w-0">
+                                            <h4 class="text-sm font-medium text-white truncate">
+                                                <%= product.product_name %>
+                                            </h4>
+                                            <div class="mt-1 flex items-center gap-4 text-sm text-gray-300">
+                                                <span>Qty: <%= product.product_quantity %></span>
+                                                <span>₹<%= product.product_price.toFixed(2) %></span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Product Total -->
+                                        <div class="flex-shrink-0 text-right">
+                                            <div class="text-sm font-medium text-white">
+                                                ₹<%= (product.product_price * product.product_quantity).toFixed(2) %>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <% }) %>
+                            </div>
+
+                            <!-- Order Footer -->
+                            <div class="mt-6 pt-4 border-t border-gray-600">
+                                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                                    <a href="/orderView?orderId=<%= order._id %>" 
+                                       class="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-300 bg-blue-900 border border-blue-800 rounded-lg hover:bg-blue-800 transition-colors duration-200">
+                                        <i class="fas fa-eye mr-2"></i>
+                                        View Details
+                                    </a>
+                                    
+                                    <div class="text-right">
+                                        <div class="text-sm text-gray-400 mb-1">Order Total</div>
+                                        <div class="text-lg font-bold text-white">
+                                            ₹<%= (order.totalPrice - order.couponDiscount).toFixed(2) %>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-
-                    <% }else{ %>
-                      <div>
-                        <p class="text-yellow-300 text-center">Returned</p>
-                      </div>
-
-                      <% } %>
-
-
+                <% }) %>
             </div>
 
-
-            <% order.products.forEach(product=>{ %>
-
-              <div class="flex flex-col md:flex-row mb-4">
-                <!-- Product Image -->
-                <div class="w-full md:w-1/4 mb-4 md:mb-0">
-                  <% if (product.product_id && product.product_id.image && product.product_id.image.length> 0) { %>
-                    <img src="<%= product.product_id.image[0] %>" alt="<%= product.product_name %>"
-                      class="rounded-lg w-1/2" />
-                    <% } else { %>
-                      <!-- Fallback Image -->
-                      <img src="/path/to/default-image.jpg" alt="No image available" class="rounded-lg w-full" />
-                      <% } %>
-                </div>
-
-                <!-- Product Details -->
-                <div class="w-full md:w-3/4 md:pl-6">
-                  <p class="text-white font-medium">
-                    <%= product.product_name %>
-                  </p>
-                  <p class="text-gray-400 text-sm">
-                    QTY: <%= product.product_quantity %>
-                  </p>
-                  <p class="text-gray-400 text-sm">
-                    Price: ₹ <%= product.product_price.toFixed(2) %>
-                  </p>
-                  <p class="text-white mt-4 font-bold">
-                    Total: ₹ <%= (product.product_price * product.product_quantity).toFixed(2) %>
-                  </p>
-
-                  <!-- View Details Button -->
-                </div>
-              </div>
-              <% }) %>
-                <div class="mt-10">
-                  <a href="/orderView?orderId=<%= order._id %>"
-                    class="bg-green-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-green-600">view
-                    details</a>
-                </div>
-
-                <!-- Total Price for the Order -->
-                <div class="bg-orange-70">
-
-
-
-
-                  <div class="text-right mt-6">
-                    <p class="text-white font-bold text-xl">
-                      Total: ₹ <%= (order.totalPrice - order.couponDiscount).toFixed(2) %>
-                    </p>
-                  </div>
-
-                  <% if(order.paymentStatus==='Pending' && (order.paymentMethod==='razorpay'
-                    ||order.paymentMethod==='Wallet' )){%>
-                    <div>
-                      <a class="bg-green-500 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-green-600"
-                        onclick="payNow('<%= order.priceAfterCouponDiscount.toFixed() %>','<%= order.order_id %>')">Pay
-                        Now</a>
+            <!-- Pagination -->
+            <% if (pagination && pagination.totalPages > 1) { %>
+                <div class="mt-8 flex items-center justify-between">
+                    <div class="text-sm text-gray-300">
+                        Showing <span class="font-medium text-white"><%= pagination.startIndex %></span> to 
+                        <span class="font-medium text-white"><%= pagination.endIndex %></span> of 
+                        <span class="font-medium text-white"><%= pagination.totalOrders %></span> results
                     </div>
-                    <%}%>
+                    
+                    <div class="flex items-center space-x-2">
+                        <!-- Previous Button -->
+                        <% if (pagination.hasPrevPage) { %>
+                            <a href="?page=<%= pagination.prevPage %>&limit=<%= pagination.limit %>" 
+                               class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-300 bg-gray-800 border border-gray-600 rounded-lg hover:bg-gray-700 hover:text-white transition-colors duration-200">
+                                <i class="fas fa-chevron-left mr-1"></i>
+                                Previous
+                            </a>
+                        <% } else { %>
+                            <span class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-gray-700 border border-gray-600 rounded-lg cursor-not-allowed">
+                                <i class="fas fa-chevron-left mr-1"></i>
+                                Previous
+                            </span>
+                        <% } %>
+
+                        <!-- Page Numbers -->
+                        <div class="hidden sm:flex space-x-1">
+                            <% 
+                                const startPage = Math.max(1, pagination.currentPage - 2);
+                                const endPage = Math.min(pagination.totalPages, pagination.currentPage + 2);
+                                
+                                if (startPage > 1) { %>
+                                    <a href="?page=1&limit=<%= pagination.limit %>" 
+                                       class="relative inline-flex items-center px-3 py-2 text-sm font-medium text-gray-300 bg-gray-800 border border-gray-600 rounded-lg hover:bg-gray-700 hover:text-white transition-colors duration-200">1</a>
+                                    <% if (startPage > 2) { %>
+                                        <span class="relative inline-flex items-center px-3 py-2 text-sm font-medium text-gray-400">...</span>
+                                    <% } %>
+                                <% }
+                                
+                                for (let i = startPage; i <= endPage; i++) { %>
+                                    <% if (i === pagination.currentPage) { %>
+                                        <span class="relative inline-flex items-center px-3 py-2 text-sm font-medium text-blue-300 bg-blue-900 border border-blue-800 rounded-lg">
+                                            <%= i %>
+                                        </span>
+                                    <% } else { %>
+                                        <a href="?page=<%= i %>&limit=<%= pagination.limit %>" 
+                                           class="relative inline-flex items-center px-3 py-2 text-sm font-medium text-gray-300 bg-gray-800 border border-gray-600 rounded-lg hover:bg-gray-700 hover:text-white transition-colors duration-200">
+                                            <%= i %>
+                                        </a>
+                                    <% } %>
+                                <% }
+                                
+                                if (endPage < pagination.totalPages) { %>
+                                    <% if (endPage < pagination.totalPages - 1) { %>
+                                        <span class="relative inline-flex items-center px-3 py-2 text-sm font-medium text-gray-400">...</span>
+                                    <% } %>
+                                    <a href="?page=<%= pagination.totalPages %>&limit=<%= pagination.limit %>" 
+                                       class="relative inline-flex items-center px-3 py-2 text-sm font-medium text-gray-300 bg-gray-800 border border-gray-600 rounded-lg hover:bg-gray-700 hover:text-white transition-colors duration-200">
+                                        <%= pagination.totalPages %>
+                                    </a>
+                                <% } %>
+                        </div>
+
+                        <!-- Next Button -->
+                        <% if (pagination.hasNextPage) { %>
+                            <a href="?page=<%= pagination.nextPage %>&limit=<%= pagination.limit %>" 
+                               class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-300 bg-gray-800 border border-gray-600 rounded-lg hover:bg-gray-700 hover:text-white transition-colors duration-200">
+                                Next
+                                <i class="fas fa-chevron-right ml-1"></i>
+                            </a>
+                        <% } else { %>
+                            <span class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-gray-700 border border-gray-600 rounded-lg cursor-not-allowed">
+                                Next
+                                <i class="fas fa-chevron-right ml-1"></i>
+                            </span>
+                        <% } %>
+                    </div>
                 </div>
-
-
-          </div>
-
-          <% }) %>
             <% } %>
-  </div>
-
-  <!-- order cancel modal -->
-
-  <div class="fixed inset-0 z-50 flex items-center justify-center overflow-auto bg-gray-500 bg-opacity-75 hidden"
-    id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel">
-    <div class="relative w-full max-w-lg mx-auto">
-      <div class="bg-white rounded-lg shadow-xl">
-        <div class="flex items-start justify-between p-4 border-b border-gray-200">
-          <h5 class="text-xl font-medium text-gray-900" id="cancelOrderModalLabel">
-            Cancel Order
-          </h5>
-          <button type="button" class="text-gray-400 hover:text-gray-600 focus:outline-none" data-bs-dismiss="modal"
-            aria-label="Close">
-            <span class="sr-only">Close</span>
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd"
-                d="M10 8.586L4.707 3.293a1 1 0 00-1.414 1.414L8.586 10l-5.293 5.293a1 1 0 001.414 1.414L10 11.414l5.293 5.293a1 1 0 001.414-1.414L11.414 10l5.293-5.293a1 1 0 00-1.414-1.414L10 8.586z"
-                clip-rule="evenodd"></path>
-            </svg>
-          </button>
-        </div>
-        <div class="p-4">
-          <form id="cancelOrderForm">
-            <input class="text-black hidden" type="text" value="" id="orderIdCancel" name="orderId" />
-            <div class="mb-4">
-              <label for="cancelReason" class="block text-sm font-medium text-gray-700">Reason for Cancellation</label>
-              <textarea
-                class="mt-1 block w-full rounded-md border-gray-700 shadow-sm focus:border-indigo-800 focus:ring-indigo-700 sm:text-sm"
-                id="cancelReason" rows="3" required></textarea>
-            </div>
-          </form>
-        </div>
-        <div class="flex items-center justify-end p-4 border-t border-gray-200">
-          <button type="button"
-            class="px-4 py-2 text-sm font-medium text-gray-500 bg-gray-200 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            data-bs-dismiss="modal">
-            Close
-          </button>
-          <button id="submitCancelOrder"
-            class="ml-3 inline-flex justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-            Confirm
-          </button>
-        </div>
-      </div>
+        <% } %>
     </div>
-  </div>
 
-  <!-- order return modal -->
-
-  <!-- Return Order Modal -->
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-gray-500 bg-opacity-75 hidden"
-    id="modalreturnOrder" tabindex="-1" aria-labelledby="returnOrderLabel">
-    <div class="relative w-full max-w-lg mx-auto">
-      <div class="bg-white rounded-lg shadow-xl">
-        <div class="flex items-start justify-between p-4 border-b border-gray-200">
-          <h5 class="text-xl font-medium text-gray-900" id="returnOrderLabel">
-            Return Order
-          </h5>
-          <button id="returnModalCloseButton" type="button" class="text-gray-400 hover:text-gray-600 focus:outline-none"
-            data-bs-dismiss="modal" aria-label="Close">
-            <span class="sr-only">Close</span>
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd"
-                d="M10 8.586L4.707 3.293a1 1 0 00-1.414 1.414L8.586 10l-5.293 5.293a1 1 0 001.414 1.414L10 11.414l5.293 5.293a1 1 0 001.414-1.414L11.414 10l5.293-5.293a1 1 0 00-1.414-1.414L10 8.586z"
-                clip-rule="evenodd"></path>
-            </svg>
-          </button>
-        </div>
-        <div class="p-4">
-          <form id="returnOrderForm">
-            <input type="hidden" id="orderIdReturn" name="orderId" value="" />
-            <div class="mb-4">
-              <label for="returnReason" class="block text-sm font-medium text-gray-700">Reason for Return</label>
-              <textarea
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                id="returnReason" name="returnReason" rows="3" required></textarea>
+    <!-- Cancel Order Modal -->
+    <div id="cancelOrderModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+        <div class="flex min-h-screen items-center justify-center p-4">
+            <div class="fixed inset-0 bg-black bg-opacity-75 transition-opacity"></div>
+            <div class="relative w-full max-w-md transform overflow-hidden rounded-lg bg-gray-800 border border-gray-700 shadow-xl transition-all">
+                <div class="bg-gray-800 px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-900 sm:mx-0 sm:h-10 sm:w-10">
+                            <i class="fas fa-exclamation-triangle text-red-300"></i>
+                        </div>
+                        <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                            <h3 class="text-lg font-medium leading-6 text-white">Cancel Order</h3>
+                            <div class="mt-4">
+                                <label for="cancelReason" class="block text-sm font-medium text-gray-300 mb-2">
+                                    Reason for cancellation
+                                </label>
+                                <textarea id="cancelReason" rows="3" 
+                                          class="w-full rounded-md bg-gray-700 border-gray-600 text-white placeholder-gray-400 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                                          placeholder="Please provide a reason for cancelling this order..."></textarea>
+                                <input type="hidden" id="orderIdCancel">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-700 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                    <button type="button" id="submitCancelOrder"
+                            class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 transition-colors duration-200 sm:ml-3 sm:w-auto">
+                        Confirm Cancel
+                    </button>
+                    <button type="button" onclick="closeCancelModal()"
+                            class="mt-3 inline-flex w-full justify-center rounded-md bg-gray-600 px-3 py-2 text-sm font-semibold text-gray-300 shadow-sm border border-gray-500 hover:bg-gray-500 hover:text-white transition-colors duration-200 sm:mt-0 sm:w-auto">
+                        Cancel
+                    </button>
+                </div>
             </div>
-            <button id="submitReturnOrder" type="submit"
-              class="inline-flex justify-center rounded-md border border-transparent bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
-              Submit Return
-            </button>
-          </form>
         </div>
-      </div>
     </div>
-  </div>
 
-  <%- include('footer') %>
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <!-- Return Order Modal -->
+    <div id="modalreturnOrder" class="fixed inset-0 z-50 hidden overflow-y-auto">
+        <div class="flex min-h-screen items-center justify-center p-4">
+            <div class="fixed inset-0 bg-black bg-opacity-75 transition-opacity"></div>
+            <div class="relative w-full max-w-md transform overflow-hidden rounded-lg bg-gray-800 border border-gray-700 shadow-xl transition-all">
+                <div class="bg-gray-800 px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-orange-900 sm:mx-0 sm:h-10 sm:w-10">
+                            <i class="fas fa-undo text-orange-300"></i>
+                        </div>
+                        <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                            <h3 class="text-lg font-medium leading-6 text-white">Return Order</h3>
+                            <div class="mt-4">
+                                <label for="returnReason" class="block text-sm font-medium text-gray-300 mb-2">
+                                    Reason for return
+                                </label>
+                                <textarea id="returnReason" rows="3" 
+                                          class="w-full rounded-md bg-gray-700 border-gray-600 text-white placeholder-gray-400 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                                          placeholder="Please provide a reason for returning this order..."></textarea>
+                                <input type="hidden" id="orderIdReturn">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-700 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                    <button type="button" id="submitReturnOrder"
+                            class="inline-flex w-full justify-center rounded-md bg-orange-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-orange-500 transition-colors duration-200 sm:ml-3 sm:w-auto">
+                        Submit Return
+                    </button>
+                    <button type="button" onclick="closeReturnModal()"
+                            class="mt-3 inline-flex w-full justify-center rounded-md bg-gray-600 px-3 py-2 text-sm font-semibold text-gray-300 shadow-sm border border-gray-500 hover:bg-gray-500 hover:text-white transition-colors duration-200 sm:mt-0 sm:w-auto">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <!-- Scripts -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
-      function showCancelModal(orderId) {
-        console.log(orderId);
+        // Modal functions
+        function showCancelModal(orderId) {
+            document.getElementById("orderIdCancel").value = orderId;
+            document.getElementById("cancelOrderModal").classList.remove("hidden");
+        }
 
-        document.getElementById("orderIdCancel").value = orderId;
+        function showReturnModal(orderId) {
+            document.getElementById("orderIdReturn").value = orderId;
+            document.getElementById("modalreturnOrder").classList.remove("hidden");
+        }
 
-        document.getElementById("cancelOrderModal").classList.remove("hidden");
-      }
+        function closeCancelModal() {
+            document.getElementById("cancelOrderModal").classList.add("hidden");
+            document.getElementById("cancelReason").value = "";
+        }
 
-      function showReturnModal(orderId) {
-        document.getElementById("orderIdReturn").value = orderId;
-        document.getElementById("modalreturnOrder").classList.remove("hidden");
-      }
+        function closeReturnModal() {
+            document.getElementById("modalreturnOrder").classList.add("hidden");
+            document.getElementById("returnReason").value = "";
+        }
 
-      // Hide modal when close button is clicked
-      document
-        .querySelector('[data-bs-dismiss="modal"]')
-        .addEventListener("click", function () {
-          document.getElementById("cancelOrderModal").classList.add("hidden");
-        });
+        // Cancel order handler
+        document.getElementById("submitCancelOrder").addEventListener("click", function () {
+            const orderId = document.getElementById("orderIdCancel").value;
+            const cancelReason = document.getElementById("cancelReason").value.trim();
 
-      document
-        .getElementById("returnModalCloseButton")
-        .addEventListener("click", function () {
-          document.getElementById("modalreturnOrder").classList.add("hidden");
-        });
-
-      document
-        .getElementById("submitCancelOrder")
-        .addEventListener("click", function () {
-          const orderId = document.getElementById("orderIdCancel").value;
-          const cancelReason = document.getElementById("cancelReason").value;
-
-          if (cancelReason.trim() === "") {
-            Swal.fire({
-              icon: "Warning",
-              title: "Reason required",
-              text: "Please provied a reson for cancelling the order",
-            });
-            return;
-          }
-
-          fetch("/cancelOrder", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ orderId, cancelReason }),
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              if (data.message) {
+            if (!cancelReason) {
                 Swal.fire({
-                  icon: "success",
-                  title: "Order cancelled",
-                  text: "order cancelled successfully",
-                  text: data.message, // Message from the controller
-                  confirmButtonText: "OK",
-                }).then((result) => {
-                  if (result.isConfirmed) {
-                    document
-                      .getElementById("cancelOrderModal")
-                      .classList.add("hidden"); // Close the modal
-                    window.location.href = "/orders";
-                  }
+                    icon: "warning",
+                    title: "Reason Required",
+                    text: "Please provide a reason for cancelling the order",
+                    background: '#1f2937',
+                    color: '#fff',
+                    confirmButtonColor: '#3b82f6'
                 });
-              } else {
-                Swal.fire({
-                  icon: "Warning",
-                  title: "Failed to cancel order",
-                  text: data.message || "An error occurred. Please try again.",
-                });
-              }
-            })
-            .catch((error) => {
-              console.error("Error:", error);
-              Swal.fire({
-                icon: "error",
-                title: "Error",
-                text:
-                  data.message || "An error occurred while cancelling the order.",
-              });
-            })
-            .then((result) => {
-              if (result.isConfirmed) {
-                document.getElementById("modalreturnOrder").classList.add("hidden");
-                window.location.href = "/orders";
-              }
-            });
-        });
-
-      // Retun order
-
-      document
-        .getElementById("submitReturnOrder")
-        .addEventListener("click", function () {
-          const orderId = document.getElementById("orderIdReturn").value;
-          const returnReason = document.getElementById("returnReason").value;
-
-          // Ensure return reason is filled
-          if (!returnReason) {
-            Swal.fire({
-              icon: "warning",
-              title: "Return reason required",
-              text: "Please provide a reason for returning the order.",
-            });
-            return;
-          }
-
-          fetch("/returnOrder", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ orderId, returnReason }),
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              console.log("hitttt");
-
-              if (data.status === "success") {
-                Swal.fire({
-                  icon: "success",
-                  title: "Order Returned",
-                  text: data.message, // Message from the controller
-                  confirmButtonText: "OK",
-                  timer: 3000,
-                })
-                  .then((result) => {
-                    if (result.isConfirmed) {
-                      document.getElementById('modalreturnOrder').classList.add('hidden');
-                      window.location.href = '/orders';
-                    }
-                  });
-              } else {
-                alert("hittt else")
-              }
-            })
-            .catch((error) => {
-              console.error("Error:", error);
-              Swal.fire({
-                icon: "error",
-                title: "Error",
-                text: "An error occurred while returning the order. Please try again later.",
-              });
-            });
-        });
-
-
-      function payNow(totalAmount, orderId) {
-        console.log(totalAmount);
-
-        const URL = `/paymentRender/${totalAmount}`;
-
-        fetch(URL, {
-          method: 'POST',
-          headers: {
-            "Content-Type": "application/json"
-          }
-        })
-          .then(res => {
-            if (!res.ok) {
-              throw new Error("Cannot render the payment page");
+                return;
             }
-            return res.json();
-          })
-          .then(data => {
-            if (data.orderId) {
-              const options = {
-                key: "rzp_test_OZVJGxiPWQgDaM",  // Replace with your Razorpay key
-                amount: totalAmount * 100,  // Razorpay accepts amounts in paise
-                currency: "INR",
-                name: "GameNation",
-                order_id: data.orderId,  // Razorpay Order ID
-                handler: function (response) {
-                  // Successful payment handler
-                  fetch('/rePay', {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': "application/json"
-                    },
-                    body: JSON.stringify({ orderId: orderId })  // Pass orderId as an object
-                  })
-                    .then(async (response) => {
-                      if (response.ok) {
-                        Swal.fire({
-                          position: "center",
-                          icon: "success",
-                          title: "Payment Success",
-                          text: "Your payment was successful!",
-                          showConfirmButton: false,
-                          timer: 2000,
-                        });
-                        const result = await response.json();
 
-                        setTimeout(() => {
-                          window.location.reload();  // Refresh the page
-                        }, 2000);
-                      } else {
-                        Swal.fire({
-                          position: "center",
-                          icon: "error",
-                          title: "Payment Failed",
-                          text: "Your payment failed. Please try again.",
-                          showConfirmButton: false,
-                          timer: 2000,
-                        });
-                      }
-                    })
-                    .catch(error => {
-                      console.error("Error while re-paying amount:", error);
-                      Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'An error occurred while processing the payment.',
-                      });
+            fetch("/cancelOrder", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ orderId, cancelReason }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Order Cancelled",
+                        text: data.message,
+                        confirmButtonText: "OK",
+                        background: '#1f2937',
+                        color: '#fff',
+                        confirmButtonColor: '#10b981'
+                    }).then(() => {
+                        closeCancelModal();
+                        window.location.reload();
                     });
-                },
-                prefill: {
-                  name: "Your Name",
-                  email: "your.email@example.com",
-                  contact: "9999999999",
-                },
-                notes: {
-                  address: "Razorpay Corporate Office"
-                },
-                theme: {
-                  color: "#3399cc"
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Failed to Cancel Order",
+                        text: data.message || "An error occurred. Please try again.",
+                        background: '#1f2937',
+                        color: '#fff',
+                        confirmButtonColor: '#ef4444'
+                    });
                 }
-              };
-              const rzp1 = new Razorpay(options);
-              rzp1.open();
-            }
-          })
-          .catch(error => {
-            console.error("Error during the payment render:", error);
-            Swal.fire({
-              icon: 'error',
-              title: 'Payment Error',
-              text: "Unable to process the payment. Please try again.",
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "An error occurred while cancelling the order.",
+                    background: '#1f2937',
+                    color: '#fff',
+                    confirmButtonColor: '#ef4444'
+                });
             });
-          });
-      }
+        });
 
+        // Return order handler
+        document.getElementById("submitReturnOrder").addEventListener("click", function () {
+            const orderId = document.getElementById("orderIdReturn").value;
+            const returnReason = document.getElementById("returnReason").value.trim();
+
+            if (!returnReason) {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Return Reason Required",
+                    text: "Please provide a reason for returning the order.",
+                    background: '#1f2937',
+                    color: '#fff',
+                    confirmButtonColor: '#3b82f6'
+                });
+                return;
+            }
+
+            fetch("/returnOrder", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ orderId, returnReason }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Order Returned",
+                        text: data.message,
+                        confirmButtonText: "OK",
+                        timer: 3000,
+                        background: '#1f2937',
+                        color: '#fff',
+                        confirmButtonColor: '#10b981'
+                    }).then(() => {
+                        closeReturnModal();
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Failed to Return Order",
+                        text: data.message || "An error occurred. Please try again.",
+                        background: '#1f2937',
+                        color: '#fff',
+                        confirmButtonColor: '#ef4444'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "An error occurred while returning the order. Please try again later.",
+                    background: '#1f2937',
+                    color: '#fff',
+                    confirmButtonColor: '#ef4444'
+                });
+            });
+        });
+
+        // Payment function
+        function payNow(totalAmount, orderId) {
+            const URL = `/paymentRender/${totalAmount}`;
+
+            fetch(URL, {
+                method: 'POST',
+                headers: { "Content-Type": "application/json" }
+            })
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error("Cannot render the payment page");
+                }
+                return res.json();
+            })
+            .then(data => {
+                if (data.orderId) {
+                    const options = {
+                        key: "rzp_test_OZVJGxiPWQgDaM",
+                        amount: totalAmount * 100,
+                        currency: "INR",
+                        name: "GameNation",
+                        order_id: data.orderId,
+                        handler: function (response) {
+                            fetch('/rePay', {
+                                method: 'POST',
+                                headers: { 'Content-Type': "application/json" },
+                                body: JSON.stringify({ orderId: orderId })
+                            })
+                            .then(async (response) => {
+                                if (response.ok) {
+                                    Swal.fire({
+                                        position: "center",
+                                        icon: "success",
+                                        title: "Payment Success",
+                                        text: "Your payment was successful!",
+                                        showConfirmButton: false,
+                                        timer: 2000,
+                                        background: '#1f2937',
+                                        color: '#fff'
+                                    });
+                                    setTimeout(() => {
+                                        window.location.reload();
+                                    }, 2000);
+                                } else {
+                                    Swal.fire({
+                                        position: "center",
+                                        icon: "error",
+                                        title: "Payment Failed",
+                                        text: "Your payment failed. Please try again.",
+                                        showConfirmButton: false,
+                                        timer: 2000,
+                                    });
+                                }
+                            })
+                            .catch(error => {
+                                console.error("Error while re-paying amount:", error);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: 'An error occurred while processing the payment.',
+                                });
+                            });
+                        },
+                        prefill: {
+                            name: "Your Name",
+                            email: "your.email@example.com",
+                            contact: "9999999999",
+                        },
+                        notes: { address: "Razorpay Corporate Office" },
+                        theme: { color: "#3399cc" }
+                    };
+                    const rzp1 = new Razorpay(options);
+                    rzp1.open();
+                }
+            })
+            .catch(error => {
+                console.error("Error during the payment render:", error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Payment Error',
+                    text: "Unable to process the payment. Please try again.",
+                });
+            });
+        }
+
+        // Close modals on outside click
+        document.addEventListener('click', function(event) {
+            const cancelModal = document.getElementById('cancelOrderModal');
+            const returnModal = document.getElementById('modalreturnOrder');
+            
+            if (event.target === cancelModal) {
+                closeCancelModal();
+            }
+            if (event.target === returnModal) {
+                closeReturnModal();
+            }
+        });
+
+        // Close modals on escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeCancelModal();
+                closeReturnModal();
+            }
+        });
     </script>
+</body>
+</html>
