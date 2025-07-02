@@ -1,86 +1,139 @@
-<header class='flex flex-wrap items-center justify-between bg-[#323030] border-b py-4 px-6 font-[sans-serif] min-h-[80px] tracking-wide relative z-50'>
-  <a href="/home">
-    <img src="/images/logo.png" alt="logo" class='w-36' />
-  </a>
+<header class='sticky top-0 z-50 bg-[#121212] border-b border-gray-800 backdrop-blur-sm bg-opacity-95 shadow-lg'>
+  <div class='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+    <div class='flex items-center justify-between h-16 md:h-20'>
+      
+      <!-- Logo Section -->
+      <div class='flex-shrink-0'>
+        <a href="/home" class='block transition-transform duration-200 hover:scale-105'>
+          <img src="/images/logo.png" alt="logo" class='h-8 md:h-10 w-auto' />
+        </a>
+      </div>
 
-  <!-- Collapse Menu Toggle Button (Visible on smaller screens) -->
-  <button id="toggleOpen" class='lg:hidden'>
-    <svg class="w-7 h-7 fill-[#fff]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-      <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path>
-    </svg>
-  </button>
-
-  <!-- Menu Links Section -->
-  <div id="collapseMenu" class='lg:flex items-center ml-5 hidden w-full lg:w-auto'>
-    <ul class='lg:flex lg:gap-x-3 space-y-3 lg:space-y-0 flex-col lg:flex-row'>
-      <!-- Example Dynamic Category Rendering -->
-      <% categories.forEach(category => { %>
-      <li>
-        <a href='/categoryView?fetchCategory=<%= category._id %>' class='text-[#ffffff] hover:text-[#3F9147] text-[15px] block font-thin'>
+      <!-- Desktop Navigation -->
+      <nav class='hidden lg:flex items-center space-x-1 flex-1 justify-center mx-8'>
+        <% categories.forEach(category => { %>
+        <a href='/categoryView?fetchCategory=<%= category._id %>' 
+           class='px-4 py-2 text-sm font-medium text-gray-300 hover:text-white hover:bg-[#364151] rounded-lg transition-all duration-200 ease-in-out transform hover:scale-105'>
           <%= category.collectionName.charAt(0).toUpperCase() + category.collectionName.slice(1).toLowerCase() %>
         </a>
-      </li>
-      <% }) %>
-      <li>
-        <a href="/allProducts" class='text-[#ffffff] hover:text-[#3F9147] text-[15px] block font-thin'>All Products</a>
-      </li>
-    </ul>
+        <% }) %>
+        <a href="/allProducts" 
+           class='px-4 py-2 text-sm font-medium text-gray-300 hover:text-white hover:bg-[#364151] rounded-lg transition-all duration-200 ease-in-out transform hover:scale-105'>
+          All Products
+        </a>
+      </nav>
+
+      <!-- Right Side Actions -->
+      <div class='flex items-center space-x-4'>
+        
+        <!-- Action Icons -->
+        <div class='flex items-center space-x-3'>
+          <!-- Wishlist -->
+          <a href="/wishList" class="relative group p-2 rounded-lg hover:bg-[#364151] transition-all duration-200">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" class="fill-gray-400 group-hover:fill-red-400 transition-colors duration-200" viewBox="0 0 64 64">
+              <path d="M45.5 4A18.53 18.53 0 0 0 32 9.86 18.5 18.5 0 0 0 0 22.5C0 40.92 29.71 59 31 59.71a2 2 0 0 0 2.06 0C34.29 59 64 40.92 64 22.5A18.52 18.52 0 0 0 45.5 4ZM32 55.64C26.83 52.34 4 36.92 4 22.5a14.5 14.5 0 0 1 26.36-8.33 2 2 0 0 0 3.27 0A14.5 14.5 0 0 1 60 22.5c0 14.41-22.83 29.83-28 33.14Z"></path>
+            </svg>
+            <span class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"></span>
+          </a>
+
+          <!-- Cart -->
+          <a href="/cart" class="relative group p-2 rounded-lg hover:bg-[#364151] transition-all duration-200">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" class="fill-gray-400 group-hover:fill-blue-400 transition-colors duration-200" viewBox="0 0 512 512">
+              <path d="M164.96 300.004h.024c.02 0 .04-.004.059-.004H437a15.003 15.003 0 0 0 14.422-10.879l60-210a15.003 15.003 0 0 0-2.445-13.152A15.006 15.006 0 0 0 497 60H130.367l-10.722-48.254A15.003 15.003 0 0 0 105 0H15C6.715 0 0 6.715 0 15s6.715 15 15 15h77.969c1.898 8.55 51.312 230.918 54.156 243.71C131.184 280.64 120 296.536 120 315c0 24.812 20.188 45 45 45h272c8.285 0 15-6.715 15-15s-6.715-15-15-15H165c-8.27 0-15-6.73-15-15 0-8.258 6.707-14.977 14.96-14.996zM477.114 90l-51.43 180H177.032l-40-180zM150 405c0 24.813 20.188 45 45 45s45-20.188 45-45-20.188-45-45-45-45 20.188-45 45zm45-15c8.27 0 15 6.73 15 15s-6.73 15-15 15-15-6.73-15-15 6.73-15 15-15zm167 15c0 24.813 20.188 45 45 45s45-20.188 45-45-20.188-45-45-45-45 20.188-45 45zm45-15c8.27 0 15 6.73 15 15s-6.73 15-15 15-15-6.73-15-15 6.73-15 15-15zm0 0"></path>
+            </svg>
+          </a>
+        </div>
+
+        <!-- User Authentication Section -->
+        <% if (!user) { %>
+        <a href="/login" class="group relative overflow-hidden px-6 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+          <span class="relative z-10">Sign In</span>
+        </a>
+        <% } else { %>
+        <div class='flex items-center space-x-3'>
+          <a href="/userProfile" class="group p-2 rounded-lg hover:bg-[#364151] transition-all duration-200">
+            <svg class="w-5 h-5 fill-gray-400 group-hover:fill-blue-400 transition-colors duration-200" viewBox="0 0 24 24">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+          </a>
+          <a href="/logout" class="group flex items-center px-4 py-2 text-sm font-medium text-gray-300 hover:text-white bg-gray-800 hover:bg-red-600 rounded-lg transition-all duration-200 transform hover:scale-105">
+            <svg class="w-4 h-4 mr-2 group-hover:rotate-12 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            Logout
+          </a>
+        </div>
+        <% } %>
+
+        <!-- Mobile Menu Button -->
+        <button id="toggleOpen" class='lg:hidden p-2 rounded-lg hover:bg-[#364151] transition-all duration-200 ml-2'>
+          <svg class="w-6 h-6 fill-gray-400 hover:fill-white transition-colors duration-200" viewBox="0 0 24 24">
+            <path fill-rule="evenodd" d="M3 6a1 1 0 011-1h16a1 1 0 110 2H4a1 1 0 01-1-1zM3 12a1 1 0 011-1h16a1 1 0 110 2H4a1 1 0 01-1-1zM3 18a1 1 0 011-1h16a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/>
+          </svg>
+        </button>
+      </div>
+    </div>
   </div>
 
-  <!-- Right-side Icons & User Actions -->
-  <div class='flex gap-x-6 items-center ml-auto'>
-    <!-- Search Bar -->
-    <!-- <div class='hidden lg:flex items-center border-2 rounded-full px-4 py-2'>
-      <input type='text' placeholder='Search something...' class='text-sm bg-transparent outline-none' />
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192.904 192.904" width="16px" class="cursor-pointer fill-gray-600">
-        <path d="M190.707 180.101-47.078-47.077c11.702-14.072 18.752-32.142 18.752-51.831C162.381 36.423 125.959 0 81.191 0 36.422 0 0 36.423 0 81.193c0 44.767 36.422 81.187 81.191 81.187 19.688 0 37.759-7.049 51.831-18.751l47.079 47.078a7.474 7.474 0 0 0 5.303 2.197 7.498 7.498 0 0 0 5.303-12.803zM15 81.193C15 44.694 44.693 15 81.191 15c36.497 0 66.189 29.694 66.189 66.193 0 36.496-29.692 66.187-66.189 66.187C44.693 147.38 15 117.689 15 81.193z"></path>
-      </svg>
-    </div> -->
-
-    <!-- Wishlist & Cart Icons -->
-    <div class='flex space-x-4'>
-      <a href="/wishList" class="relative">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20px" class="cursor-pointer fill-[#fff]" viewBox="0 0 64 64">
-          <path d="M45.5 4A18.53 18.53 0 0 0 32 9.86 18.5 18.5 0 0 0 0 22.5C0 40.92 29.71 59 31 59.71a2 2 0 0 0 2.06 0C34.29 59 64 40.92 64 22.5A18.52 18.52 0 0 0 45.5 4ZM32 55.64C26.83 52.34 4 36.92 4 22.5a14.5 14.5 0 0 1 26.36-8.33 2 2 0 0 0 3.27 0A14.5 14.5 0 0 1 60 22.5c0 14.41-22.83 29.83-28 33.14Z"></path>
-        </svg>
-        <!-- <span class="absolute top-0 left-auto -ml-1 bg-red-500 rounded-full px-1 text-xs text-white">0</span> -->
+  <!-- Mobile Navigation Menu -->
+  <div id="collapseMenu" class='lg:hidden hidden bg-[#1a1a1a] border-t border-gray-800'>
+    <div class='px-4 py-3 space-y-1'>
+      <% categories.forEach(category => { %>
+      <a href='/categoryView?fetchCategory=<%= category._id %>' 
+         class='block px-4 py-3 text-sm font-medium text-gray-300 hover:text-white hover:bg-[#364151] rounded-lg transition-all duration-200'>
+        <%= category.collectionName.charAt(0).toUpperCase() + category.collectionName.slice(1).toLowerCase() %>
       </a>
-
-      <a href="/cart" class="relative">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" class="cursor-pointer fill-[#fff]" viewBox="0 0 512 512">
-          <path d="M164.96 300.004h.024c.02 0 .04-.004.059-.004H437a15.003 15.003 0 0 0 14.422-10.879l60-210a15.003 15.003 0 0 0-2.445-13.152A15.006 15.006 0 0 0 497 60H130.367l-10.722-48.254A15.003 15.003 0 0 0 105 0H15C6.715 0 0 6.715 0 15s6.715 15 15 15h77.969c1.898 8.55 51.312 230.918 54.156 243.71C131.184 280.64 120 296.536 120 315c0 24.812 20.188 45 45 45h272c8.285 0 15-6.715 15-15s-6.715-15-15-15H165c-8.27 0-15-6.73-15-15 0-8.258 6.707-14.977 14.96-14.996zM477.114 90l-51.43 180H177.032l-40-180zM150 405c0 24.813 20.188 45 45 45s45-20.188 45-45-20.188-45-45-45-45 20.188-45 45zm45-15c8.27 0 15 6.73 15 15s-6.73 15-15 15-15-6.73-15-15 6.73-15 15-15zm167 15c0 24.813 20.188 45 45 45s45-20.188 45-45-20.188-45-45-45-45 20.188-45 45zm45-15c8.27 0 15 6.73 15 15s-6.73 15-15 15-15-6.73-15-15 6.73-15 15-15zm0 0"></path>
-        </svg>
-        <!-- <span class="absolute top-0 left-auto -ml-1 bg-red-500 rounded-full px-1 text-xs text-white">1</span> -->
+      <% }) %>
+      <a href="/allProducts" 
+         class='block px-4 py-3 text-sm font-medium text-gray-300 hover:text-white hover:bg-[#364151] rounded-lg transition-all duration-200'>
+        All Products
       </a>
     </div>
-
-    <!-- Sign In / User & Logout -->
-    <% if (!user) { %>
-    <a href="/login" class="px-5 py-2 text-sm rounded-full text-white border-2 border-[#3F9147] bg-[#3F9147] hover:bg-[#004bff]">
-      Sign In
-    </a>
-    <% } else { %>
-    <div class='flex items-center space-x-4'>
-      <a class="text-white" href="/userProfile"><i class="fa-solid fa-user"></i></a>
-      <a href="/logout" class="flex items-center px-4 py-2 border border-gray-700 rounded bg-black text-white hover:bg-red-600">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-          <polyline points="16 17 21 12 16 7" />
-          <line x1="21" y1="12" x2="9" y2="12" />
-        </svg>
-        Logout
-      </a>
-    </div>
-    <% } %>
   </div>
 </header>
 
 <script>
-  var toggleOpen = document.getElementById('toggleOpen');
-  var toggleClose = document.getElementById('toggleClose');
-  var collapseMenu = document.getElementById('collapseMenu');
+  // Mobile menu toggle functionality
+  const toggleOpen = document.getElementById('toggleOpen');
+  const collapseMenu = document.getElementById('collapseMenu');
 
   toggleOpen.addEventListener('click', () => {
     collapseMenu.classList.toggle('hidden');
+    
+    // Add smooth slide animation
+    if (!collapseMenu.classList.contains('hidden')) {
+      collapseMenu.style.maxHeight = '0';
+      collapseMenu.style.opacity = '0';
+      setTimeout(() => {
+        collapseMenu.style.maxHeight = '400px';
+        collapseMenu.style.opacity = '1';
+        collapseMenu.style.transition = 'max-height 0.3s ease-out, opacity 0.3s ease-out';
+      }, 10);
+    }
   });
+
+  // Close mobile menu when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!toggleOpen.contains(e.target) && !collapseMenu.contains(e.target)) {
+      collapseMenu.classList.add('hidden');
+    }
+  });
+
+  // Add scroll effect to header
+  let lastScrollTop = 0;
+  const header = document.querySelector('header');
+  
+  window.addEventListener('scroll', () => {
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    
+    if (scrollTop > lastScrollTop && scrollTop > 100) {
+      // Scrolling down
+      header.style.transform = 'translateY(-100%)';
+    } else {
+      // Scrolling up
+      header.style.transform = 'translateY(0)';
+    }
+    
+    lastScrollTop = scrollTop;
+  }, { passive: true });
 </script>

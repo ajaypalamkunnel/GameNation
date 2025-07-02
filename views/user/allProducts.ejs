@@ -49,11 +49,7 @@
       </div>
     </div>
 
-
-
-
     <!-------------------------- Filter Modal --------------------------------->
-    
     
     <div id="filterModal" class="fixed inset-1 bg-gray-900  bg-opacity-75 flex justify-center items-center hidden z-50">
   <div class="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-xl relative">
@@ -435,23 +431,6 @@ document.getElementById('clearBtn').addEventListener('click',()=>{
 document.getElementById('closeFilterModal').addEventListener('click', () => {
   document.getElementById('filterModal').classList.add('hidden');
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 const addToCart = async (productId)=>{
     try {
       const response = await fetch('/cart/add',{
@@ -476,8 +455,7 @@ const addToCart = async (productId)=>{
           time:500
 
         })
-        
-        
+          
       }else{
         Swal.fire({
         icon: 'error',
@@ -499,7 +477,6 @@ const addToCart = async (productId)=>{
     }
   }
 
-
   document.querySelectorAll('.add-to-cart-btn').forEach(button=>{
     button.addEventListener('click',function(){
       const productId = this.getAttribute('data-product-id');
@@ -509,6 +486,5 @@ const addToCart = async (productId)=>{
 
 
 //---------------------filter ---------------------------------------
-
 
 </script>

@@ -427,48 +427,67 @@ export const removeWishList = async(req,res)=>{
 }
 
 
-export const wallet = async(req,res)=>{
+export const wallet = async (req, res) => {
   try {
-    const categories = await category.find({isActive:true});
-    const user = await User.findOne({email:req.session.user})
-    let userWallet = await Wallet.findOne({userId:user._id}).sort({createdAt:-1})
+    const categories = await category.find({ isActive: true });
+    const user = await User.findOne({ email: req.session.user });
+    let userWallet = await Wallet.findOne({ userId: user._id }).sort({ createdAt: -1 });
 
-    if(!userWallet){
-
+    // Create a wallet if it doesn't exist
+    if (!userWallet) {
       const newWallet = new Wallet({
-        userId:user._id,
-        balance:0,
-        transactions:[]
-
-      })
+        userId: user._id,
+        balance: 0,
+        transactions: []
+      });
 
       await newWallet.save();
 
-      return res.render('user/wallet',{
-        title:'Wallet',
+      return res.render('user/wallet', {
+        title: 'Wallet',
         categories,
-        user:req.session.user,
-        wallet:newWallet
-      })
-
+        user: req.session.user,
+        wallet: newWallet,
+        currentPage: 1,
+        totalPages: 0
+      });
     }
 
-    
-    return res.render('user/wallet',{
-      title:'Wallet',
+    // Pagination Logic
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
+    const totalTransactions = userWallet.transactions.length;
+    const totalPages = Math.ceil(totalTransactions / limit);
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+
+    // Clone and sort transactions in descending order
+    const sortedTransactions = [...userWallet.transactions].sort((a, b) => {
+      return new Date(b.transactionDate) - new Date(a.transactionDate);
+    });
+
+    const paginatedTransactions = sortedTransactions.slice(startIndex, endIndex);
+
+    // Prepare wallet object with paginated transactions
+    const walletWithPaginatedTransactions = {
+      ...userWallet.toObject(),
+      transactions: paginatedTransactions
+    };
+
+    return res.render('user/wallet', {
+      title: 'Wallet',
       categories,
-      user:req.session.user,
-      wallet:userWallet
+      user: req.session.user,
+      wallet: walletWithPaginatedTransactions,
+      currentPage: page,
+      totalPages
+    });
 
-    })
-
-    
-    
   } catch (error) {
-    console.log("error while rendering wallet",error);
-    
+    console.error("Error while rendering wallet:", error);
+    res.status(500).send("Internal Server Error");
   }
-}
+};
 
 
 

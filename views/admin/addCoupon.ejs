@@ -23,7 +23,7 @@
                           <!-- Discount -->
                           <div>
                             <label class="block text-sm text-gray-300">Discount</label>
-                            <input id="discount" type="number" class="w-full mt-1 p-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring focus:border-orange-500"  />
+                            <input id="discount" type="number" class="w-full mt-1 p-2 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring focus:border-orange-500" placeholder="Enter discount value"  />
                             <p id="discountValueError" class="text-red-500 text-sm hidden"></p>
                           </div>
                           <!-- Discount Type -->
@@ -166,6 +166,16 @@ function submitForm(event){
 
       }}
 
+    }
+
+    if(discountType == 'Fixed'){
+
+      if(discountValue > minAmount){
+        document.getElementById('discountValueError').innerHTML = 'Discount amount should be less than min amount'
+        document.getElementById('discountValueError').classList.remove('hidden');
+        isValid = false;
+      }
+      
     }
 
 

@@ -1,97 +1,136 @@
 <%- include('header') %>
 
-<div class="flex flex-col md:flex-row min-h-screen">
+  <div class="flex flex-col md:flex-row min-h-screen bg-[#111828] text-white">
 
-    <!-- Sidebar Section (1/4 of the width) -->
-    <div class="w-full bg-gray-700 md:w-1/4">
-        <%- include('sidebar') %>
+    <!-- Sidebar -->
+    <div class="w-full md:w-1/4 bg-[#202938]">
+      <%- include('sidebar') %>
     </div>
 
-    <div class="container bg-[#111828] mx-auto p-4 space-y-8">
-        <!-- Wallet Section -->
-        <div class="lg:w-2/3 mx-auto bg-white shadow-md p-6 rounded-lg">
-          <div class="flex items-center space-x-4">
-            <i class="bi bi-wallet-fill text-3xl text-gray-600"></i>
-            <div>
-              <h1 class="text-2xl font-semibold">Your Wallet</h1>
-              <p class="text-gray-600">Available Balance</p>
-              <h3 class="text-green-500 text-2xl">₹ <%= wallet.balance.toFixed(2) %></h3>
-            </div>
+    <!-- Main Content -->
+    <div class="flex-1 p-4 space-y-8">
+
+      <!-- Wallet Balance Card -->
+      <div class="max-w-2xl mx-auto bg-[#202938] shadow-lg rounded-xl p-6">
+        <div class="flex items-center space-x-4">
+          <i class="bi bi-wallet-fill text-4xl text-green-400"></i>
+          <div>
+            <h1 class="text-2xl font-semibold">Your Wallet</h1>
+            <p class="text-gray-400">Available Balance</p>
+            <h3 class="text-green-400 text-3xl font-bold mt-1">₹ <%= wallet.balance.toFixed(2) %>
+            </h3>
           </div>
         </div>
-      
-        <!-- Transaction History Section -->
-        <div class="lg:w-3/4 mx-auto bg-white shadow-md p-6 rounded-lg">
-          <h1 class="text-2xl font-semibold mb-4">Transaction History</h1>
-      
-          <% if (wallet.transactions.length > 0) { %>
-            <!-- If there are transactions -->
-            <div class="hidden md:block">
-              <div class="grid grid-cols-4 gap-4 font-semibold text-gray-700">
-                <div class="text-center">Date</div>
-                <div class="text-center">Type</div>
-                <div class="text-center">Order Id</div>
-                <div class="text-center">Amount</div>
-              </div>
-      
-              <!-- Transaction rows -->
-              <div class="space-y-2 mt-4">
-                <% wallet.transactions.reverse() %>
-                <% wallet.transactions.forEach(transaction => { %>
-                  <div class="grid grid-cols-4 gap-4 bg-gray-100 p-3 rounded-md">
-                    <div class="text-center"><%= new Date(transaction.transactionDate).toLocaleDateString() %></div>
-                    <div class="text-center"><%= transaction.transactionType %></div>
-                    <div class="text-center"><%= transaction.orderId || 'N/A' %></div>
-                    <div class="text-center <%= transaction.transactionType === 'Credited' ? 'text-green-500' : 'text-red-500' %>">
-                      ₹ <%= transaction.walletAmount.toFixed(2) %>
-                    </div>
-                  </div>
-                <% }) %>
-              </div>
-            </div>
-      
-            <!-- Responsive for smaller screens -->
-            <div class="block md:hidden">
-              <!-- Transaction rows for mobile -->
-              <div class="space-y-4">
-                <% wallet.transactions.forEach(transaction => { %>
-                  <div class="bg-gray-200 p-4 rounded-lg">
-                    <div class="flex justify-between">
-                      <div>
-                        <h6 class="font-semibold">Date</h6>
-                        <p><%= new Date(transaction.transactionDate).toLocaleDateString() %></p>
-                      </div>
-                      <div>
-                        <h6 class="font-semibold">Type</h6>
-                        <p><%= transaction.transactionType %></p>
-                      </div>
-                    </div>
-                    <div class="flex justify-between mt-2">
-                      <div>
-                        <h6 class="font-semibold">Order Id</h6>
-                        <p><%= transaction.orderId || 'N/A' %></p>
-                      </div>
-                      <div class="text-right">
-                        <h6 class="font-semibold">Amount</h6>
-                        <p class="<%= transaction.transactionType === 'Credited' ? 'text-green-500' : 'text-red-500' %>">
-                          ₹ <%= transaction.walletAmount %>
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                <% }) %>
-              </div>
-            </div>
-          <% } else { %>
-            <!-- No transactions case -->
-            <div class="text-center text-gray-500 mt-4 md:mt-8">
-              <h3 class="text-lg">No Transactions Yet</h3>
-            </div>
-          <% } %>
-        </div>
       </div>
-      
-                
 
+      <!-- Transaction History Section -->
+      <!-- Transaction History Section -->
+      <div class="max-w-4xl mx-auto bg-[#1F2937] shadow-xl rounded-2xl p-6 md:p-8">
+        <h2 class="text-2xl md:text-3xl font-bold mb-6 text-white">Transaction History</h2>
 
-</div>
+        <% if (wallet.transactions.length> 0) { %>
+          <!-- Desktop View -->
+          <div class="hidden md:block overflow-x-auto">
+            <table class="w-full table-auto text-left">
+              <thead class="text-gray-400 border-b border-gray-600">
+                <tr>
+                  <th class="px-4 py-3 font-semibold text-sm tracking-wider">Date</th>
+                  <th class="px-4 py-3 font-semibold text-sm tracking-wider">Type</th>
+                  <th class="px-4 py-3 font-semibold text-sm tracking-wider">Order ID</th>
+                  <th class="px-4 py-3 font-semibold text-sm tracking-wider">Amount</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-700">
+                <% wallet.transactions.forEach(transaction=> { %>
+                  <tr class="bg-[#111828] hover:bg-[#2A3447] transition-all duration-200 rounded-lg text-center">
+                    <td class="px-4 py-3 text-gray-300">
+                      <%= new Date(transaction.transactionDate).toLocaleDateString() %>
+                    </td>
+                    <td class="px-4 py-3 text-gray-300 capitalize">
+                      <%= transaction.transactionType %>
+                    </td>
+                    <td class="px-4 py-3 text-gray-300">
+                      <%= transaction.orderId ? transaction.orderId.slice(-6) : 'N/A' %>
+                    </td>
+                    <td
+                      class="px-4 py-3 font-medium <%= transaction.transactionType === 'Credited' ? 'text-green-400' : 'text-red-400' %>">
+                      ₹ <%= transaction.walletAmount.toFixed(2) %>
+                    </td>
+                  </tr>
+                  <% }) %>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Mobile View -->
+          <div class="md:hidden space-y-4 mt-4">
+            <% wallet.transactions.forEach(transaction=> { %>
+              <div
+                class="bg-[#111828] p-4 rounded-xl shadow-md border border-gray-700 transition-transform hover:scale-[1.01]">
+                <div class="flex justify-between items-start mb-2">
+                  <div>
+                    <p class="text-gray-400 text-xs">Date</p>
+                    <p class="text-white font-medium">
+                      <%= new Date(transaction.transactionDate).toLocaleDateString() %>
+                    </p>
+                  </div>
+                  <span
+                    class="inline-block px-2 py-1 rounded-full text-xs font-semibold <%= transaction.transactionType === 'Credited' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400' %>">
+                    <%= transaction.transactionType %>
+                  </span>
+                </div>
+                <div class="mt-3 grid grid-cols-2 gap-2 text-sm">
+                  <div>
+                    <p class="text-gray-400">Order ID</p>
+                    <p class="text-white">
+                      <%= transaction.orderId ? transaction.orderId.slice(-6) : 'N/A' %>
+                    </p>
+                  </div>
+                  <div class="text-right">
+                    <p class="text-gray-400">Amount</p>
+                    <p
+                      class="<%= transaction.transactionType === 'Credited' ? 'text-green-400' : 'text-red-400' %> font-medium">
+                      ₹ <%= transaction.walletAmount.toFixed(2) %>
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <% }) %>
+          </div>
+
+          <!-- Pagination -->
+          <div class="flex justify-center mt-8">
+            <nav class="inline-flex rounded-md overflow-hidden bg-[#111828] shadow-sm">
+              <% if (currentPage> 1) { %>
+                <a href="?page=<%= currentPage - 1 %>"
+                  class="px-4 py-2 bg-[#202938] text-gray-300 hover:bg-gray-600 transition text-sm">Previous</a>
+                <% } %>
+
+                  <% for (let i=1; i <=totalPages; i++) { %>
+                    <a href="?page=<%= i %>"
+                      class="px-4 py-2 <%= currentPage === i ? 'bg-blue-600 text-white' : 'bg-[#202938] text-gray-300 hover:bg-gray-600' %> transition text-sm">
+                      <%= i %>
+                    </a>
+                    <% } %>
+
+                      <% if (currentPage < totalPages) { %>
+                        <a href="?page=<%= currentPage + 1 %>"
+                          class="px-4 py-2 bg-[#202938] text-gray-300 hover:bg-gray-600 transition text-sm">Next</a>
+                        <% } %>
+            </nav>
+          </div>
+
+          <% } else { %>
+            <div class="text-center text-gray-400 mt-6">
+              <svg class="mx-auto h-12 w-12 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                </path>
+              </svg>
+              <p class="text-lg font-medium mt-2">No Transactions Yet</p>
+            </div>
+            <% } %>
+      </div>
+    </div>
+  </div>
