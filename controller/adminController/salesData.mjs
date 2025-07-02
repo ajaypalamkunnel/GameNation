@@ -1,6 +1,7 @@
 import OrderSchema from "../../model/orderSchema.mjs";
 import xlsx from 'xlsx';
 import PDFDocument from "pdfkit";
+import HTTP_STATUS from "../../constants/statusCodes.mjs";
 
 //----------------- date based filter applying function ------------------
 
@@ -122,9 +123,9 @@ export const sales = async (req, res) => {
     console.error('Error while rendering the sales report:', error);
 
     if (req.xhr || req.headers.accept.indexOf('json') > -1) {
-      return res.status(500).json({ message: 'Server Error', error: error.message });
+      return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: 'Server Error', error: error.message });
     } else {
-      res.status(500).render('error', { message: 'Server Error', error });
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).render('error', { message: 'Server Error', error });
     }
   }
 };
@@ -260,6 +261,6 @@ export const exportReport = async(req,res)=>{
     } catch (error) {
 
         console.error('Error generating report:', error);
-        res.status(500).json({ message: 'Server Error', error: error.message });
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: 'Server Error', error: error.message });
   }
 }

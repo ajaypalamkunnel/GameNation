@@ -6,6 +6,7 @@ import { razorpayInstance } from "../../services/razorpay.mjs";
 import { loginPost } from "./userAuth.mjs";
 import Wallet from "../../model/walletSchema.mjs";
 import { wallet } from "./userController.mjs";
+import HTTP_STATUS from "../../constants/statusCodes.mjs";
 
 export const orderSummary = async (req, res) => {
   if (req.session.user) {
@@ -16,7 +17,7 @@ export const orderSummary = async (req, res) => {
     const categories = await category.find({ isActive: true });
 
     if (!order) {
-      return res.status(404).json({ message: "order not found" });
+      return res.status(HTTP_STATUS.NOT_FOUND).json({ message: "order not found" });
     }
 
     res.render("user/orderSummary", {
@@ -79,14 +80,14 @@ export const orderStatus = async (req, res) => {
     const currentOrder = await OrderSchema.findOne({ _id: orderId });
 
     if (!currentOrder) {
-      return res.status(404).send("Order not found");
+      return res.status(HTTP_STATUS.NOT_FOUND).send("Order not found");
     }
 
     if (
       validStatuses.indexOf(status) <=
       validStatuses.indexOf(currentOrder.status)
     ) {
-      return res.status(400).send("Invalid status change");
+      return res.status(HTTP_STATUS.BAD_REQUEST).send("Invalid status change");
     }
 
     if (status == "Delivered") {
@@ -101,7 +102,7 @@ export const orderStatus = async (req, res) => {
     res.send("Order status updated");
   } catch (error) {
     console.log(error);
-    res.status(500).send("server error");
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("server error");
   }
 };
 
@@ -175,7 +176,7 @@ export const cancelOrder = async (req, res) => {
 
     if (!orderId) {
       console.log(orderId);
-      return res.status(400).json({ message: "Order ID not provided." });
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({ message: "Order ID not provided." });
     }
 
     const order = await OrderSchema.findByIdAndUpdate(orderId, {
@@ -185,7 +186,7 @@ export const cancelOrder = async (req, res) => {
     if (!order) {
       console.log("order");
       return res
-        .status(404)
+        .status(HTTP_STATUS.NOT_FOUND)
         .json({ message: "Order not found or access denied." });
     }
     const orderdetails = await OrderSchema.findById(orderId);
@@ -197,7 +198,7 @@ export const cancelOrder = async (req, res) => {
       let wallet = await Wallet.findOne({ userId: user._id });
       if (!wallet) {
         return res
-          .status(404)
+          .status(HTTP_STATUS.NOT_FOUND)
           .json({ status: "error", message: "Wallet not avaliable" });
       }
 
@@ -213,7 +214,7 @@ export const cancelOrder = async (req, res) => {
       await wallet.save();
     }
 
-    return res.status(200).json({ message: "order cancelled successfully" });
+    return res.status(HTTP_STATUS.OK).json({ message: "order cancelled successfully" });
   } catch (error) {
     console.log("error while cancelling order ", error);
   }
@@ -229,7 +230,7 @@ export const returnOrder = async (req, res) => {
 
     if (!orderId || !returnReason) {
       return res
-        .status(400)
+        .status(HTTP_STATUS.BAD_REQUEST)
         .json({
           status: "error",
           message: "order Id and return reason are required",
@@ -238,13 +239,13 @@ export const returnOrder = async (req, res) => {
     const order = await OrderSchema.findById(orderId);
     if (!order) {
       return res
-        .status(404)
+        .status(HTTP_STATUS.NOT_FOUND)
         .json({ status: "error", message: "Order not found" });
     }
 
     if (order.orderStatus === "Returned" || order.orderStatus === "Cancelled") {
       return res
-        .status(400)
+        .status(HTTP_STATUS.BAD_REQUEST)
         .json({
           status: "error",
           message: "Order is already return or cancelled",
@@ -295,12 +296,12 @@ export const returnOrder = async (req, res) => {
     }
 
     return res
-      .status(200)
+      .status(HTTP_STATUS.OK)
       .json({ status: "success", message: "Order returned successfully" });
   } catch (error) {
     console.error("Error while returning order: ", error);
     return res
-      .status(500)
+      .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
       .json({ status: "error", message: "Internal server error" });
   }
 };
@@ -324,15 +325,15 @@ export const paymentRender = async (req, res) => {
       if (error) {
         console.error("Failed to create order:", error);
         return res
-          .status(500)
+          .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
           .json({ error: `Failed to create oreder : ${error.message}` });
       }
       console.log(order.id);
 
-      return res.status(200).json({ orderId: order.id });
+      return res.status(HTTP_STATUS.OK).json({ orderId: order.id });
     });
   } catch (error) {
     console.error("Error order in checkout : ", error);
-    return res.status(500).json({ error: "Internal server error" });
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: "Internal server error" });
   }
 };

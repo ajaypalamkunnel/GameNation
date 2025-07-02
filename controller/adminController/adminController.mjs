@@ -6,6 +6,7 @@ import User from "../../model/userSchema.mjs";
 import mongoose from "mongoose";
 import Offer from "../../model/offerSchema.mjs";
 import { orderStatus } from "../userController/orderController.mjs";
+import HTTP_STATUS from "../../constants/statusCodes.mjs";
 //---------------------- admin login get request ----------------------
 export const getAdminLogin = (req, res) => {
   try {
@@ -51,7 +52,7 @@ export const adminLogout = (req,res)=>{
     req.session.destroy((err)=>{
       if(err){
         console.error('Error destroying session:', err);
-        return res.status(500).send('Error logging out');
+        return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send('Error logging out');
       }
 
       res.redirect('/login')
@@ -393,7 +394,7 @@ export const dashboard = async (req, res) => {
     
   } catch (error) {
     console.error("Error in admin dashboard:", error);
-    res.status(500).send("Internal Server Error");
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Internal Server Error");
   }
 };
 
@@ -475,7 +476,7 @@ export const dashboardFilter = async (req, res) => {
     });
   } catch (error) {
     console.error("Error in admin dashboard:", error);
-    res.status(500).send("Internal Server Error");
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Internal Server Error");
   }
 };
 
@@ -544,7 +545,7 @@ export const categoryView = async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching categories:", error);
-    res.status(500).send("Internal Server Error");
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Internal Server Error");
   }
 };
 
@@ -562,15 +563,15 @@ export const updateCategory = async (req, res) => {
     );
 
     if (!result) {
-      return res.status(404).json({ message: "Category not found" });
+      return res.status(HTTP_STATUS.NOT_FOUND).json({ message: "Category not found" });
     }
 
     res
-      .status(200)
+      .status(HTTP_STATUS.OK)
       .json({ message: "category updated succesfully", category: result });
   } catch (error) {
     console.error("Error updating category:", error);
-    res.status(500).json({ message: "Internal Server Error" });
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: "Internal Server Error" });
   }
 };
 
@@ -624,7 +625,7 @@ export const toggleVerification = async (req, res) => {
   } catch (error) {
     console.log(`Error while updating verification status: ${error}`);
     res
-      .status(500)
+      .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
       .json({ success: false, message: "Failed to update status" });
     res.json({ success: false });
   }
@@ -717,7 +718,7 @@ export const orderViewAdmin = async (req, res) => {
 
     res.json(order);
   } catch (error) {
-    res.status(500).json({ error: "Error fetching order details" });
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: "Error fetching order details" });
   }
 };
 
@@ -756,21 +757,21 @@ export const addOfferPost = async (req, res) => {
     console.log(offerCategory, "---", name, "----", percentage);
     if (!offerCategory || !name || !percentage) {
       return res
-        .status(400)
+        .status(HTTP_STATUS.BAD_REQUEST)
         .json({ status: error, message: "All fields are required." });
     }
 
     const isCategory = await category.findById(offerCategory);
 
     if (!isCategory) {
-      return res.status(404).json({ message: "Category not found." });
+      return res.status(HTTP_STATUS.NOT_FOUND).json({ message: "Category not found." });
     }
 
     const products = await Product.find({ category: offerCategory });
 
     if (products.length === 0) {
       return res
-        .status(404)
+        .status(HTTP_STATUS.NOT_FOUND)
         .json({ message: "No products found in this category." });
     }
 
@@ -791,13 +792,13 @@ export const addOfferPost = async (req, res) => {
 
     console.log(products);
 
-    res.status(200).json({
+    res.status(HTTP_STATUS.OK).json({
       status: "success",
       message: "Offer created successfully!",
     });
   } catch (error) {
     console.error("Error while creating offer:", error);
-    res.status(500).json({
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       message: "An error occurred while creating the offer.",
       error: error.message,
     });
@@ -811,12 +812,12 @@ export const removeOffer = async (req, res) => {
     const { offerId } = req.body;
 
     if (!offerId) {
-      return res.status(400).json({ message: "Offer ID is required." });
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({ message: "Offer ID is required." });
     }
 
     const offer = await Offer.findById(offerId);
     if (!offer) {
-      return res.status(404).json({ message: "Offer not found." });
+      return res.status(HTTP_STATUS.NOT_FOUND).json({ message: "Offer not found." });
     }
 
     offer.isActive = false;
@@ -832,13 +833,13 @@ export const removeOffer = async (req, res) => {
 
     await Promise.all(updatePromises);
 
-    return res.status(200).json({
+    return res.status(HTTP_STATUS.OK).json({
       status: "success",
       message: "Offer removed and products updated successfully!",
     });
   } catch (error) {
     console.error("Error while removing offer:", error);
-    return res.status(500).json({
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       status: "error",
       message: "Failed to remove offer. Please try again later.",
     });

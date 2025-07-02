@@ -1,3 +1,4 @@
+import HTTP_STATUS from "../../constants/statusCodes.mjs";
 import category from "../../model/categoryScehema.mjs";
 import Coupon from "../../model/couponSchema.mjs";
 
@@ -14,7 +15,7 @@ export const coupons = async(req,res)=>{
         
     } catch (error) {
         console.log('Error while rendering coupons page',error);
-        res.status(500).send("Error rendering the coupons page")
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Error rendering the coupons page")
     }
 
 }
@@ -49,7 +50,7 @@ export const addCouponPost = async (req, res) => {
         const existCouponCode = await Coupon.findOne({ couponCode: couponCode });
 
         if (existCouponCode) {
-            return res.status(400).json({
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({
                 status: 'alreadyFound',
                 message: `Coupon code already exists: ${couponCode}`
             });
@@ -68,14 +69,14 @@ export const addCouponPost = async (req, res) => {
 
         await newCoupon.save();
 
-        return res.status(200).json({
+        return res.status(HTTP_STATUS.OK).json({
             status: 'success',
             message: 'Coupon created successfully'
         });
 
     } catch (error) {
         console.log("Error while adding coupon: ", error);
-        return res.status(500).json({
+        return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
             status: 'error',
             message: 'Failed to add coupon'
         });
@@ -93,19 +94,19 @@ export const removeCoupon =  async(req,res)=>{
         const coupon = await Coupon.findById(couponId)
 
         if(!coupon){
-            return res.status(404).json({status:'error',message:'Coupon not found'})
+            return res.status(HTTP_STATUS.NOT_FOUND).json({status:'error',message:'Coupon not found'})
         }
 
         coupon.isActive = !coupon.isActive;
         await coupon.save();
-        res.status(200).json({
+        res.status(HTTP_STATUS.OK).json({
             status:'success',
             message: "Coupon updated"
         })
         
     } catch (error) {
         console.log('Error in product removing: ',error);
-        res.status(500).json({status:'error',message:`Server error ,${error}`})
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({status:'error',message:`Server error ,${error}`})
     }
 }
 
@@ -145,7 +146,7 @@ export const editCoupon = async(req,res)=>{
         const coupon = await Coupon.findById(couponId)
     
         if(!coupon){
-            return res.status(404).json({status:'error',message:'Coupon not found'})
+            return res.status(HTTP_STATUS.NOT_FOUND).json({status:'error',message:'Coupon not found'})
         }
     
         res.render('admin/editCoupon',{
@@ -154,7 +155,7 @@ export const editCoupon = async(req,res)=>{
         })
     } catch (error) {
         console.error('error while rendering edit coupon',error);
-        return res.status(500).json({status:'error',message:'server error'})
+        return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({status:'error',message:'server error'})
     }
     
 }
@@ -173,7 +174,7 @@ export const editCouponPost = async(req,res)=>{
         const couponEdit = await Coupon.findById(coupon_id);
     
         if(!couponEdit){
-            return res.status(404).json({status:'error',message:'coupon not found'})
+            return res.status(HTTP_STATUS.NOT_FOUND).json({status:'error',message:'coupon not found'})
         }
 
         couponEdit.couponCode = couponCode;
@@ -186,12 +187,12 @@ export const editCouponPost = async(req,res)=>{
 
         await couponEdit.save()
 
-        return res.status(200).json({status:"success",message:'Coupon updated successfuly'})
+        return res.status(HTTP_STATUS.OK).json({status:"success",message:'Coupon updated successfuly'})
 
         
     } catch (error) {
         console.error('error while edit coupon',error);
-        return res.status(500).json({status:'error',message:'server error coupon edit'})
+        return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({status:'error',message:'server error coupon edit'})
     }
 
     

@@ -6,6 +6,7 @@ import passport from "passport";
 import { title } from "process";
 import category from "../../model/categoryScehema.mjs";
 import { log } from "console";
+import HTTP_STATUS from "../../constants/statusCodes.mjs";
 //---------------------- user signup get request ---------------------- 
 
 export const getSignUp = (req,res)=>{
@@ -77,7 +78,7 @@ export const signupPost = async(req,res)=>{
 
         if (existingUser) {
             console.log("Email already exists");
-            return res.status(400).json({
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({
                 success: false,
                 message: "Email already exists"
             });
@@ -109,7 +110,7 @@ export const signupPost = async(req,res)=>{
 
         await sendOtpEmail(email,otp)
     
-    return res.status(200).json({
+    return res.status(HTTP_STATUS.OK).json({
         success: true,
         message: 'OTP sent to email'
     });  
@@ -117,7 +118,7 @@ export const signupPost = async(req,res)=>{
     } catch (error) {
         
         console.error(`Error during signup: ${error}`);
-        return res.status(500).json({
+        return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: 'Server error. Please try again later.',
             email: newUser.email
@@ -136,12 +137,12 @@ export const verifyOtp = async (req,res)=>{
         const user = await User.findOne({email});
 
         if(!user){
-            return res.status(400).json({success:false,message:"user not found"})
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({success:false,message:"user not found"})
         }
 
         const sessionOtp = req.session.otp;
         if (!sessionOtp || sessionOtp.otp !== otp || sessionOtp.otpExpiry < Date.now()) {
-            return res.status(400).json({ success: false, message: "Invalid or expired OTP" });
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, message: "Invalid or expired OTP" });
         }
         
         user.isVerified = true;
@@ -150,11 +151,11 @@ export const verifyOtp = async (req,res)=>{
         req.session.otp = null;
 
         req.session.user = email;
-        return res.status(200).json({ success: true, message: "OTP verified, account activated" });
+        return res.status(HTTP_STATUS.OK).json({ success: true, message: "OTP verified, account activated" });
 
     } catch (error) {
         console.error(`Error during OTP verification: ${error}`);
-        return res.status(500).json({ success: false, message: "Server error. Please try again later." });       
+        return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: "Server error. Please try again later." });       
     }
 }
 
@@ -213,7 +214,7 @@ export const resendOtp = async (req, res) => {
         const user = await User.findOne({ email });
 
         if (!user) {
-            return res.status(400).json({ success: false, message: "User not found" });
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, message: "User not found" });
         }
 
         // Generate a new OTP
@@ -225,10 +226,10 @@ export const resendOtp = async (req, res) => {
 
         await sendOtpEmail(email, otp);
 
-        return res.status(200).json({ success: true, message: 'OTP resent successfully' });
+        return res.status(HTTP_STATUS.OK).json({ success: true, message: 'OTP resent successfully' });
     } catch (error) {
         console.error(`Error resending OTP: ${error}`);
-        return res.status(500).json({ success: false, message: "Server error. Please try again later." });
+        return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: "Server error. Please try again later." });
     }
 };
 
@@ -259,7 +260,7 @@ export const forgotOtpMail = async(req,res)=>{
        await sendOtpEmail(data.email,otp);
        req.session.otpMail = data.email
 
-       return res.status(200).json({status:'success',message:'OTP sent to email'})
+       return res.status(HTTP_STATUS.OK).json({status:'success',message:'OTP sent to email'})
 
 
         
@@ -283,11 +284,11 @@ export const validateForgotOtp = async (req, res) => {
     if (otp == req.session.otp) {
       req.session.otp = null;
       return res
-        .status(200)
+        .status(HTTP_STATUS.OK)
         .json({ status: "success", message: "OTP validated successfully" });
     }
 
-    return res.status(400).json({ status: "error", message: "Invalid OTP" });
+    return res.status(HTTP_STATUS.BAD_REQUEST).json({ status: "error", message: "Invalid OTP" });
   } catch (error) {
     console.log("Error while validating OTP : ", error);
   }
@@ -394,7 +395,7 @@ export const googleAuthCallback = (req, res, next) => {
       req.session.otpMail = null;
 
       return res
-        .status(200)
+        .status(HTTP_STATUS.OK)
         .json({ status: "success", message: "Password changed successfully" });
     } catch (error) {
       console.log("error while changing password", error);
@@ -410,7 +411,7 @@ export const googleAuthCallback = (req, res, next) => {
     req.session.destroy((err) => {
       if (err) {
         console.error("Error destroying session:", err);
-        return res.status(500).send("Error logging out");
+        return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Error logging out");
       }
 
       res.redirect("/login");
@@ -447,7 +448,7 @@ export const passwordChange = async(req,res)=>{
         const hashedPassword = await bcrypt.hash(newPassword,10)
 
         if(!iscurrentPasswordValid){
-            return res.status(400).json({message:"current password is incorrect"})
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({message:"current password is incorrect"})
         }
     
         
@@ -462,15 +463,15 @@ export const passwordChange = async(req,res)=>{
             )
     
         if(passwordUpdated){
-            return res.status(200).json({message:"password successfully updated"})
+            return res.status(HTTP_STATUS.OK).json({message:"password successfully updated"})
         }else{
-            return res.status(500).json({message: "Error updating the password"})
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({message: "Error updating the password"})
         }
     
         
     } catch (error) {
         console.log("Errror in passoword change:",error);
-        return res.status(500).json({message:"Server error occurred while changing the password." })
+        return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({message:"Server error occurred while changing the password." })
         
     }
 
@@ -494,11 +495,11 @@ export const updateMobile = async(req,res)=>{
         user.phone = phone;
         await user.save();
 
-        return res.status(200).json({status:'success',message:"Mobile number update successfully"});
+        return res.status(HTTP_STATUS.OK).json({status:'success',message:"Mobile number update successfully"});
       
     } catch (error) {
         console.log("Errror in update mobile:",error);
-        return res.status(500).json({status:'error',message:"Server error occurred while updating mobile" })
+        return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({status:'error',message:"Server error occurred while updating mobile" })
         
     }
 }

@@ -7,6 +7,7 @@ import { Buffer } from "buffer";
 import { response } from "express";
 import { title } from "process";
 import Cart from "../../model/cartSchema.mjs";
+import HTTP_STATUS from "../../constants/statusCodes.mjs";
 
 //----------------------------add product page -------------------------------------
 
@@ -26,7 +27,7 @@ export const addProduct = async (req, res) => {
    
   } catch (error) {
     console.error("Error fetching categories: ", error);
-    res.status(500).send("Internal Server Error");
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Internal Server Error");
   }
 };
 
@@ -116,7 +117,7 @@ export const addProductPost = async (req, res) => {
   } catch (error) {
     req.flash("failed", "could not add product");
     console.error("Error adding product:", error);
-    res.status(500).json({ error: "Server error, could not add product" });
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: "Server error, could not add product" });
   }
 };
 
@@ -162,7 +163,7 @@ export const viewProducts = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).send("An error occurred while fetching products.");
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("An error occurred while fetching products.");
   }
 };
 
@@ -188,7 +189,7 @@ export const editProduct = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).send("An error occurred while showing edit product", error);
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("An error occurred while showing edit product", error);
   }
 };
 
@@ -222,13 +223,13 @@ export const editProductPut = async (req, res) => {
       : null;
 
     if (!categoryObjectId) {
-      return res.status(400).json({ error: "Invalid category ID" });
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({ error: "Invalid category ID" });
     }
 
     const product = await Product.findById(productId);
 
     if (!product) {
-      return res.status(404).json({ error: "Product not found" });
+      return res.status(HTTP_STATUS.NOT_FOUND).json({ error: "Product not found" });
     }
 
     // If the product image array has 3 images, remove them
@@ -279,13 +280,13 @@ export const editProductPut = async (req, res) => {
 
     req.flash("success", "Product updated successfully");
     return res
-      .status(200)
+      .status(HTTP_STATUS.OK)
       .json({ message: "Product updated successfully", product });
   } catch (error) {
     console.error("Error updating product:", error);
     req.flash("failed", "Could not update product");
     return res
-      .status(500)
+      .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
       .json({ error: "Server error, could not update product" });
   }
 };
@@ -297,7 +298,7 @@ export const deleteProduct = async (req, res) => {
 
     const product = await Product.findById(id);
     if (!product) {
-      return res.status(404).json({ message: "Product not found" });
+      return res.status(HTTP_STATUS.NOT_FOUND).json({ message: "Product not found" });
     }
     // Toggle the isDelete field
     product.isDelete = !product.isDelete;
@@ -305,12 +306,12 @@ export const deleteProduct = async (req, res) => {
     // Save the updated product
     await product.save();
 
-    res.status(200).json({
+    res.status(HTTP_STATUS.OK).json({
       message: `Product has been ${product.isDelete ? "deleted" : "restored"}`,
       isDelete: product.isDelete,
     });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error });
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: "Server error", error });
   }
 };
 
@@ -326,7 +327,7 @@ export const productView = async (req, res) => {
     const categories = await category.find({ isActive: true });
 
     if (!product || product.isDelete) {
-      return res.status(404).json({ message: "Product not found or deleted" });
+      return res.status(HTTP_STATUS.NOT_FOUND).json({ message: "Product not found or deleted" });
     }
 
     let discountPrice = Math.ceil(
@@ -342,7 +343,7 @@ export const productView = async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching product details:", error);
-    res.status(500).json({ message: "Server error" });
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: "Server error" });
   }
 };
 
@@ -476,7 +477,7 @@ export const allProducts = async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching product details:", error);
-    res.status(500).json({ message: "Server error" });
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: "Server error" });
   }
 };
 
@@ -551,7 +552,7 @@ export const addToCart = async (req, res) => {
       const user = await User.findOne({ email: email });
 
       if (!user) {
-        return res.status(404).json({ message: "User not found please login" });
+        return res.status(HTTP_STATUS.NOT_FOUND).json({ message: "User not found please login" });
       }
 
       const { productId, productCount } = req.body;
@@ -571,20 +572,20 @@ export const addToCart = async (req, res) => {
       }
       
       if(cart.items.length > 4){
-        return res.status(400).json({message: "Your cart is full"})
+        return res.status(HTTP_STATUS.BAD_REQUEST).json({message: "Your cart is full"})
       }
       
 
       if (!product) {
-        return res.status(404).json({ message: "Product not found" });
+        return res.status(HTTP_STATUS.NOT_FOUND).json({ message: "Product not found" });
       }
 
       if (product.isDelete) {
-        return res.status(404).json({ message: "Product is not available" });
+        return res.status(HTTP_STATUS.NOT_FOUND).json({ message: "Product is not available" });
       }
 
       if (product.stock < productCount) {
-        return res.status(400).json({
+        return res.status(HTTP_STATUS.BAD_REQUEST).json({
           message: `Insufficient stock. Only ${product.stock} items available.`,
         });
       }
@@ -604,7 +605,7 @@ export const addToCart = async (req, res) => {
           cart.items[existingItemIndex].productCount + productCount;
 
         if (newProductCount > product.stock) {
-          return res.status(400).json({
+          return res.status(HTTP_STATUS.BAD_REQUEST).json({
             message: `Not enough stock. Only ${product.stock} items available.`,
           });
         }
@@ -636,13 +637,13 @@ export const addToCart = async (req, res) => {
       await cart.save();
 
       return res
-        .status(200)
+        .status(HTTP_STATUS.OK)
         .json({ message: "Product added to cart successfully", cart });
     
     
   } catch (error) {
     console.error(error);
-    return res.status(500).json({
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       message: "An error occurred while adding the product to the cart",
     });
   }
@@ -675,14 +676,14 @@ export const removeProductFromCart = async (req, res) => {
 
       await userCart.save();
 
-      res.status(200).json({
+      res.status(HTTP_STATUS.OK).json({
         message: "Item remove successfully",
         totalPayable: userCart.totalPrice,
       });
     
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Error removing item from cart" });
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: "Error removing item from cart" });
   }
 };
 
@@ -696,13 +697,13 @@ export const updateCartQuantity = async (req, res) => {
       const product = await Product.findById(productId);
 
       if (!product) {
-        return res.status(404).json({ message: "Product not found" });
+        return res.status(HTTP_STATUS.NOT_FOUND).json({ message: "Product not found" });
       }
 
       const cart = await Cart.findOne({ userId }).populate("items.productId");
 
       if (!cart) {
-        return res.status(404).json({ message: "cart not found" });
+        return res.status(HTTP_STATUS.NOT_FOUND).json({ message: "cart not found" });
       }
 
       const cartItem = cart.items.find(
@@ -710,20 +711,20 @@ export const updateCartQuantity = async (req, res) => {
       );
 
       if (!cartItem) {
-        return res.status(404).json({ message: "product not found" });
+        return res.status(HTTP_STATUS.NOT_FOUND).json({ message: "product not found" });
       }
      
 
       if (action === "increment") {
         if (cartItem.productCount >= cartItem.productId.stock) {
           return res
-            .status(400)
+            .status(HTTP_STATUS.BAD_REQUEST)
             .json({ message: "Not enough stock available" });
         }
 
         if(cartItem.productCount > 4){
           return res
-            .status(400)
+            .status(HTTP_STATUS.BAD_REQUEST)
             .json({message:"You can purchase only 5 quantity"})
         }
         cartItem.productCount += 1;
@@ -732,7 +733,7 @@ export const updateCartQuantity = async (req, res) => {
       } else if (action === "decrement") {
         if (cartItem.productCount === 1) {
           return res
-            .status(400)
+            .status(HTTP_STATUS.BAD_REQUEST)
             .json({ message: "Cannot reduce quantity below 1" });
         }
 
@@ -753,7 +754,7 @@ export const updateCartQuantity = async (req, res) => {
 
       await cart.save();
 
-      res.status(200).json({
+      res.status(HTTP_STATUS.OK).json({
         message: "cart updated successfully",
         productCount: cartItem.productCount,
         productPrice: cartItem.productPrice,
@@ -762,7 +763,7 @@ export const updateCartQuantity = async (req, res) => {
     
   } catch (error) {
     console.error("Error updating cart:", error);
-    res.status(500).json({ message: "Server error" });
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: "Server error" });
   }
 };
 
@@ -795,7 +796,7 @@ export const searchProducts = async (req, res) => {
     res.json({ products: productsWithDiscount });
   } catch (error) {
     console.error("Error searching products:", error);
-    res.status(500).json({ message: "Error searching products" });
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: "Error searching products" });
   }
 };
 
@@ -830,7 +831,7 @@ export const allProductsSort = async (req, res) => {
     res.json({ products: productsWithDiscount });
   } catch (error) {
     console.error("Error fetching sorted products:", error);
-    res.status(500).json({ message: "Failed to fetch products." });
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: "Failed to fetch products." });
   }
 };
 

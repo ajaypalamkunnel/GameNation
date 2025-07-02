@@ -5,6 +5,7 @@ import User from "../../model/userSchema.mjs";
 import WishList from "../../model/wishListSchema.mjs";
 
 import Wallet from "../../model/walletSchema.mjs";
+import HTTP_STATUS from "../../constants/statusCodes.mjs";
 
 
 
@@ -238,7 +239,7 @@ export const editAddressPut = async (req, res) => {
 
     if (!user) {
       return res
-        .status(404)
+        .status(HTTP_STATUS.NOT_FOUND)
         .json({ success: false, message: "User or Address not found" });
     }
 
@@ -246,7 +247,7 @@ export const editAddressPut = async (req, res) => {
 
     if (!address) {
       return res
-        .status(404)
+        .status(HTTP_STATUS.NOT_FOUND)
         .json({ success: false, message: "Address not found" });
     }
 
@@ -265,7 +266,7 @@ export const editAddressPut = async (req, res) => {
     return res.json({ success: true, message: "Address updated successfully" });
   } catch (error) {
     console.error("Error updating address:", error);
-    return res.status(500).json({ success: false, message: "Server error" });
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: "Server error" });
   }
 };
 
@@ -278,7 +279,7 @@ export const deleteAddress = async (req, res) => {
 
     if (!user) {
       return res
-        .status(404)
+        .status(HTTP_STATUS.NOT_FOUND)
         .json({ success: false, message: "User not found" });
     }
 
@@ -287,11 +288,11 @@ export const deleteAddress = async (req, res) => {
     await user.save();
 
     return res
-      .status(200)
+      .status(HTTP_STATUS.OK)
       .json({ success: true, message: "Address deleted successfully" });
   } catch (error) {
     console.error("Error deleting address:", error);
-    return res.status(500).json({ success: false, message: "Server error" });
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ success: false, message: "Server error" });
   }
 };
 
@@ -391,7 +392,7 @@ export const addWisList = async (req, res) => {
     });
   } catch (error) {
     console.error("Error while adding to wishlist:", error);
-    return res.status(500).json({
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       status: "error",
       message: "Failed to add product to wishlist",
     });
@@ -412,14 +413,14 @@ export const removeWishList = async(req,res)=>{
         (item)=>item.productId.toString() !== productId
       )
       await wishList.save()
-      return res.status(200).json({status:'success',message:'Product removed from wishlist'})
+      return res.status(HTTP_STATUS.OK).json({status:'success',message:'Product removed from wishlist'})
     }else{
-      res.status(404).json({ status: 'error', message: 'Wishlist not found' });
+      res.status(HTTP_STATUS.NOT_FOUND).json({ status: 'error', message: 'Wishlist not found' });
   
     }
   } catch (error) {
     console.log('Error removing product from wishlist',error);
-    res.status(500).json({ status: 'error', message: 'Failed to remove product from wishlist' });
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ status: 'error', message: 'Failed to remove product from wishlist' });
     
   }
 
@@ -540,7 +541,7 @@ export const categoryView = async(req,res)=>{
     
   } catch (error) {
     console.log('error while rendering category view',error);
-    res.status(500).json({message:'Internal Server Error'})
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({message:'Internal Server Error'})
   }
 
 }

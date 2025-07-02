@@ -1,5 +1,6 @@
 
 
+import HTTP_STATUS from "../../constants/statusCodes.mjs";
 import addressSchema from "../../model/addressSchema.mjs";
 import Cart from "../../model/cartSchema.mjs";
 import category from "../../model/categoryScehema.mjs";
@@ -84,14 +85,14 @@ export const applyCoupon = async (req, res) => {
     const coupon = await Coupon.findById(couponCode);
 
     if (!coupon) {
-      return res.status(400).json({
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({
         status: "error",
         message: "Coupon not found",
       });
     }
 
     if (!coupon.isActive) {
-      return res.status(400).json({
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({
         status: "error",
         message: "Coupon not not active",
       });
@@ -99,7 +100,7 @@ export const applyCoupon = async (req, res) => {
     console.log(coupon.endDate);
     
     if (!coupon.endDate > new Date()) {
-      return res.status(400).json({
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({
         status: "error",
         message: "Coupon expired",
       });
@@ -113,7 +114,7 @@ export const applyCoupon = async (req, res) => {
       console.log('this is applied cop :',couponUsage);
       
     if (couponUsage && couponUsage.usageCount >= coupon.usageCount) {
-      return res.status(400).json({
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({
         status: error,
         message: "You have reached the maximum coupon usage limit",
       });
@@ -123,7 +124,7 @@ export const applyCoupon = async (req, res) => {
 
     if (!cart) {
       return res
-        .status(404)
+        .status(HTTP_STATUS.NOT_FOUND)
         .json({ status: "error", message: "cart not found" });
     }
     const total = cart.payableAmount;
@@ -166,12 +167,12 @@ export const applyCoupon = async (req, res) => {
     await user.save()
 
     return res
-      .status(200)
+      .status(HTTP_STATUS.OK)
       .json({ status: "success", message: "coupon applied", total:discountedTotal,couponDiscount});
   } catch (error) {
     console.log(`Error in apply coupon: ${err}`);
     res
-      .status(500)
+      .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
       .json({ error: "An error occurred while applying the coupon." });
   }
 
@@ -193,13 +194,13 @@ export const removeCoupon = async (req, res) => {
 
     if (!cart) {
       return res
-        .status(404)
+        .status(HTTP_STATUS.NOT_FOUND)
         .json({ status: "error", message: "Cart not found" });
     }
 
     // Check if the coupon is applied to the cart
     if (!cart.isCouponApplied) {
-      return res.status(400).json({
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({
         status: "error",
         message: "No coupon is applied to the cart.",
       });
@@ -229,14 +230,14 @@ export const removeCoupon = async (req, res) => {
     await cart.save();
     await user.save();
 
-    return res.status(200).json({
+    return res.status(HTTP_STATUS.OK).json({
       status: "success",
       message: "Coupon removed successfully",
       total: cart.payableAmount,
     });
   } catch (error) {
     console.log(`Error in removeCoupon: ${error}`);
-    return res.status(500).json({
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       error: "An error occurred while removing the coupon.",
     });
   }
@@ -314,7 +315,7 @@ export const placeOrder = async(req,res)=>{
             const selectedAddress = await user.address.id(addressId);;
 
             if (!selectedAddress) {
-                return res.status(400).json({ message: "Address not found" });
+                return res.status(HTTP_STATUS.BAD_REQUEST).json({ message: "Address not found" });
               }
              
 
@@ -324,11 +325,11 @@ export const placeOrder = async(req,res)=>{
                 const product = await Product.findById(item.productId);
 
                 if (!product) {
-                    return res.status(404).json({ message: `Product ${item.productName} not found` });
+                    return res.status(HTTP_STATUS.NOT_FOUND).json({ message: `Product ${item.productName} not found` });
                   }
 
                   if (product.stock < item.productQuantity) {
-                    return res.status(400).json({ message: `Insufficient stock for ${item.productName}. Only ${product.stock} available.` });
+                    return res.status(HTTP_STATUS.BAD_REQUEST).json({ message: `Insufficient stock for ${item.productName}. Only ${product.stock} available.` });
                   }
 
               }
@@ -377,7 +378,7 @@ export const placeOrder = async(req,res)=>{
 
               })
 
-              console.log("'''''''",newOrder);
+             
               
 
               await newOrder.save();
@@ -398,7 +399,7 @@ export const placeOrder = async(req,res)=>{
               console.log(newOrder._id);
               
 
-              res.status(200).json({message:"Order placed succesfully",orderId: newOrder.order_id })
+              res.status(HTTP_STATUS.OK).json({message:"Order placed succesfully",orderId: newOrder.order_id })
 
 
 
@@ -411,7 +412,7 @@ export const placeOrder = async(req,res)=>{
     } catch (error) {
 
         console.error("Error placing order:", error);
-        res.status(500).json({ message: "An error occurred while placing the order" });
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: "An error occurred while placing the order" });
         
     }
 
@@ -432,7 +433,7 @@ export const walletPayment = async (req, res) => {
 
       if (!wallet) {
         return res
-          .status(404)
+          .status(HTTP_STATUS.NOT_FOUND)
           .json({ status: "error", message: "User has no wallet" });
       }
 
@@ -446,7 +447,7 @@ export const walletPayment = async (req, res) => {
         await wallet.save();
 
         return res
-          .status(200)
+          .status(HTTP_STATUS.OK)
           .json({
             status: "success",
             message: "You have enough balance to place order",
@@ -464,7 +465,7 @@ export const walletPayment = async (req, res) => {
         });
         await wallet.save();
         return res
-          .status(200)
+          .status(HTTP_STATUS.OK)
           .json({
             status: "partial_payment_needed",
             message: "Wallet balance is not enough. Proceed to pay the remaining amount.",
@@ -477,7 +478,7 @@ export const walletPayment = async (req, res) => {
   } catch (error) {
     console.error("Error while wallet payment", error);
     res
-      .status(500)
+      .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
       .json({
         status: "error",
         message: "An error occurred while wallet payment ",
@@ -495,14 +496,14 @@ export const rePay = async(req,res)=>{
       let order = await OrderSchema.findOne({order_id:orderId});
 
       if(!order){
-        return res.status(404).json({status:'error',message:'order not found'})
+        return res.status(HTTP_STATUS.NOT_FOUND).json({status:'error',message:'order not found'})
       }
 
       order.paymentStatus = 'Paid';
 
       await order.save()
 
-      return res.status(200).json({status:'success',message:'payment status updated'});
+      return res.status(HTTP_STATUS.OK).json({status:'success',message:'payment status updated'});
     }else{
       res.redirect('/login')
     }
