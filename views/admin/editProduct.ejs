@@ -476,7 +476,6 @@
 
 <script>
   window.onload = () => {
-    console.log("Page loaded");
     imageAdder(); // Initialize existing images
   };
 
@@ -509,9 +508,7 @@
   const productId = document.getElementById("productId").innerHTML;
 
   let cropper;
-  let fileCount = 0;
-  let croppedImages = []; // Store all cropped images
-  let removedImages = []; // Array to store removed images
+  let images = []; // Array to store all images (base64 or URL)
 
   // Handle file input for cropping
   fileInput.addEventListener("change", handleFiles);
@@ -519,29 +516,22 @@
   function handleFiles(event) {
     const files = event.target.files;
     const maxFiles = 3;
-
-    if (files.length + fileCount > maxFiles) {
-
+    if (images.length >= maxFiles) {
       Swal.fire({
-        icon:'warning',
-        title:'warning',
-        text: "You can upload a maximum of 3 files.",
+        icon: 'warning',
+        title: 'Warning',
+        text: "You can upload a maximum of 3 images.",
         confirmButtonText: 'OK'
-      })
-      
+      });
       return;
     }
-
     Array.from(files).forEach((file) => {
+      if (images.length >= maxFiles) return;
       const reader = new FileReader();
       reader.onload = function (e) {
         imageToCrop.src = e.target.result;
         cropModal.classList.remove("hidden");
-
-        if (cropper) {
-          cropper.destroy(); // Make sure to destroy the previous cropper instance
-        }
-
+        if (cropper) cropper.destroy();
         cropper = new Cropper(imageToCrop, {
           aspectRatio: 1,
           viewMode: 1,
@@ -556,37 +546,28 @@
   document.getElementById("cropButton").addEventListener("click", function () {
     const croppedCanvas = cropper.getCroppedCanvas();
     const croppedImageURL = croppedCanvas.toDataURL();
-
-    addImageToPreview(croppedImageURL, true);
-    croppedImages.push(croppedImageURL); // Add to croppedImages array
-
+    addImageToPreview(croppedImageURL);
+    images.push(croppedImageURL);
     cropper.destroy();
     cropModal.classList.add("hidden");
-    fileCount += 1;
-
-    if (fileCount === 3) {
+    if (images.length === 3) {
       Swal.fire({
-        icon:'succes',
-        title:'Uploaded',
-        text:'Maximum number of images cropped.',
-        timer:1000
-      })
-     
+        icon: 'success',
+        title: 'Uploaded',
+        text: 'Maximum number of images cropped.',
+        timer: 1000
+      });
     }
   });
 
   // Function to add images to preview
-  function addImageToPreview(imageSrc, isCropped = true) {
+  function addImageToPreview(imageSrc) {
     const imgElement = document.createElement("img");
     imgElement.src = imageSrc;
     imgElement.classList.add("rounded", "border", "border-gray-700", "p-2");
-
     const imgContainer = document.createElement("div");
     imgContainer.classList.add("relative");
-
-    // Add the image to the container
     imgContainer.appendChild(imgElement);
-
     // Add a delete button to remove the image
     const removeButton = document.createElement("button");
     removeButton.type = "button";
@@ -595,56 +576,58 @@
     );
     removeButton.innerHTML = "&times;";
     removeButton.addEventListener("click", function () {
-      imgContainer.remove(); // Remove the image container
-      fileCount -= 1;
-      if (!isCropped) {
-        removedImages.push(imageSrc); // Add to removedImages array if it is an existing image
-      } else {
-        croppedImages = croppedImages.filter(img => img !== imageSrc); // Remove from croppedImages
-      }
+      const idx = images.indexOf(imageSrc);
+      if (idx !== -1) images.splice(idx, 1);
+      imgContainer.remove();
     });
-
     imgContainer.appendChild(removeButton);
-    //previewContainer.appendChild(imgContainer);
+    previewContainer.appendChild(imgContainer);
   }
 
-  // Function to remove old images from the preview
+  // Function to remove old images from the preview (used by server-rendered images)
   function removeOldImage(imageSrc) {
-    removedImages.push(imageSrc); // Add image to removedImages array
+    const idx = images.indexOf(imageSrc);
+    if (idx !== -1) images.splice(idx, 1);
     const imgElement = document.querySelector(`img[src='${imageSrc}']`);
     if (imgElement) {
-      imgElement.parentElement.remove(); // Remove image container
+      imgElement.parentElement.remove();
     }
+  }
 
-    let imgIndex = croppedImages.indexOf(imageSrc)
+  // Image loader for existing images
+  function imageAdder() {
+    const existingImages = '<%= product.image %>';
+    let links = existingImages.split(",").map(val => val.trim()).filter(Boolean);
+    images = links;
+    previewContainer.innerHTML = "";
+    loadExistingImages(links);
+  }
 
-    if(imgIndex != -1){
-      croppedImages.splice(imgIndex,1)
-    }else{
-      console.log("Element not found");
-      
-    }
+  // Function to load existing images into the preview
+  function loadExistingImages(imgs) {
+    imgs.forEach((imageSrc) => {
+      addImageToPreview(imageSrc);
+    });
   }
 
   // Form submission logic
   productForm.addEventListener("submit", function (e) {
-    e.preventDefault(); // Prevent default form submission
-
+    e.preventDefault();
+    if (images.length !== 3) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Image Requirement',
+        text: 'You must have exactly 3 images to submit.',
+        confirmButtonText: 'OK'
+      });
+      return;
+    }
     const formData = new FormData(productForm);
-
-    // Append cropped images as Base64 strings
-    croppedImages.forEach((img, index) => {
-      formData.append(`croppedImage${index + 1}`, img);
+    // Append images as croppedImage1, croppedImage2, croppedImage3
+    images.forEach((img, idx) => {
+      formData.append(`croppedImage${idx + 1}`, img);
     });
-
-    // Append removed images
-    removedImages.forEach((img, index) => {
-      formData.append(`removedImage${index}`, img);
-    });
-
     spinner.classList.remove("hidden");
-
-    // Submit form data via fetch
     fetch(`/admin/editProduct/${productId}`, {
       method: "POST",
       body: formData,
@@ -655,19 +638,17 @@
         if (data.message) {
           successModal.classList.remove("hidden");
           productForm.reset();
-          previewContainer.innerHTML = ""; // Clear preview container
-          croppedImages = []; // Reset cropped images array
-          removedImages = []; // Reset removed images array
-          fileCount = 0; // Reset file count
+          previewContainer.innerHTML = "";
+          images = [];
         }
       })
       .catch((error) => {
         console.error("Error editing product:", error);
         Swal.fire({
-          icon:'error',
-          title:'Edit error',
-          text:error||'An error occurred while editing the product.'
-        })
+          icon: 'error',
+          title: 'Edit error',
+          text: error || 'An error occurred while editing the product.'
+        });
       });
   });
 
@@ -675,29 +656,4 @@
   successBtn.addEventListener("click", function () {
     successModal.classList.add("hidden");
   });
-
-  // Image loader for existing images
-  function imageAdder() {
-    const existingImages =' <%= product.image %>'; // Server-side code to inject existing images
-    const link = existingImages.split(",")
-    console.log("--",typeof link);
-    
-    let images = []
-    link.forEach((val)=>{
-      images.push(val.replace(/\s+/g, ''))
-
-    })
-    
-    console.log("------------",images);
-    
-    loadExistingImages(link);
-  }
-
-  // Function to load existing images into the preview and croppedImages array
-  function loadExistingImages(images) {
-    images.forEach((imageSrc) => {
-      addImageToPreview(imageSrc, false); // Load into preview without cropping
-      croppedImages.push(imageSrc); // Add to the croppedImages array
-    });
-  }
 </script>

@@ -227,34 +227,26 @@ export const editProductPut = async (req, res) => {
     }
 
     const product = await Product.findById(productId);
-
     if (!product) {
       return res.status(HTTP_STATUS.NOT_FOUND).json({ error: "Product not found" });
     }
 
-    // If the product image array has 3 images, remove them
-    if (product.image.length === 3) {
-      product.image = []; // Remove all images from the array
-    }
-
-
-    product.image = product.image.filter((img) => !removedImages.includes(img));
-
-
-
-   // Convert and process new cropped images if provided
+    // Handle images: always expect 3 images (base64 or URL)
+    const imageFields = [req.body.croppedImage1, req.body.croppedImage2, req.body.croppedImage3];
     const imageUrls = [];
-    if (req.body.croppedImage1) {
-      imageUrls.push(req.body.croppedImage1); // Assuming these are valid URLs from Cloudinary or another source
+    for (const img of imageFields) {
+      if (img && img.startsWith("data:image/")) {
+        // Upload base64 to Cloudinary
+        const url = await uploadBase64ImageToCloudinary(img);
+        imageUrls.push(url);
+      } else if (img && (img.startsWith("http://") || img.startsWith("https://"))) {
+        // Already a URL
+        imageUrls.push(img);
+      }
     }
-    if (req.body.croppedImage2) {
-      imageUrls.push(req.body.croppedImage2);
+    if (imageUrls.length !== 3) {
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({ error: "Exactly 3 images are required." });
     }
-    if (req.body.croppedImage3) {
-      imageUrls.push(req.body.croppedImage3);
-    }
-
-  //  Replace the old images with the new ones
     product.image = imageUrls;
 
     // Update product fields

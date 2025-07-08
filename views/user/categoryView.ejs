@@ -1,104 +1,92 @@
 <%- include('header') %>
 
-<div class="container bg-[#121212]  mx-auto p-5">
-    <!-- Search and Sort Controls -->
-    <div class="flex flex-col md:flex-row items-center justify-between mb-5 space-y-3 md:space-y-0">
-      <input type="text" id="search" placeholder="Search products..." value="<%= searchQuery %>" class="p-2 rounded-lg w-full md:w-80 focus:outline-none focus:ring-2 focus:ring-green-500">
-      
-      <div class="flex space-x-2">
-          
-          <button id="searchBtn" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">Search</button>
-          <button id="clearSearchBtn" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">Clear</button>
-          <select class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700" id="sortDropdown" onchange="sortProducts(this.value)">
-            <option value="">Sort</option>
-            <option value="lowToHigh" <%= sortBy === 'lowToHigh' ? 'selected' : '' %> >Price: Low to High</option>
-            <option value="highToLow" <%= sortBy === 'highToLow' ? 'selected' : '' %> >Price: High to Low</option>
-            <option value="aToZ" <%= sortBy === 'aToZ' ? 'selected' : '' %>>Name: A - Z</option>
-            <option value="zToA" <%= sortBy === 'zToA' ? 'selected' : '' %>>Name: Z - A</option>
-          </select>
-        </div>
+<div class="bg-[#121212] min-h-screen p-4 md:p-8">
+  <!-- Breadcrumb or Category Title -->
+  <div class="mb-6">
+    <h2 class="text-2xl font-bold text-green-400 tracking-wide mb-2">Category Products</h2>
+    <!-- Optionally, add breadcrumb here if you want -->
+  </div>
+
+  <!-- Search & Sort Bar -->
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+    <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+      <div class="flex flex-1">
+        <input type="text" id="search" placeholder="Search products..." value="<%= searchQuery %>" class="flex-1 p-3 rounded-l-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-500 shadow-md" />
+        <button id="searchBtn" class="bg-green-600 text-white px-4 py-2 rounded-r-lg hover:bg-green-700 shadow-md">Search</button>
+      </div>
+      <button id="clearSearchBtn" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 shadow-md">Clear</button>
     </div>
-  <% let category %>
-    <!-- Product Grid -->
-    <div id="product-list" class="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        <% products.forEach(product=>{ %>
-
-        <% category = product.category %>
-
-        <div class="mb-3 w-72 rounded-lg">
-            <a href="/productView/<%= product._id %>">
-              <div class="rounded-lg bg-white shadow-md">
-                <a href="/productView/<%= product._id %>">
-                  <!-- Product Image -->
-                  <img class="h-60 w-full object-cover object-center rounded-t-lg" src="<%= product.image[0] %>" alt="product image"/>
-                </a>
-                <div class="p-5">
-                  <!-- Product Title -->
-                  <a href="/productView/<%= product._id %>">
-                    <h5 class="text-xl font-semibold tracking-tight text-slate-900">
-                      <%= product.product_name %>
-                     
-                      
-                    </h5>
-                  </a>
-                  <!-- Discount Price -->
-                  <div id="rating" class="mt-2.5 mb-5 flex items-center">
-                    <% const totalStars = 5; %>
-                    <% const filledStars = Math.round(3 || 0); %> <!-- Round rating to nearest integer -->
-                    <% const emptyStars = totalStars - filledStars; %>
-          
-                    <% for (let i = 0; i < filledStars; i++) { %>
-                      <span class="text-yellow-500 text-xl">★</span>
-                    <% } %>
-                    <% for (let i = 0; i < emptyStars; i++) { %>
-                      <span class="text-gray-400 text-xl">☆</span>
-                    <% } %>
-          
-                    <!-- Optional: Display numeric rating beside the stars -->
-                    <span class="ml-2 text-sm text-gray-600">( <%= filledStars.toFixed(1) %> )</span>
-                  </div>
-        
-                  <!-- Price and Add to Cart -->
-                  <a href="/productView/<%= product._id %>">
-                    <div class="flex items-center justify-between">
-                      <p>
-                        <span class="text-3xl font-bold text-slate-900">
-                          ₹<%= product.discountPrice %>
-                        </span>
-                        <span class="text-sm text-slate-900 line-through">
-                          ₹<%= product.price %>
-                        </span>
-                      </p>
-                      <button class="add-to-cart-btn flex items-center rounded-md bg-slate-900 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-gray-700" data-product-id="1">
-                        Buy Now
-                      </button>
-                    </div>
-                  </a>
-                </div>
-              </div>
-            </a>
-          </div>
-          <% }) %>
-          
-
-
-
-      
-    </div>
-  
-    <!-- Pagination -->
-    <div class="flex justify-center mt-5 space-x-2" id="pagination">
-      <% if(currentPage>1){ %>
-        <a href="/categoryView?page=<%= currentPage - 1 %>&search=<%= searchQuery %>&sort=<%= sortBy %>&fetchCategory=<%= category %>" class="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400">Previous</a>
-      <% } %>
-      <span id="page-info" class="px-4 py-2 bg-gray-100 rounded-lg">Page <%= currentPage %> of <%= totalPages %></span>
-      <% if(currentPage < totalPages){ %>
-        <a href="/categoryView?page=<%= currentPage + 1 %>&search=<%= searchQuery %>&sort=<%= sortBy %>&fetchCategory=<%= category %>" class="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400">Next</a>
-      <% } %>
+    <div class="flex gap-2 w-full md:w-auto">
+      <select class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 shadow-md" id="sortDropdown" onchange="sortProducts(this.value)">
+        <option value="">Sort</option>
+        <option value="lowToHigh" <%= sortBy === 'lowToHigh' ? 'selected' : '' %> >Price: Low to High</option>
+        <option value="highToLow" <%= sortBy === 'highToLow' ? 'selected' : '' %> >Price: High to Low</option>
+        <option value="aToZ" <%= sortBy === 'aToZ' ? 'selected' : '' %>>Name: A - Z</option>
+        <option value="zToA" <%= sortBy === 'zToA' ? 'selected' : '' %>>Name: Z - A</option>
+      </select>
     </div>
   </div>
-  
-  <script>
+
+  <!-- Product Grid -->
+  <% let category %>
+  <div id="product-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 justify-items-center">
+    <% products.forEach(product=>{ %>
+      <% category = product.category %>
+      <div class="w-full max-w-xs bg-gray-900 rounded-2xl shadow-lg hover:shadow-2xl transition-shadow duration-300 flex flex-col">
+        <a href="/productView/<%= product._id %>" class="block">
+          <div class="relative">
+            <img class="h-56 w-full object-cover object-center rounded-t-2xl" src="<%= product.image[0] %>" alt="product image" />
+            <% if (product.discountPrice < product.price) { %>
+              <span class="absolute top-3 left-3 bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow">SALE</span>
+            <% } %>
+          </div>
+        </a>
+        <div class="p-5 flex flex-col flex-1">
+          <a href="/productView/<%= product._id %>">
+            <h5 class="text-lg font-semibold tracking-tight text-white mb-2 truncate"><%= product.product_name %></h5>
+          </a>
+          <div class="flex items-center mb-3">
+            <% const totalStars = 5; %>
+            <% const filledStars = Math.round(3 || 0); %>
+            <% const emptyStars = totalStars - filledStars; %>
+            <% for (let i = 0; i < filledStars; i++) { %>
+              <span class="text-yellow-400 text-lg">★</span>
+            <% } %>
+            <% for (let i = 0; i < emptyStars; i++) { %>
+              <span class="text-gray-600 text-lg">☆</span>
+            <% } %>
+            <span class="ml-2 text-xs text-gray-400">(<%= filledStars.toFixed(1) %>)</span>
+          </div>
+          <div class="flex items-center justify-between mt-auto">
+            <div>
+              <span class="text-2xl font-bold text-green-400">₹<%= product.discountPrice %></span>
+              <span class="text-sm text-gray-400 line-through ml-2">₹<%= product.price %></span>
+            </div>
+            <button class="add-to-cart-btn flex items-center rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700 transition-colors duration-200 shadow" data-product-id="1">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.35 2.7A2 2 0 0 0 7.6 19h8.8a2 2 0 0 0 1.95-2.3L17 13M7 13V6a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v7" /></svg>
+              Buy Now
+            </button>
+          </div>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+
+  <!-- Pagination -->
+  <div class="flex justify-center mt-10">
+    <nav class="inline-flex space-x-2">
+      <% if(currentPage>1){ %>
+        <a href="/categoryView?page=<%= currentPage - 1 %>&search=<%= searchQuery %>&sort=<%= sortBy %>&fetchCategory=<%= category %>" class="px-4 py-2 bg-gray-800 text-white rounded-full hover:bg-gray-700 shadow">Previous</a>
+      <% } %>
+      <span id="page-info" class="px-4 py-2 bg-green-600 text-white rounded-full shadow">Page <%= currentPage %> of <%= totalPages %></span>
+      <% if(currentPage < totalPages){ %>
+        <a href="/categoryView?page=<%= currentPage + 1 %>&search=<%= searchQuery %>&sort=<%= sortBy %>&fetchCategory=<%= category %>" class="px-4 py-2 bg-gray-800 text-white rounded-full hover:bg-gray-700 shadow">Next</a>
+      <% } %>
+    </nav>
+  </div>
+</div>
+
+<script>
 
     document.getElementById('searchBtn').addEventListener('click',()=>{
       const query = document.getElementById('search').value.toLowerCase();

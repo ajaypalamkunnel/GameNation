@@ -1,220 +1,126 @@
 <%- include('header') %>
 <div class="bg-[#121212] p-2">
-    <ul class="flex items-center ml-6   bg-[#121212] font-[sans-serif]  ">
-      <a class="text-white  text-base cursor-pointer" href="/"><li ></li>
-        Home
-      </li></a>
-      <li>
-        <svg xmlns="http://www.w3.org/2000/svg" class="fill-gray-400 w-3.5 -rotate-90" viewBox="0 0 24 24">
-          <path fill-rule="evenodd"
-            d="M11.99997 18.1669a2.38 2.38 0 0 1-1.68266-.69733l-9.52-9.52a2.38 2.38 0 1 1 3.36532-3.36532l7.83734 7.83734 7.83734-7.83734a2.38 2.38 0 1 1 3.36532 3.36532l-9.52 9.52a2.38 2.38 0 0 1-1.68266.69734z"
-            clip-rule="evenodd" data-original="#000000"></path>
-        </svg>
-      </li>
-      <li class="text-gray-500 text-base cursor-pointer">
-        Product
-      </li>
-      <li>
-        <svg xmlns="http://www.w3.org/2000/svg" class="fill-gray-400 w-3.5 -rotate-90" viewBox="0 0 24 24">
-          <path fill-rule="evenodd"
-            d="M11.99997 18.1669a2.38 2.38 0 0 1-1.68266-.69733l-9.52-9.52a2.38 2.38 0 1 1 3.36532-3.36532l7.83734 7.83734 7.83734-7.83734a2.38 2.38 0 1 1 3.36532 3.36532l-9.52 9.52a2.38 2.38 0 0 1-1.68266.69734z"
-            clip-rule="evenodd" data-original="#000000"></path>
-        </svg>
-      </li>
-     
-    </ul>
-  </div>
-  
-  
-  <div class="bg-[#121212] min-h-screen p-5">
-    <!-- Search and Filter Section -->
-    <div class="flex justify-between items-center mb-6">
-        <div class="flex space-x-2">
-           
-            <input type="text" id="search" value="<%= returnQuery ? returnQuery : '' %>" placeholder="Search products..." class="p-2 rounded-lg w-80 focus:outline-none focus:ring-2 focus:ring-green-500" >
-
-            <button id="searchBtn" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">Search</button>
-            <button id="clearSearchBtn" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">Clear</button>
-        </div>
-        <div>
-        <select class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700" name="" id="sortDropdown" onchange="sort(this.value)">
-          <option value="">Sort</option>
-          <option value="lowToHigh">Price: Low to High</option>
-          <option value="highToLow">Price: High to Low</option>
-          <option value="aToZ">Name: A - Z</option>   <!-- A to Z sorting -->
-          <option value="zToA">Name: Z - A</option> 
-        </select>
-        <button id="filterBtn" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">Filter</button>
-        <button id="clearBtn" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">Clear Filter</button>
-      </div>
-    </div>
-
-    <!-------------------------- Filter Modal --------------------------------->
-    
-    <div id="filterModal" class="fixed inset-1 bg-gray-900  bg-opacity-75 flex justify-center items-center hidden z-50">
-  <div class="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-xl relative">
-    <button id="closeFilterModal" class="absolute top-4 right-4 text-white bg-red-500 hover:bg-red-600 p-2 rounded-full">&times;</button>
-    
-    <h2 class="text-2xl font-semibold mb-4 text-white text-center">Apply Filters</h2>
-    
-    <form id="filterForm" class="space-y-4">
-      <!-- Category -->
-      <div>
-        <label for="category" class="text-white">Category:</label>
-        <select id="category" name="category" class="w-full bg-gray-700 text-white p-2 rounded-lg">
-          <option value="">Select Category</option>
-          
-          <!-- Dynamically populated with categories from DB -->
-        </select>
-      </div>
-
-      <div>
-        <label for="minPrice" class="text-white">Min Price:</label>
-        <input type="number" id="minPrice" name="minPrice" class="w-full bg-gray-700 text-white p-2 rounded-lg">
-        <label for="maxPrice" class="text-white">Max Price:</label>
-        <input type="number" id="maxPrice" name="maxPrice" class="w-full bg-gray-700 text-white p-2 rounded-lg">
-      </div>
-
-      <button type="submit" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg w-full">Apply Filters</button>
-    </form>
-  </div>
+  <nav class="flex items-center text-sm text-gray-400 space-x-2 ml-2">
+    <a href="/" class="hover:text-green-400 flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M13 5v6h6" /></svg>
+      Home
+    </a>
+    <span>/</span>
+    <span class="text-green-400">Products</span>
+  </nav>
 </div>
 
-<!-------------------------- Filter Modal --------------------------------->
+<div class="bg-[#121212] min-h-screen p-4 md:p-8">
+  <!-- Search, Sort, Filter Bar -->
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+    <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+      <div class="flex flex-1">
+        <input type="text" id="search" value="<%= returnQuery ? returnQuery : '' %>" placeholder="Search products..." class="flex-1 p-3 rounded-l-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-500 shadow-md" />
+        <button id="searchBtn" class="bg-green-600 text-white px-4 py-2 rounded-r-lg hover:bg-green-700 shadow-md">Search</button>
+      </div>
+      <button id="clearSearchBtn" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 shadow-md">Clear</button>
+    </div>
+    <div class="flex gap-2 w-full md:w-auto">
+      <select class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 shadow-md" id="sortDropdown" onchange="sort(this.value)">
+        <option value="">Sort</option>
+        <option value="lowToHigh">Price: Low to High</option>
+        <option value="highToLow">Price: High to Low</option>
+        <option value="aToZ">Name: A - Z</option>
+        <option value="zToA">Name: Z - A</option>
+      </select>
+      <button id="filterBtn" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 shadow-md">Filter</button>
+      <button id="clearBtn" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 shadow-md">Clear Filter</button>
+    </div>
+  </div>
 
-    <!-- Product List -->
-    <div class="product-list scrollbar-hide flex flex-wrap  gap-x-4 justify-center">
-      <!-- <div class="flex flex-wrap  gap-x-4 justify-center"> -->
-        <% products.forEach(product => { %>
-
-          <div class="mb-3 w-72 rounded-lg">
-             <a href="/productView/<%= product._id %>">
-              <div class="  rounded-lg bg-white shadow-md">
-                <a href="/productView/<%= product._id %>">
-                  <!-- Product Image -->
-                  <img class="h-60 w-full object-cover object-center rounded-t-lg" src="<%= product.image[0] %>" alt="product image"/>
-                </a>
-                <div class="p-5">
-                  <!-- Product Title -->
-                  <a href="/productView/<%= product._id %>">
-                    <h5 class="text-xl font-semibold tracking-tight text-slate-900">
-                      <%= product.product_name %>
-                    </h5>
-                  </a>
-                  <!-- Discount Price -->
-                  <div id="rating" class="mt-2.5 mb-5 flex items-center">
-                    <% const totalStars = 5; %>
-                    <% const filledStars = Math.round(3 || 0); %> <!-- Round rating to nearest integer -->
-                    <% const emptyStars = totalStars - filledStars; %>
-          
-                    <% for (let i = 0; i < filledStars; i++) { %>
-                      <span class="text-yellow-500 text-xl">★</span>
-                    <% } %>
-                    <% for (let i = 0; i < emptyStars; i++) { %>
-                      <span class="text-gray-400 text-xl">☆</span>
-                    <% } %>
-          
-                    <!-- Optional: Display numeric rating beside the stars -->
-                    <span class="ml-2 text-sm text-gray-600">( <%= filledStars.toFixed(1) %> )</span>
-                  </div>
-                  <!-- Price and Add to Cart -->
-                  <a href="/productView/<%= product._id %>">
-                    <div class="flex items-center justify-between">
-                      <p>
-                        <span class="text-3xl font-bold text-slate-900">
-                          ₹<%= product.discountPrice %>
-                        </span>
-                        <span class="text-sm text-slate-900 line-through">
-                          ₹<%= product.price %>
-                        </span>
-                      </p>
-                      <button class="add-to-cart-btn flex items-center rounded-md bg-slate-900 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-gray-700" data-product-id="<%= product._id %>">
-                        Add to cart
-                    </button>
-                      
-                    </div>
-                  </a>
-                </div>
-              </div>
-            </a>
+  <!-- Filter Modal -->
+  <div id="filterModal" class="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center hidden z-50">
+    <div class="bg-gray-900 bg-opacity-95 p-8 rounded-2xl shadow-2xl w-full max-w-lg relative border border-gray-700">
+      <button id="closeFilterModal" class="absolute top-4 right-4 text-white bg-red-500 hover:bg-red-600 p-2 rounded-full text-xl">&times;</button>
+      <h2 class="text-2xl font-bold mb-6 text-white text-center tracking-wide">Apply Filters</h2>
+      <form id="filterForm" class="space-y-6">
+        <div>
+          <label for="category" class="text-white block mb-1">Category:</label>
+          <select id="category" name="category" class="w-full bg-gray-800 text-white p-3 rounded-lg border border-gray-700">
+            <option value="">Select Category</option>
+            <!-- Dynamically populated -->
+          </select>
+        </div>
+        <div class="flex gap-4">
+          <div class="flex-1">
+            <label for="minPrice" class="text-white block mb-1">Min Price:</label>
+            <input type="number" id="minPrice" name="minPrice" class="w-full bg-gray-800 text-white p-3 rounded-lg border border-gray-700" />
           </div>
-
-          
-<!-- search product display -->
-<!-- Hidden product card template -->
-<div id="product-template" class="hidden">
-  <div class="mb-3 w-72 rounded-lg product-card">
-    <a href="#" class="product-link">
-      <div class="rounded-lg bg-white shadow-md">
-        <img class="h-60 w-full object-cover object-center rounded-t-lg product-image" src="#" alt="product image" />
-        <div class="p-5">
-          <h5 class="text-xl font-semibold tracking-tight text-slate-900 product-name"></h5>
-          <div id="rating" class="mt-2.5 mb-5 flex items-center product-rating">
-            <!-- Stars go here -->
+          <div class="flex-1">
+            <label for="maxPrice" class="text-white block mb-1">Max Price:</label>
+            <input type="number" id="maxPrice" name="maxPrice" class="w-full bg-gray-800 text-white p-3 rounded-lg border border-gray-700" />
           </div>
-          <div class="flex items-center justify-between">
-            <p>
-              <span class="text-3xl font-bold text-slate-900 product-discountPrice"></span>
-              <span class="text-sm text-slate-900 line-through product-price"></span>
-            </p>
-            <button class="add-to-cart-btn flex items-center rounded-md bg-slate-900 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-gray-700" data-product-id="">
+        </div>
+        <button type="submit" class="bg-green-500 hover:bg-green-600 text-white px-4 py-3 rounded-lg w-full font-semibold shadow-md">Apply Filters</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Product Grid -->
+  <div class="product-list grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 justify-items-center">
+    <% products.forEach(product => { %>
+      <div class="w-full max-w-xs bg-gray-900 rounded-2xl shadow-lg hover:shadow-2xl transition-shadow duration-300 flex flex-col">
+        <a href="/productView/<%= product._id %>" class="block">
+          <div class="relative">
+            <img class="h-56 w-full object-cover object-center rounded-t-2xl" src="<%= product.image[0] %>" alt="product image" />
+            <% if (product.discountPrice < product.price) { %>
+              <span class="absolute top-3 left-3 bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow">SALE</span>
+            <% } %>
+          </div>
+        </a>
+        <div class="p-5 flex flex-col flex-1">
+          <a href="/productView/<%= product._id %>">
+            <h5 class="text-lg font-semibold tracking-tight text-white mb-2 truncate"><%= product.product_name %></h5>
+          </a>
+          <div class="flex items-center mb-3">
+            <% const totalStars = 5; %>
+            <% const filledStars = Math.round(3 || 0); %>
+            <% const emptyStars = totalStars - filledStars; %>
+            <% for (let i = 0; i < filledStars; i++) { %>
+              <span class="text-yellow-400 text-lg">★</span>
+            <% } %>
+            <% for (let i = 0; i < emptyStars; i++) { %>
+              <span class="text-gray-600 text-lg">☆</span>
+            <% } %>
+            <span class="ml-2 text-xs text-gray-400">(<%= filledStars.toFixed(1) %>)</span>
+          </div>
+          <div class="flex items-center justify-between mt-auto">
+            <div>
+              <span class="text-2xl font-bold text-green-400">₹<%= product.discountPrice %></span>
+              <span class="text-sm text-gray-400 line-through ml-2">₹<%= product.price %></span>
+            </div>
+            <button class="add-to-cart-btn flex items-center rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700 transition-colors duration-200 shadow" data-product-id="<%= product._id %>">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.35 2.7A2 2 0 0 0 7.6 19h8.8a2 2 0 0 0 1.95-2.3L17 13M7 13V6a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v7" /></svg>
               Add to cart
             </button>
           </div>
         </div>
       </div>
-    </a>
+    <% }) %>
+  </div>
+
+  <!-- Pagination -->
+  <div class="flex justify-center mt-10">
+    <nav class="inline-flex space-x-2">
+      <% if (currentPage > 1) { %>
+        <a href="/allProducts?page=<%= currentPage - 1 %>&limit=10&category=<%= category %>&minPrice=<%= minPrice %>&maxPrice=<%= maxPrice %>" class="px-4 py-2 bg-gray-800 text-white rounded-full hover:bg-gray-700 shadow">Previous</a>
+      <% } %>
+      <% for (let i = 1; i <= totalPages; i++) { %>
+        <a href="/allProducts?page=<%= i %>&limit=10&category=<%= category %>&minPrice=<%= minPrice %>&maxPrice=<%= maxPrice %>" class="px-4 py-2 rounded-full transition-all duration-200 <% if (i === currentPage) { %> bg-green-600 text-white shadow-lg <% } else { %> bg-gray-800 text-white hover:bg-gray-700 shadow <% } %>"><%= i %></a>
+      <% } %>
+      <% if (currentPage < totalPages) { %>
+        <a href="/allProducts?page=<%= currentPage + 1 %>&limit=10&category=<%= category %>&minPrice=<%= minPrice %>&maxPrice=<%= maxPrice %>" class="px-4 py-2 bg-gray-800 text-white rounded-full hover:bg-gray-700 shadow">Next</a>
+      <% } %>
+    </nav>
   </div>
 </div>
 
-
-        <% }) %>
-      <!-- </div> -->
-    </div>
-
-
-
-
-
-
-
-    <div class="flex justify-center mt-8">
-      <nav class="inline-flex space-x-2">
-        <% if (currentPage > 1) { %>
-          <!-- Previous Button -->
-          <a href="/allProducts?page=<%= currentPage - 1 %>&limit=10&category=<%= category %>&minPrice=<%= minPrice %>&maxPrice=<%= maxPrice %>"
-             class="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700">
-            Previous
-          </a>
-        <% } %>
-    
-        <!-- Page Numbers -->
-        <% for (let i = 1; i <= totalPages; i++) { %>
-          <a href="/allProducts?page=<%= i %>&limit=10&category=<%= category %>&minPrice=<%= minPrice %>&maxPrice=<%= maxPrice %>"
-             class="px-4 py-2 rounded <% if (i === currentPage) { %> bg-green-600 text-white <% } else { %> bg-gray-800 text-white hover:bg-gray-700 <% } %>">
-            <%= i %>
-          </a>
-        <% } %>
-    
-        <% if (currentPage < totalPages) { %>
-          <!-- Next Button -->
-          <a href="/allProducts?page=<%= currentPage + 1 %>&limit=10&category=<%= category %>&minPrice=<%= minPrice %>&maxPrice=<%= maxPrice %>"
-             class="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700">
-            Next
-          </a>
-        <% } %>
-      </nav>
-    </div>
-    
-
-
-
-
-</div>
-
-
 <script>
-
 function sort(sortValue){
   const query = document.querySelector('#search').value;
   console.log("---",query);
