@@ -101,7 +101,7 @@
   
           <!-- Buttons -->
           <div class="mt-6 flex gap-4">
-            <% if (product.stock > 0) { %>
+            <% if ((product.stock > 0) &&(product.release_date < new Date())) { %>
               <!-- Enable buttons when in stock -->
               <button onclick="addToWishList('<%= product._id %>')" class="bg-pink-500 text-white font-semibold py-2 px-6 rounded-lg hover:bg-pink-400 transition flex items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">

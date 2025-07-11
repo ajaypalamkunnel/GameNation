@@ -119,12 +119,13 @@
         onsubmit="return validateForm()"
       >
         <div style="margin-bottom: 15px">
-          <label for="categoryName" style="color: #ffffff">Category Name:</label
+          <label for="categoryName" style="color: #ffffff">Category Name</label
           ><br />
           <input
             type="text"
             id="categoryName"
             name="categoryName"
+            placeholder="Enter Category Name"
             required
             style="width: 80%; padding: 8px; border-radius: 4px; border: none"
           />
@@ -133,15 +134,16 @@
           </p>
         </div>
         <div style="margin-bottom: 15px">
-          <label for="isBlocked" style="color: #ffffff">Is Blocked:</label
+          <label for="isBlocked" style="color: #ffffff">Active</label
           ><br />
           <select
             id="isBlocked"
             name="isBlocked"
+            placeholder="Select Active or Inactive"
             style="width: 80%; padding: 8px; border-radius: 4px; border: none"
           >
-            <option value="false">False</option>
-            <option value="true">True</option>
+            <option value="true">Active</option>
+            <option value="false">Inactive</option>
           </select>
           <p id="isBlockedError" style="color: #ff0000; display: none">
             Please select if the category is blocked or not.

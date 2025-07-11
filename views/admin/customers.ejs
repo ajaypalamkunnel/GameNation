@@ -1,128 +1,114 @@
 <%- include('adminHeader') %>
-<div style="display: flex; height: 100vh">
-    <%- include('sidebar') %>
-
-    <div class="font-[sans-serif] flex-grow: 2; overflow-x-auto w-full">
-         <!-- Search box -->
-         <form class="w-full flex items-center bg-gray-800" method="GET" action="/admin/customers">
-          <input id="searchInput" type="text" name="search" class="w-3/6 mt-5 ml-4 mb-3 border rounded-lg p-2 h-8 text-sm"
-                 placeholder="Search by user name or email..." value="<%= searchQuery %>">
-          <button type="submit" class="bg-green-400 ml-4 mt-5 mb-3 text-white p-2 h-8 text-sm rounded-lg hover:bg-blue-700">Search</button>
-          <button id="clearSearchBtn" type="button" class="bg-red-400 ml-2 mt-5 mb-3 text-white p-2 h-8 text-sm rounded-lg hover:bg-red-600">Clear Search</button>
-
-        </form>
-        
-        <table class="min-w-full bg-white">
-          <thead class="whitespace-nowrap">
-            <tr>
-              
-              <th class="p-4 text-sm font-semibold text-black">
-                Name
-              </th>
-              <th class="p-4  ml-10 text-sm font-semibold text-black">
-               Email
-               
-              </th>
-              <th class="p-4 text-left text-sm font-semibold text-black">
-                Mobile
-                
-              </th>
-              <th class="p-4 text-left text-sm font-semibold text-black">
-               Block/Unblock
-              </th>
-            </tr>
-          </thead>
-  
-          <tbody class="whitespace-nowrap">
-            <% users.forEach(user=>{ %>
-            <tr class="odd:bg-blue-50">
-              <td class="pl-4 w-8">
-               
-                 <p class="text-sm text-black"><%= user.username %></p>
-              </td>
-              <td class="p-4 text-sm">
-               
-                    <p class="text-sm ml-40 text-black"><%= user.email %></p>
-                   
-                  
-                </div>
-              </td>
-              <td class="p-4 text-sm text-black">
-               <%= user.phone %>
-              </td>
-              <td class="p-4">
-                <label class="relative cursor-pointer">
-                  <input type="checkbox" class="sr-only peer" <%= user.isVerified ? 'checked' : ''%> 
-                  onchange="toggleVerification('<%= user._id %>',this.checked)"
-                  />
-                  <div
-                    class="w-11 h-6 flex items-center bg-gray-300 rounded-full peer peer-checked:after:translate-x-full after:absolute after:left-[2px] peer-checked:after:border-white after:bg-white after:border after:border-gray-300 after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#007bff]">
-                  </div>
-                </label>
-              </td>
-              <td class="p-4">
-               
-               
-              </td>
-            </tr>
-            <% }) %>
-            
-          </tbody>
-        </table>
-  <!-- Pagination Controls -->
-  <div class="flex mt-5 space-x-2">
-    <% if(currentPage > 1){ %>
-      <a href="?page=<%= currentPage - 1 %>&limit=<%= limit %>&search=<%= searchQuery %>" class="p-2 bg-blue-100 text-gray-500 rounded">Previous</a>
-    <% } %>
-    <% for (let i = 1; i <= totalPages; i++) { %>
-      <a href="?page=<%= i %>&limit=<%= limit %>&search=<%= searchQuery %>" class="p-2 <%= i === currentPage ? 'bg-[#007bff] text-white' : 'bg-blue-100 text-gray-500' %> rounded">
-        <%= i %>
-      </a>
-    <% } %>
-    <% if (currentPage < totalPages) { %>
-      <a href="?page=<%= currentPage + 1 %>&limit=<%= limit %>&search=<%= searchQuery %>" class="p-2 bg-blue-100 text-gray-500 rounded">Next</a>
-    <% } %>
-  </div>
-  
-      </div>
-
+<div class="flex flex-col md:flex-row min-h-screen bg-gray-900">
+  <%- include('sidebar') %>
+  <main class="flex-1 p-4 md:p-8">
+    <section class="mb-6">
+      <h1 class="text-2xl font-bold text-white mb-2">Customers</h1>
+      <p class="text-gray-300 mb-4">Manage your customers efficiently. Search, view, and update their status easily.</p>
+      <form class="flex flex-col sm:flex-row items-center gap-2 bg-gray-800 rounded-lg shadow p-4" method="GET" action="/admin/customers">
+        <input id="searchInput" type="text" name="search" class="flex-1 border border-gray-700 bg-gray-900 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder-gray-400" placeholder="Search by user name or email..." value="<%= searchQuery %>">
+        <div class="flex gap-2 w-full sm:w-auto">
+          <button type="submit" class="bg-blue-900 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-bold shadow transition">Search</button>
+          <button id="clearSearchBtn" type="button" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow transition">Clear</button>
+        </div>
+      </form>
+    </section>
+    <section class="overflow-x-auto bg-gray-800 rounded-lg shadow">
+      <table class="min-w-full divide-y divide-gray-700">
+        <thead class="bg-gray-900">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Name</th>
+            <th class="px-6 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Email</th>
+            <th class="px-6 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Mobile</th>
+            <th class="px-6 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Status</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-700">
+          <% users.forEach(user=>{ %>
+          <tr class="hover:bg-gray-700 transition">
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-white font-semibold"><%= user.username %></td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-white font-semibold"><%= user.email %></td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-white font-semibold"><%= user.phone %></td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center gap-4">
+                <span class="text-sm font-semibold <%= user.isVerified ? 'text-green-400' : 'text-red-400' %>">
+                  <%= user.isVerified ? 'Active' : 'Blocked' %>
+                </span>
+                <button
+                  type="button"
+                  class="flex items-center gap-2 px-4 py-1.5 rounded-md text-sm font-bold transition
+                    <%= user.isVerified
+                      ? 'bg-green-600 hover:bg-green-700 text-white'
+                      : 'bg-red-600 hover:bg-red-700 text-white' %>"
+                  onclick="toggleVerification('<%= user._id %>', <%= !user.isVerified %>)"
+                  aria-label="<%= user.isVerified ? 'Block user' : 'Activate user' %>"
+                  title="<%= user.isVerified ? 'Block user' : 'Activate user' %>"
+                >
+                  <% if (user.isVerified) { %>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 fill-white" viewBox="0 0 20 20"><path d="M10 2a6 6 0 0 0-6 6v2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2V8a6 6 0 0 0-6-6zm0 2a4 4 0 0 1 4 4v2H6V8a4 4 0 0 1 4-4zm-6 8h12v4H4v-4z"/></svg>
+                    Block
+                  <% } else { %>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 fill-white" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 0 0-1.414 0L9 11.586 6.707 9.293a1 1 0 0 0-1.414 1.414l3 3a1 1 0 0 0 1.414 0l7-7a1 1 0 0 0-1.414-1.414z"/></svg>
+                    Activate
+                  <% } %>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </section>
+    <!-- Pagination Controls -->
+    <div class="flex flex-wrap justify-center items-center gap-2 mt-6">
+      <% if(currentPage > 1){ %>
+        <a href="?page=<%= currentPage - 1 %>&limit=<%= limit %>&search=<%= searchQuery %>" class="px-3 py-1 bg-gray-700 text-white rounded hover:bg-blue-900 font-bold transition">Previous</a>
+      <% } %>
+      <% for (let i = 1; i <= totalPages; i++) { %>
+        <a href="?page=<%= i %>&limit=<%= limit %>&search=<%= searchQuery %>" class="px-3 py-1 rounded <%= i === currentPage ? 'bg-blue-900 text-white font-bold' : 'bg-gray-700 text-white hover:bg-blue-900' %> transition">
+          <%= i %>
+        </a>
+      <% } %>
+      <% if (currentPage < totalPages) { %>
+        <a href="?page=<%= currentPage + 1 %>&limit=<%= limit %>&search=<%= searchQuery %>" class="px-3 py-1 bg-gray-700 text-white rounded hover:bg-blue-900 font-bold transition">Next</a>
+      <% } %>
+    </div>
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 hidden px-6 py-4 rounded-lg font-bold text-white shadow-lg"></div>
+  </main>
 </div>
-
-
 <script>
-
+  function showToast(message, type = 'success') {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.className = `fixed bottom-6 right-6 z-50 px-6 py-4 rounded-lg font-bold text-white shadow-lg ${type === 'success' ? 'bg-green-700' : 'bg-red-700'}`;
+    toast.style.display = 'block';
+    setTimeout(() => {
+      toast.style.display = 'none';
+    }, 2000);
+  }
   async function toggleVerification(userId,isChecked){
     try {
-
       const response = await fetch('/admin/toggleVerification',{
         method:'POST',
         headers:{
-          'content-Type':'application/json',
+          'Content-Type':'application/json',
         },
         body:JSON.stringify({userId,isVerified:isChecked})
       });
-
       if(response.ok){
-        console.log('verifcation is updated succesfully');
-        console.log(response);
-        
-        
+        showToast('User status updated successfully', 'success');
+        setTimeout(()=>{ window.location.reload(); }, 1200);
       }else{
-        console.error('Failed to update verification status');
+        showToast('Failed to update user status', 'error');
       }
-      
     } catch (error) {
-      console.error('Error:', error);
-      
+      showToast('Error updating user status', 'error');
     }
   }
-
   document.getElementById('clearSearchBtn').addEventListener('click',function(){
     document.getElementById('searchInput').value = '';
     window.location.href = '/admin/customers';
   })
-
-
-
 </script>
 

@@ -556,6 +556,14 @@ export const updateCategory = async (req, res) => {
   const { name, isBlocked } = req.body;
 
   try {
+
+    const existingCategory = await category.findOne({
+      collectionName: name.trim().toLowerCase().replace(/\s+/g, ""),
+    });
+    if (existingCategory) {
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({ message: "Category already exists" });
+    }
+
     const result = await category.findByIdAndUpdate(
       id,
       { collectionName: name, isActive: isBlocked },
