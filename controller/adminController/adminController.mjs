@@ -533,21 +533,46 @@ export const addCategoryPost = async (req, res) => {
 
 export const categoryView = async (req, res) => {
   try {
-    // Fetch all categories from the database
-    const categories = await category.find({});
-
-    // Render the view and pass the categories data
-
+    const searchQuery = req.query.search || "";
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const skip = (page - 1) * limit;
+    const searchFilter = searchQuery
+      ? { collectionName: { $regex: searchQuery, $options: "i" } }
+      : {};
+    const categories = await category.find(searchFilter).skip(skip).limit(limit);
+    const totalCategories = await category.countDocuments(searchFilter);
+    const totalPages = Math.ceil(totalCategories / limit);
+    // Support AJAX/JSON requests for pagination
+    if (
+      req.xhr ||
+      req.headers["content-type"] === "application/json" ||
+      (req.headers.accept && req.headers.accept.indexOf("json") > -1)
+    ) {
+      return res.json({
+        categories,
+        currentPage: page,
+        totalPages: totalPages,
+        limit: limit,
+        searchQuery,
+        totalRecordsCount: totalCategories,
+      });
+    }
     res.render("admin/category", {
       title: "Category",
       admin: req.session.admin,
       categories,
+      currentPage: page,
+      totalPages: totalPages,
+      limit: limit,
+      searchQuery,
+      totalRecordsCount: totalCategories,
     });
   } catch (error) {
     console.error("Error fetching categories:", error);
     res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send("Internal Server Error");
   }
-};
+}
 
 //----------------------------category update -------------------------------------
 
@@ -587,36 +612,43 @@ export const updateCategory = async (req, res) => {
 
 export const customers = async (req, res) => {
   try {
-    
       const searchQuery = req.query.search || "";
-
       const page = parseInt(req.query.page) || 1;
       const limit = parseInt(req.query.limit) || 5;
-
       const skip = (page - 1) * limit;
-
       const searchFilter = {
         $or: [
           { username: { $regex: searchQuery, $options: "i" } },
           { email: { $regex: searchQuery, $options: "i" } },
         ],
       };
-
       const users = await User.find(searchFilter).skip(skip).limit(limit);
-
-      const totalUsers = await User.countDocuments({});
-
+      const totalUsers = await User.countDocuments(searchFilter); // count only filtered users
       const totalPages = Math.ceil(totalUsers / limit);
+      // Support AJAX/JSON requests for pagination
+      if (
+        req.xhr ||
+        req.headers["content-type"] === "application/json" ||
+        (req.headers.accept && req.headers.accept.indexOf("json") > -1)
+      ) {
+        return res.json({
+          users,
+          currentPage: page,
+          totalPages: totalPages,
+          limit: limit,
+          searchQuery,
+          totalRecordsCount: totalUsers,
+        });
+      }
       res.render("admin/customers", {
         title: "customers",
         users,
-        users: users,
         currentPage: page,
         totalPages: totalPages,
         limit: limit,
         searchQuery,
+        totalRecordsCount: totalUsers, // <-- add this line
       });
-   
   } catch (error) {
     console.log(`error while rendering add customers ${error} `);
   }

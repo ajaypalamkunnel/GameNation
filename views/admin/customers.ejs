@@ -60,23 +60,23 @@
       </table>
     </section>
     <!-- Pagination Controls -->
-    <div class="flex flex-wrap justify-center items-center gap-2 mt-6">
-      <% if(currentPage > 1){ %>
-        <a href="?page=<%= currentPage - 1 %>&limit=<%= limit %>&search=<%= searchQuery %>" class="px-3 py-1 bg-gray-700 text-white rounded hover:bg-blue-900 font-bold transition">Previous</a>
-      <% } %>
-      <% for (let i = 1; i <= totalPages; i++) { %>
-        <a href="?page=<%= i %>&limit=<%= limit %>&search=<%= searchQuery %>" class="px-3 py-1 rounded <%= i === currentPage ? 'bg-blue-900 text-white font-bold' : 'bg-gray-700 text-white hover:bg-blue-900' %> transition">
-          <%= i %>
-        </a>
-      <% } %>
-      <% if (currentPage < totalPages) { %>
-        <a href="?page=<%= currentPage + 1 %>&limit=<%= limit %>&search=<%= searchQuery %>" class="px-3 py-1 bg-gray-700 text-white rounded hover:bg-blue-900 font-bold transition">Next</a>
-      <% } %>
+    <div class="flex justify-between items-center mt-6">
+      <div class="text-sm text-gray-400">
+        Showing <span class="font-medium" id="currentPage"><%= currentPage %></span> to <span class="font-medium" id="totalPages"><%= totalPages %></span> of <span class="font-medium" id="totalRecords"><%= totalRecordsCount %></span> results
+      </div>
+      <div class="inline-flex">
+        <button id="prevPage" class="px-3 py-1 rounded-l-md bg-gray-700 text-gray-400 hover:bg-gray-600">Previous</button>
+        <button id="nextPage" class="px-3 py-1 rounded-r-md bg-gray-700 text-gray-400 hover:bg-gray-600">Next</button>
+      </div>
     </div>
     <!-- Toast Notification -->
     <div id="toast" class="fixed bottom-6 right-6 z-50 hidden px-6 py-4 rounded-lg font-bold text-white shadow-lg"></div>
   </main>
 </div>
+<script>
+  // Make limit available as a global JS variable
+  window.CUSTOMER_LIMIT = <%- limit %>;
+</script>
 <script>
   function showToast(message, type = 'success') {
     const toast = document.getElementById('toast');
@@ -110,5 +110,80 @@
     document.getElementById('searchInput').value = '';
     window.location.href = '/admin/customers';
   })
+
+  // --- Pagination logic like salesReport ---
+  let currentPage = parseInt(document.getElementById('currentPage').innerText);
+  let totalPages = parseInt(document.getElementById('totalPages').innerText);
+  let totalRecords = parseInt(document.getElementById('totalRecords').innerText);
+  let searchQuery = document.getElementById('searchInput').value;
+  const limit = window.CUSTOMER_LIMIT;
+
+  function fetchCustomers(page, search = '') {
+    const url = `/admin/customers?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}`;
+    fetch(url, { headers: { 'Accept': 'application/json' } })
+      .then(response => {
+        if (!response.ok) throw new Error(`Server error: ${response.status}`);
+        return response.json();
+      })
+      .then(data => {
+        updateCustomerTable(data.users);
+        updatePagination(data.currentPage, data.totalPages, data.totalRecordsCount);
+      })
+      .catch(error => console.error('Error fetching customers:', error));
+  }
+
+  function updateCustomerTable(users) {
+    const tBody = document.querySelector('tbody');
+    tBody.innerHTML = '';
+    users.forEach(user => {
+      const row = document.createElement('tr');
+      row.className = 'hover:bg-gray-700 transition';
+      row.innerHTML =
+        '<td class="px-6 py-4 whitespace-nowrap text-sm text-white font-semibold">' + user.username + '</td>' +
+        '<td class="px-6 py-4 whitespace-nowrap text-sm text-white font-semibold">' + user.email + '</td>' +
+        '<td class="px-6 py-4 whitespace-nowrap text-sm text-white font-semibold">' + user.phone + '</td>' +
+        '<td class="px-6 py-4 whitespace-nowrap">' +
+          '<div class="flex items-center gap-4">' +
+            '<span class="text-sm font-semibold ' + (user.isVerified ? 'text-green-400' : 'text-red-400') + '">' +
+              (user.isVerified ? 'Active' : 'Blocked') +
+            '</span>' +
+            '<button type="button" class="flex items-center gap-2 px-4 py-1.5 rounded-md text-sm font-bold transition ' + (user.isVerified ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-red-600 hover:bg-red-700 text-white') + '" ' +
+              'onclick="toggleVerification(\'' + user._id + '\', ' + (!user.isVerified) + ')" ' +
+              'aria-label="' + (user.isVerified ? 'Block user' : 'Activate user') + '" ' +
+              'title="' + (user.isVerified ? 'Block user' : 'Activate user') + '">' +
+              (user.isVerified
+                ? '<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 fill-white" viewBox="0 0 20 20"><path d="M10 2a6 6 0 0 0-6 6v2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2V8a6 6 0 0 0-6-6zm0 2a4 4 0 0 1 4 4v2H6V8a4 4 0 0 1 4-4zm-6 8h12v4H4v-4z"/></svg> Block'
+                : '<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 fill-white" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 0 0-1.414 0L9 11.586 6.707 9.293a1 1 0 0 0-1.414 1.414l3 3a1 1 0 0 0 1.414 0l7-7a1 1 0 0 0-1.414-1.414z"/></svg> Activate') +
+            '</button>' +
+          '</div>' +
+        '</td>';
+      tBody.appendChild(row);
+    });
+  }
+
+  function updatePagination(current, total, totalRecordsCount) {
+    currentPage = current;
+    totalPages = total;
+    document.getElementById('currentPage').innerText = current;
+    document.getElementById('totalPages').innerText = total;
+    document.getElementById('totalRecords').innerText = totalRecordsCount;
+    document.getElementById('prevPage').disabled = currentPage === 1;
+    document.getElementById('nextPage').disabled = currentPage === totalPages;
+  }
+
+  document.getElementById('prevPage').addEventListener('click', function () {
+    if (currentPage > 1) {
+      fetchCustomers(currentPage - 1, searchQuery);
+    }
+  });
+  document.getElementById('nextPage').addEventListener('click', function () {
+    if (currentPage < totalPages) {
+      fetchCustomers(currentPage + 1, searchQuery);
+    }
+  });
+  // Optionally, update searchQuery on input change
+  document.getElementById('searchInput').addEventListener('input', function(e) {
+    searchQuery = e.target.value;
+  });
 </script>
 
