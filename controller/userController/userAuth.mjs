@@ -7,6 +7,8 @@ import { title } from "process";
 import category from "../../model/categoryScehema.mjs";
 import { log } from "console";
 import HTTP_STATUS from "../../constants/statusCodes.mjs";
+import dotenv from 'dotenv';
+dotenv.config();
 //---------------------- user signup get request ---------------------- 
 
 export const getSignUp = (req,res)=>{
@@ -40,9 +42,10 @@ async function sendOtpEmail(email,otp){
     const transporter = nodemailer.createTransport({
             service:'Gmail',
             auth:{
-                user:'gamenationproject@gmail.com',
-                pass: 'cjhu vavt wglz yrzp'
-            }
+                user: process.env.NODEMAILER_USER,
+                pass: process.env.NODEMAILER_PASS
+            },
+            
         });
 
 
