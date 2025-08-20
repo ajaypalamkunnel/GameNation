@@ -510,8 +510,8 @@ export const addCategoryPost = async (req, res) => {
     });
 
     if (existingCategory) {
-      req.flash("error", "category already exist");
-      return res.redirect("/admin/addCategory?success=false");
+      req.flash("error", "Category already exists.");
+      return res.redirect("/admin/addCategory");
     }
 
     const newCategory = new category({
@@ -521,11 +521,11 @@ export const addCategoryPost = async (req, res) => {
 
     await newCategory.save();
     req.flash("success", "Category added successfully!");
-    return res.redirect("addCategory/?success=true");
+    return res.redirect("/admin/addCategory");
   } catch (error) {
     console.log("Error adding category:", error);
-
-    res.redirect("/addCategory?success=false");
+    req.flash("error", "Failed to add category. Please try again.");
+    return res.redirect("/admin/addCategory");
   }
 };
 
@@ -581,17 +581,22 @@ export const updateCategory = async (req, res) => {
   const { name, isBlocked } = req.body;
 
   try {
-
-    const existingCategory = await category.findOne({
-      collectionName: name.trim().toLowerCase().replace(/\s+/g, ""),
+    const normalizedName = name.trim().toLowerCase().replace(/\s+/g, "");
+    const existsWithName = await category.findOne({
+      collectionName: normalizedName,
+      _id: { $ne: id },
     });
-    if (existingCategory) {
-      return res.status(HTTP_STATUS.BAD_REQUEST).json({ message: "Category already exists" });
+    if (existsWithName) {
+      return res
+        .status(HTTP_STATUS.BAD_REQUEST)
+        .json({ message: "Category already exists" });
     }
+
+    const isActiveBoolean = isBlocked === true || isBlocked === "true";
 
     const result = await category.findByIdAndUpdate(
       id,
-      { collectionName: name, isActive: isBlocked },
+      { collectionName: normalizedName, isActive: isActiveBoolean },
       { new: true }
     );
 
